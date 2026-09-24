@@ -1,0 +1,13 @@
+{
+  "source": "vd_school_holidays_2023_31",
+  "authority_level": "cantonal",
+  "authority": "Canton of Vaud",
+  "url": "https://www.vd.ch/fileadmin/user_upload/themes/formation/Vacances_scolaires/def_calendrier_vacances_scolaires_2023_2031.pdf",
+  "crawled_at": "2026-09-24T14:49:42.137402+00:00",
+  "markdown": "Ce QR code permet d’ajouter toutes les dates \n              des vacances scolaires vaudoises dans votre agenda.  vd.ch/vacances \n  \nVacances scolaires vaudoises \n 2022-2023 2023-2024 2024-2025 2025-2026 2026-2027 2027-2028 2028-2029 2029-2030 2030-2031 \nRentrée scolaire 22 août 21 août 19 août 18 août 17 août 23 août 21 août 20 août 26 août \nLundi du \nJeûne fédéral \n19 septembre 18 septembre 16 septembre 22 septembre 21 septembre 20 septembre 18 septembre 17 septembre 16 septembre \nVacances \nd’automne \n15 au 30 octobre 14 au 29 octobre 12 au 27 octobre 11 au 26 octobre 10 au 25 octobre 9 au 24 octobre 14 au 29 octobre 13 au 28 octobre 12 au 27 octobre \nVacances d’hiver 24 décembre 2022 \nau 8 janvier 2023 \n23 décembre 2023 \nau 7 janvier 2024 \n21 décembre 2024 \nau 5 janvier 2025 \n20 décembre 2025 \nau 4 janvier 2026 \n24 décembre 2026 \nau 10 janvier 2027 \n24 décembre 2027 \nau 9 janvier 2028 \n23 décembre 2028 \nau 7 janvier 2029 \n22 décembre 2029 \nau 6 janvier 2030 \n21 décembre 2030 \nau 5 janvier 2031 \nRelâches 11 au 19 février 10 au 18 février 15 au 23 février 14 au 22 février 6 au 14 février 12 au 20 février 10 au 18 février 16 au 24 février 15 au 23 février \nVacances \nde Pâques \n7 au 23 avril 29 mars au \n14 avril 12 au 27 avril 3 au 19 avril 26 mars au \n11 avril 14 au 30 avril 30 mars au \n15 avril 19 avril au 5 mai 11 au 27 avril \nPont de l’Ascension \n(je/ve) \n18 et 19 mai 9 et 10 mai 29 et 30 mai 14 et 15 mai 6 et 7 mai 25 et 26 mai 10 et 11 mai 30 et 31 mai 22 et 23 mai \nLundi de \nPentecôte \n29 mai 20 mai 9 juin 25 mai 17 mai 5 juin 21 mai 10 juin 2 juin \nFin de \nl’année scolaire \n30 juin 28 juin 27 juin 26 juin 2 juillet 30 juin 29 juin 5 juillet 4 juillet \nVacances d’été 1er juillet au \n20 août \n29 juin au \n18 août \n28 juin au \n17 août \n27 juin au \n16 août \n3 juillet au \n22 août \n1er juillet au \n20 août \n30 juin au \n19 août \n6 juillet au \n25 août \n5 juillet au \n24 août",
+  "metadata": {
+    "source_url": "https://www.vd.ch/fileadmin/user_upload/themes/formation/Vacances_scolaires/def_calendrier_vacances_scolaires_2023_2031.pdf",
+    "status_code": 200,
+    "content_type": "application/pdf"
+  }
+}
