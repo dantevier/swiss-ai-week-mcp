@@ -9,13 +9,14 @@ from src.mcp_boilerplate.tools.school_holiday_tools import swiss_school_holidays
 
 
 def call(*args, **kwargs):
-    return asyncio.run(swiss_school_holidays(*args, **kwargs))
+    return asyncio.run(swiss_school_holidays(*args, **kwargs)).structured_content
 
 
 def test_registration_and_invalid_arguments(monkeypatch):
     tool = asyncio.run(mcp.get_tool("swiss_school_holidays"))
     assert tool is not None
     assert "OpenHolidays" in tool.description
+    assert tool.annotations.read_only_hint is True
     assert all(
         name in tool.parameters["properties"]
         for name in ("canton", "school_year", "holiday_type", "municipality")
@@ -68,6 +69,9 @@ def test_lookup_keeps_school_types_and_filters_name(monkeypatch):
     assert "subdivisionCode=CH-BE" in urls[0]
     assert result["source"]["license"] == "CC BY 4.0"
     assert call("BE", 2026, "summer")["status"] == "no_data"
+    text = asyncio.run(swiss_school_holidays("BE", 2026, "autumn")).content[0].text
+    assert "05 Oct 2026 – 17 Oct 2026: Autumn holidays" in text
+    assert "Source: OpenHolidays (CC BY 4.0)" in text
 
 
 def test_local_variation_needs_municipality_and_scopes_result(monkeypatch):

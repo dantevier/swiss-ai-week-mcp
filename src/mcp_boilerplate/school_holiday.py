@@ -204,3 +204,22 @@ class SchoolHolidayService:
                 "Zurich schools set some dates locally; OpenHolidays may omit local sport holidays and school-free days. Confirm with the school."
             )
         return result
+
+    def format_result(self, result: dict) -> str:
+        """Present the structured response as a readable school-holiday list."""
+        if result["status"] != "answered":
+            return result.get("message", "No matching school holidays found.")
+
+        scope = result["scope"]
+        lines = [f"School holidays for {scope['name']} ({result['school_year']})"]
+        for holiday in result["holidays"]:
+            start = datetime.fromisoformat(holiday["start_date"]).strftime("%d %b %Y")
+            end = datetime.fromisoformat(holiday["end_date"]).strftime("%d %b %Y")
+            types = ", ".join(holiday["school_types"])
+            detail = f"; school types: {types}" if types else ""
+            lines.append(f"- {start} – {end}: {holiday['name']} ({holiday['scope']} scope{detail})")
+        lines.append(f"Requested scope: {scope['level']} {scope['name']} ({scope['code']})")
+        if result.get("coverage_note"):
+            lines.append(result["coverage_note"])
+        lines.append(f"Source: OpenHolidays (CC BY 4.0) — {result['source']['query_url']}")
+        return "\n".join(lines)
