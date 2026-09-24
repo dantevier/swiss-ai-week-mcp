@@ -187,11 +187,13 @@ Two different things share the word "source" here, and they don't overlap:
 `src/mcp_boilerplate/zefix/sources/` holds the **live API clients**
 (`LindasClient`, `ZefixClient`, `GazetteClient`) that `company_info` calls
 fresh on every request and stores nothing; `src/mcp_boilerplate/sources.py`
-is the **registry of reviewed authorities** — pages the crawler and
-`get_source` are restricted to, in `SOURCES`, and the four API endpoints
-`company_info` is allowed to call, in `API_SOURCES` (used for the egress
-allow-list). Nothing in `SOURCES` is fetched until a `crawl_*_sources` call
-asks for it, and the result is saved, not proxied.
+is the **single registry of reviewed authorities**, `SOURCES`, whose rows
+come in two kinds: `Source` pages, which the crawler and `get_source` are
+restricted to, and `ApiSource` APIs (`zefix_lindas`, `zefix_web`, `gazette`),
+which `company_info` calls live. `API_SOURCES` is the view of the API rows and
+feeds the egress allow-list; the crawler, the knowledge base and the dashboard
+skip API rows. A page is fetched only when a `crawl_*_sources` call asks for
+it, and the result is saved, not proxied.
 
 ### Commercial register (`zefix/sources/`)
 
@@ -268,7 +270,7 @@ every request (including redirects). The allow-list is derived from
 The crawler has no `RESPECT_ROBOTS_TXT`-equivalent setting; it is compliant
 by construction instead. `check_url()` in `src/mcp_boilerplate/crawler.py`
 rejects any URL — including a redirect target — that is not exactly one of
-the 13 URLs in `sources.py`; `crawl_*_sources` and `get_source` take a
+the 13 page URLs in `sources.py`; `crawl_*_sources` and `get_source` take a
 source name, never a URL, so no tool call can reach an arbitrary or
 user-supplied page. Direct and PDF fetches identify themselves with a fixed
 `User-Agent: swiss-ai-week-mcp/0.1`. Each of the 13 URLs was reviewed by

@@ -11,7 +11,7 @@ PR #7 ships `company_info` as a 915-line module under `tools/`, a 539-line `enve
 | D1 | `tools/company_info.py` keeps only the MCP surface: signature, docstring, `@mcp.tool`, one delegate call. Everything else lives in one package, `mcp_boilerplate/zefix/`. |
 | D2 | Orchestrator `CompanyLookup` in `zefix/lookup.py`, constructor-injected clients and config, mirroring `Crawler(web_fetcher, pdf_fetcher, database, embedder)`. |
 | D3 | The three source clients live in `zefix/sources/` (moved from `zefix_sources/` with `git mv`) and become classes (`LindasClient`, `ZefixClient`, `GazetteClient`) whose constructors take config with defaults from `settings`. Method names and pure helpers keep their vendored names. |
-| D4 | `sources.py` gains `ApiSource` and `API_SOURCES` for Zefix/LINDAS and the gazette. The egress allow-list and the citation authority derive from it. Zefix is not added to `SOURCES` (F5). |
+| D4 | `sources.py` gains `ApiSource`; Zefix/LINDAS and the gazette are `ApiSource` rows of `SOURCES["federal"]` (`zefix_lindas`, `zefix_web`, `gazette`), so `SOURCES` is the one registry. `API_SOURCES` is the derived view of every `ApiSource` row; the egress allow-list and the citation authority derive from it. Page consumers select `Source` rows only (F5). |
 | D5 | Step-0 gates (persons, jurisdiction, analytics, topic) move to `zefix/gates.py`, pure functions, one `classify()` entry point. `envelope.py` moves to `zefix/envelope.py` unchanged. |
 | D6 | Behaviour freeze: every envelope produced from the existing fixtures is identical before and after. Tests move with the code; assertions do not change. |
 | D7 | `origin/main` is merged into `victor-dev` before the refactor starts (F9). |
@@ -25,7 +25,7 @@ PR #7 ships `company_info` as a 915-line module under `tools/`, a 539-line `enve
 | F2 | Registration form differs. `main` uses the `@mcp.tool` decorator. `company_info.py` ends with `company_info_tool = mcp.tool(company_info, name="company_info")` so tests can await the undecorated function. Once logic lives in `CompanyLookup`, tests target that and the decorator form works. |
 | F3 | The crawler pattern is: domain module at package root, orchestrator class with constructor-injected collaborators, collaborators as small classes with one async method, thin tools. `tests/test_crawler.py` injects fakes: `Crawler(fetcher, fetcher, db, FakeEmbedder())`. `company_info` reaches its collaborators as module globals (`lindas.find_by_uid`, `zefix.firm_detail`, `settings`); tests monkeypatch them through `conftest.patch_sources` and a `settings_override` fixture. |
 | F4 | Two allow-lists. `crawler.check_url` validates every request and redirect against `sources.SOURCES`. `zefix_sources/http.py` validates every request and redirect against `settings.allowed_hosts`. Same guarantee, two registries; `sources.py` does not know Zefix, LINDAS or the gazette exist. |
-| F5 | `SOURCES` is consumed by `crawler.check_url`, `Crawler.crawl` (`source="all"` iterates every entry of a level), `KnowledgeBase.get`/validation, and `test_crawler.py`. A `Source` row for Zefix would be crawled by `crawl_federal_sources()` and resolvable through `get_source`; the SPARQL endpoint is not a page. Zefix needs a registry entry of a different kind, not a `SOURCES` row. |
+| F5 | `SOURCES` is consumed by `crawler.check_url`, `Crawler.crawl` (`source="all"` iterates a level), `KnowledgeBase.get`/validation, the dashboard status and refresh endpoints, and `test_crawler.py`. A SPARQL endpoint is not a page, so a Zefix row must never be crawled, allowed by `check_url`, resolved by `get_source` or listed as a crawled source. Zefix is therefore a row of a different kind (`ApiSource`), and every page consumer reads only the `Source` rows of a level (`sources.pages(level)`); an API name is reported exactly like an unknown source. |
 | F6 | Status vocabulary. `BaseKnowledge/CONTRACT.md` §5 defines `answered`, `need_info`, `out_of_scope`, `source_unavailable`, `no_match`. `company_info` conforms. `main`'s bfs/geo/opendata/weather/health tools use `answered`, `no_data`, `not_found`, `invalid_input`, `source_unavailable`. The debt is on `main`, out of scope here (Q2). |
 | F7 | HTTP stacks. `main`'s newer tools use stdlib `urllib` through `tools/_public_api.py`; the crawler uses `urllib` plus the MCP httpx client; `zefix_sources` uses async httpx. httpx is already a transitive dependency of `fastmcp`. Rewriting 1,271 vendored lines onto `urllib` buys nothing (N2). |
 | F8 | Config. `main` tools use module constants; the crawler reads `.env` directly; PR #7 adds 13 pydantic settings fields. Endpoints, credentials, the compliance switch and budgets are legitimate runtime config and stay. `allowed_hosts` duplicates what the source registry should own (D4). |
@@ -40,7 +40,7 @@ Goals:
 
 - G1 `tools/company_info.py` is ≤ 100 lines: docstring, `@mcp.tool`, one call into `CompanyLookup`.
 - G2 All company logic sits in the `zefix/` package and is testable with injected fakes, no `monkeypatch.setattr` on modules or settings.
-- G3 `sources.py` is the single registry of reviewed authorities, pages and APIs alike; the egress allow-list is derived from it.
+- G3 `SOURCES` in `sources.py` is the single registry of reviewed authorities: `Source` pages (crawled and saved) and `ApiSource` APIs (called live by `company_info`). Page consumers filter by kind; `API_SOURCES` and the egress allow-list are derived from it.
 - G4 Zero behaviour change (D6). The 76 offline tests and 3 live tests pass; new tests cover registration and the registry.
 - G5 `victor-dev` contains `origin/main` (D7) and `tools/__init__.py` registers all seven tool modules.
 
@@ -56,7 +56,7 @@ Non-goals:
 
 ```
 src/mcp_boilerplate/
-  sources.py              SOURCES (unchanged) + ApiSource + API_SOURCES: zefix_lindas, zefix_web, gazette
+  sources.py              SOURCES: Source pages + ApiSource rows zefix_lindas, zefix_web, gazette; pages(); API_SOURCES view
   zefix/                  NEW package: everything company_info needs except the MCP surface
     __init__.py           exports CompanyLookup
     gates.py              NEW  step-0 classification, pure: classify(question, uid, canton) -> reason | None
@@ -109,26 +109,34 @@ class ApiSource:
     authority: str
     terms: str                  # licence / terms sentence used in README attribution
 
-API_SOURCES: dict[str, ApiSource] = {
-    "zefix_lindas": ApiSource(
-        "https://lindas.admin.ch/query",
-        ("lindas.admin.ch", "register.ld.admin.ch"),
-        "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
-        "LINDAS: open use, provide the source. Not legally binding.",
-    ),
-    "zefix_web": ApiSource(
-        "https://www.zefix.admin.ch/ZefixREST/api/v1",
-        ("www.zefix.admin.ch",),
-        "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
-        "Undocumented web endpoint; called only when RESPECT_ROBOTS_TXT=false or credentials are set.",
-    ),
-    "gazette": ApiSource(
-        "https://amtsblattportal.ch/api/v1",
-        ("amtsblattportal.ch",),
-        "Schweizerisches Handelsamtsblatt (SHAB), SECO",
-        "The signed PDF is the binding version.",
-    ),
+SOURCES: dict[str, dict[str, Source | ApiSource]] = {
+    "federal": {
+        "zefix_lindas": ApiSource(
+            "https://lindas.admin.ch/query",
+            ("lindas.admin.ch", "register.ld.admin.ch"),
+            "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
+            "LINDAS: open use, provide the source. Not legally binding.",
+        ),
+        "zefix_web": ApiSource(
+            "https://www.zefix.admin.ch/ZefixREST/api/v1",
+            ("www.zefix.admin.ch",),
+            "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
+            "Undocumented web endpoint; called only when RESPECT_ROBOTS_TXT=false or credentials are set.",
+        ),
+        "gazette": ApiSource(
+            "https://amtsblattportal.ch/api/v1",
+            ("amtsblattportal.ch",),
+            "Schweizerisches Handelsamtsblatt (SHAB), SECO",
+            "The signed PDF is the binding version.",
+        ),
+        # ... Source page rows
+    },
+    # "cantonal", "municipal": Source page rows
 }
+
+def pages(level: str) -> dict[str, Source]: ...   # the Source rows of a level; crawler, knowledge base, dashboard
+
+API_SOURCES: dict[str, ApiSource]   # every ApiSource row of SOURCES, keyed by name
 
 def api_hosts() -> frozenset[str]: ...   # union of API_SOURCES[*].hosts; http.allowed_hosts() returns this
 ```

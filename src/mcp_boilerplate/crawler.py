@@ -16,14 +16,14 @@ from mcp.shared._httpx_utils import create_mcp_http_client
 from pypdf import PdfReader
 
 from .knowledge import KnowledgeBase, OpenAIEmbedder, split_passages
-from .sources import SOURCES
+from .sources import SOURCES, pages
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 def check_url(level: str, url: str) -> None:
-    """Reject any URL outside the exact reviewed list."""
-    if level not in SOURCES or url not in {entry.url for entry in SOURCES[level].values()}:
+    """Reject any URL that is not one of the reviewed page sources of ``level``."""
+    if url not in {entry.url for entry in pages(level).values()}:
         raise ValueError("URL is not in the approved source list")
 
 
@@ -161,13 +161,14 @@ class Crawler:
     async def crawl(self, level: str, source: str | None = None) -> dict:
         if level not in SOURCES:
             raise ValueError("Unknown authority level")
-        if source and source != "all" and source not in SOURCES[level]:
+        crawlable = pages(level)
+        if source and source != "all" and source not in crawlable:
             raise ValueError(f"Unknown {level} source: {source}")
 
         selected = (
-            [(source, SOURCES[level][source])]
+            [(source, crawlable[source])]
             if source and source != "all"
-            else list(SOURCES[level].items())
+            else list(crawlable.items())
         )
         results = []
         for source_id, entry in selected:

@@ -5,9 +5,9 @@ from datetime import UTC, datetime, timedelta
 from starlette.testclient import TestClient
 
 from mcp_boilerplate.dashboard import server as dashboard
-from mcp_boilerplate.knowledge import KnowledgeBase
-from mcp_boilerplate.sources import SOURCES
 from mcp_boilerplate.dashboard.status import get_status
+from mcp_boilerplate.knowledge import KnowledgeBase
+from mcp_boilerplate.sources import API_SOURCES, SOURCES, pages
 
 NOW = datetime(2026, 9, 24, tzinfo=UTC)
 
@@ -33,7 +33,8 @@ def test_states(tmp_path):
     failed = rows[("federal", "health_insurance_premiums")]
     assert failed["state"] == "failed" and failed["error"] == "boom"
     assert rows[("federal", "reference_interest_rate_law")]["state"] == "never_crawled"
-    assert len(rows) >= sum(len(v) for v in SOURCES.values())
+    assert len(rows) >= sum(len(pages(level)) for level in SOURCES)
+    assert not {name for (_, name) in rows} & set(API_SOURCES)
 
 
 def test_refresh_endpoint_guards(monkeypatch):

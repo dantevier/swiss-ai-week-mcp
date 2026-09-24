@@ -1,4 +1,13 @@
-"""Reviewed Swiss authority sources for the crawler."""
+"""Reviewed Swiss authorities: the single registry of every source the server reads.
+
+``SOURCES`` maps each authority level to its named sources. A row is one of two kinds:
+
+- ``Source``: a page the crawler fetches, validates and saves to the knowledge base.
+- ``ApiSource``: an API that company_info calls live; it is never crawled or saved.
+
+Consumers that handle pages (crawler, knowledge base, dashboard) select ``Source`` rows
+with ``isinstance``. ``API_SOURCES`` is the view of every ``ApiSource`` row, keyed by name.
+"""
 
 from dataclasses import dataclass
 
@@ -18,35 +27,26 @@ class ApiSource:
     terms: str
 
 
-API_SOURCES: dict[str, ApiSource] = {
-    "zefix_lindas": ApiSource(
-        "https://lindas.admin.ch/query",
-        ("lindas.admin.ch", "register.ld.admin.ch"),
-        "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
-        "LINDAS: open use, provide the source. Not legally binding.",
-    ),
-    "zefix_web": ApiSource(
-        "https://www.zefix.admin.ch/ZefixREST/api/v1",
-        ("www.zefix.admin.ch",),
-        "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
-        "Undocumented web endpoint; called only when RESPECT_ROBOTS_TXT=false or credentials are set.",
-    ),
-    "gazette": ApiSource(
-        "https://amtsblattportal.ch/api/v1",
-        ("amtsblattportal.ch",),
-        "Schweizerisches Handelsamtsblatt (SHAB), SECO",
-        "The signed PDF is the binding version.",
-    ),
-}
-
-
-def api_hosts() -> frozenset[str]:
-    """Union of every host any registered API source (or its redirects) may reach."""
-    return frozenset(host for source in API_SOURCES.values() for host in source.hosts)
-
-
-SOURCES: dict[str, dict[str, Source]] = {
+SOURCES: dict[str, dict[str, Source | ApiSource]] = {
     "federal": {
+        "zefix_lindas": ApiSource(
+            "https://lindas.admin.ch/query",
+            ("lindas.admin.ch", "register.ld.admin.ch"),
+            "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
+            "LINDAS: open use, provide the source. Not legally binding.",
+        ),
+        "zefix_web": ApiSource(
+            "https://www.zefix.admin.ch/ZefixREST/api/v1",
+            ("www.zefix.admin.ch",),
+            "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
+            "Undocumented web endpoint; called only when RESPECT_ROBOTS_TXT=false or credentials are set.",
+        ),
+        "gazette": ApiSource(
+            "https://amtsblattportal.ch/api/v1",
+            ("amtsblattportal.ch",),
+            "Schweizerisches Handelsamtsblatt (SHAB), SECO",
+            "The signed PDF is the binding version.",
+        ),
         "health_insurance_premiums": Source(
             "https://ckan.opendata.swiss/api/3/action/package_show?id=health-insurance-premiums",
             "Federal Office of Public Health (BAG)",
@@ -127,3 +127,23 @@ SOURCES: dict[str, dict[str, Source]] = {
         ),
     },
 }
+
+
+def pages(level: str) -> dict[str, Source]:
+    """The crawlable ``Source`` rows of one level; empty for an unknown level."""
+    return {
+        name: entry for name, entry in SOURCES.get(level, {}).items() if isinstance(entry, Source)
+    }
+
+
+API_SOURCES: dict[str, ApiSource] = {
+    name: entry
+    for entries in SOURCES.values()
+    for name, entry in entries.items()
+    if isinstance(entry, ApiSource)
+}
+
+
+def api_hosts() -> frozenset[str]:
+    """Union of every host any registered API source (or its redirects) may reach."""
+    return frozenset(host for source in API_SOURCES.values() for host in source.hosts)
