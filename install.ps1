@@ -29,7 +29,7 @@ $ErrorActionPreference = 'Stop'
 # $PSScriptRoot is empty inside param() defaults in Windows PowerShell 5.1, so defaults are set here.
 $Repo = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
 if (-not $EnvFile) { $EnvFile = Join-Path $Repo '.env' }
-if (-not $OpencodeConfig) { $OpencodeConfig = Join-Path $HOME '.config\opencode\opencode.json' }
+if (-not $OpencodeConfig) { $OpencodeConfig = Join-Path (Join-Path (Join-Path $HOME '.config') 'opencode') 'opencode.json' }
 $Name = 'mcp-swiss-info'
 # --directory makes the server work from any project; the server then finds this repo's .env.
 $Launch = @('uv', 'run', '--directory', $Repo, 'python', '-m', 'mcp_boilerplate.main')
@@ -88,6 +88,8 @@ function Save-EnvKeys([hashtable]$Updates) {
 }
 
 function Read-Secret([string]$Prompt) {
+    # Piped input cannot be read as a secure string, and there is nothing on screen to hide then anyway.
+    if ([Console]::IsInputRedirected) { return ([string](Read-Host -Prompt $Prompt)).Trim() }
     $secure = Read-Host -Prompt $Prompt -AsSecureString
     $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
     try { return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr).Trim() }

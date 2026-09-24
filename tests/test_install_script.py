@@ -105,3 +105,23 @@ def test_defaults_resolve_next_to_the_script(sandbox):
     assert done.returncode == 0, done.stdout + done.stderr
     assert (copy / ".env").read_text() == "OPENAI_API_KEY=sk-default-123456\n"
     assert "mcp-swiss-info" in json.loads(config.read_text())["mcp"]
+
+
+def test_interactive_prompts_take_typed_keys_and_choices(sandbox):
+    """No -Yes: keys are typed at the prompts (Enter skips) and each harness is answered y/n."""
+    tmp_path, bin_dir = sandbox
+    (tmp_path / "opencode.json").write_text("{}")
+    system = r"C:\Windows\System32"
+    env = {"PATH": rf"{bin_dir};{system};{system}\WindowsPowerShell\v1.0", "PATHEXT": ".COM;.EXE;.BAT;.CMD",
+           "SystemRoot": r"C:\Windows", "USERPROFILE": str(tmp_path), "TEMP": str(tmp_path)}
+    typed = "crawl-typed-123456\n\ny\nn\ny\n"  # Crawlora key, skip OpenAI, Claude yes, Codex no, opencode yes
+    done = subprocess.run(
+        ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(SCRIPT), "-NoSync",
+         "-EnvFile", str(tmp_path / ".env"), "-OpencodeConfig", str(tmp_path / "opencode.json")],
+        input=typed, capture_output=True, text=True, env=env, timeout=120,
+    )
+    assert done.returncode == 0, done.stdout + done.stderr
+    assert (tmp_path / ".env").read_text() == "CRAWLORA_API_KEY=crawl-typed-123456\n"
+    assert (tmp_path / "claude.args").exists() and not (tmp_path / "codex.args").exists()
+    assert "mcp-swiss-info" in json.loads((tmp_path / "opencode.json").read_text())["mcp"]
+    assert "OPENAI_API_KEY: skipped" in done.stdout
