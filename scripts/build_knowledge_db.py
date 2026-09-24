@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build the offline Swiss public-sector knowledge database.
+"""Build the offline Swiss places and 2026 premiums database.
 
 Network access is build-time only. Runtime code should open
-``data/swiss_public_data.sqlite`` read-only and never fetch these sources again.
+``data/swiss_places_premiums_2026.sqlite`` read-only and never fetch these sources again.
 
 The selected reusable datasets are:
 
@@ -35,7 +35,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CACHE = ROOT / ".cache" / "knowledge"
-DEFAULT_OUTPUT = ROOT / "data" / "swiss_public_data.sqlite"
+DEFAULT_OUTPUT = ROOT / "data" / "swiss_places_premiums_2026.sqlite"
 QA_PATH = ROOT / "benchmark" / "data" / "qa.jsonl"
 USER_AGENT = "swiss-grounding-mcp/0.1 (Swiss AI Weeks; offline data builder)"
 REGISTER_DATE = "24-09-2026"
@@ -415,7 +415,7 @@ def build_database(output: Path, cache_dir: Path, offline: bool) -> dict[str, in
                 ("built_at", BUILD_DATE),
                 ("register_date", "2026-09-24"),
                 ("runtime_network_required", "false"),
-                ("description", "Offline deterministic Swiss public-sector knowledge"),
+                ("description", "Offline commune register, historical names, and 2026 health-insurance premiums"),
             ],
         )
         for source_id, source in SOURCES.items():

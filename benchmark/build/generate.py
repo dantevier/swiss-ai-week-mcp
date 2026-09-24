@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate benchmark questions from the offline Swiss knowledge database.
+"""Generate benchmark questions from the offline places and 2026 premiums database.
 
     python scripts/build_knowledge_db.py
     python benchmark/build/generate.py
@@ -21,7 +21,7 @@ from decimal import Decimal
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_DB = ROOT / "data" / "swiss_public_data.sqlite"
+DEFAULT_DB = ROOT / "data" / "swiss_places_premiums_2026.sqlite"
 OUT = ROOT / "benchmark" / "data" / "generated.jsonl"
 TODAY = "2026-09-24"
 REGISTER_DATE = "24-09-2026"

@@ -48,7 +48,7 @@ It tests whether an assistant (an LLM on its own, or an LLM connected to an MCP 
 | `verified` (`data/qa.jsonl`) | 32 | checked by hand against the responsible authority's page; 15 of the 16 briefing topic areas |
 | `generated` (`data/generated.jsonl`) | 870 | computed by `build/generate.py` from the offline official-data database; ids start with `gen-` |
 
-The generated items come from `../data/swiss_public_data.sqlite`. That reusable
+The generated items come from `../data/swiss_places_premiums_2026.sqlite`. That reusable
 runtime database was built from the BAG health insurance premiums 2026 (217,472
 rows), SR 832.106 Annex 1 (premium region per municipality, version in force on
 1 Jan 2026, from the Fedlex filestore), and the BFS register of municipalities
@@ -68,7 +68,7 @@ came from in `evidence`.
 Regenerate, for example after the BAG publishes new premiums:
 
 ```bash
-python scripts/build_knowledge_db.py       # network at build time; writes data/swiss_public_data.sqlite
+python scripts/build_knowledge_db.py       # network at build time; writes data/swiss_places_premiums_2026.sqlite
 python benchmark/build/generate.py         # offline; writes benchmark/data/generated.jsonl
 ```
 

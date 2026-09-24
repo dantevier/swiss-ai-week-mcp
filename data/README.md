@@ -1,7 +1,9 @@
-# Offline Swiss public-sector knowledge
+# Offline Swiss places and 2026 premiums
 
-`swiss_public_data.sqlite` is the reusable, deterministic runtime knowledge store.
-The MCP server and the benchmark can query this file without network access.
+`swiss_places_premiums_2026.sqlite` holds reusable, deterministic lookups for
+municipalities and 2026 health-insurance premiums. It is not a dump of all Swiss
+public-sector websites. The MCP server and the benchmark can query this file
+without network access.
 
 ## Included data
 
@@ -52,7 +54,7 @@ Open the database once when the MCP server starts:
 from pathlib import Path
 import sqlite3
 
-path = Path("data/swiss_public_data.sqlite").resolve()
+path = Path("data/swiss_places_premiums_2026.sqlite").resolve()
 db = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
 db.row_factory = sqlite3.Row
 ```
@@ -70,4 +72,4 @@ evaluation and runtime use the same facts.
 
 Raw downloads remain in `.cache/knowledge/` and are intentionally not committed. The
 database records each raw file's SHA-256 in `sources`, so a build can be audited.
-`swiss_public_data.sha256` contains the checksum of the final database artifact.
+`swiss_places_premiums_2026.sha256` contains the checksum of the final database artifact.

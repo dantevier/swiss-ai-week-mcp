@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Query the local Swiss public-sector knowledge database.
+"""Query the local Swiss places and 2026 premiums database.
 
 Examples:
 
@@ -23,7 +23,7 @@ import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DB = ROOT / "data" / "swiss_public_data.sqlite"
+DEFAULT_DB = ROOT / "data" / "swiss_places_premiums_2026.sqlite"
 AGE_CLASSES = {
     "child": "AKL-KIN",
     "young-adult": "AKL-JUG",
