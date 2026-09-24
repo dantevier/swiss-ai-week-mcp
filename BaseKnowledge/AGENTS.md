@@ -1,7 +1,11 @@
 # AGENTS.md â€” Swiss Grounding MCP
 
-Read this first. It applies to every agent (Claude Code, Codex, OpenCode) and every
-human on the team. Current state and open work: `STATUS.md`.
+> Historical rehearsal specification for a separate Node/TypeScript project. The current
+> workspace uses Python/FastMCP; see [STATUS.md](STATUS.md). Paths, commands, and coverage
+> below describe the rehearsal unless implemented in this repository.
+
+This records the rehearsal team's approach. For current implementation state and open
+work in this repository, read `STATUS.md` first.
 
 ## What we are building
 
@@ -53,7 +57,8 @@ Every response is a JSON envelope with exactly one of five states (CONTRACT.md Â
 | `test/` | `routing-test.ts` (description oracle), `place-test.ts`, `mcp-client-test.ts` (end-to-end over stdio) |
 | `opencode.json` | project-level MCP config for OpenCode |
 
-Italian in the docs is historical; new docs and all code are in English.
+The prose in these documents is English. Original-language test questions and source
+passages remain unchanged so they can be checked against the source.
 
 ## Commands
 
