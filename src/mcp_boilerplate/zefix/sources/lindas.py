@@ -117,7 +117,7 @@ from dataclasses import dataclass, field
 
 import httpx
 
-from ..config.settings import settings
+from ...config.settings import settings
 from .http import SourceUnavailable, classify_error, make_client
 
 GRAPH = "https://lindas.admin.ch/foj/zefix"

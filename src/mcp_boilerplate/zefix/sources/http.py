@@ -10,7 +10,7 @@ import logging
 
 import httpx
 
-from ..config.settings import settings
+from ...config.settings import settings
 
 logger = logging.getLogger("mcp_boilerplate.sources.http")
 

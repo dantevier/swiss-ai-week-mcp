@@ -46,7 +46,7 @@ from typing import Any
 
 import httpx
 
-from ..config.settings import settings
+from ...config.settings import settings
 from .http import SourceUnavailable, classify_error, make_client
 
 # ---------------------------------------------------------------------------

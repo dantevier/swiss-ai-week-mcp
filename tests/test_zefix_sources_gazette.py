@@ -15,7 +15,7 @@ import pytest
 import respx
 
 from mcp_boilerplate.config.settings import settings
-from mcp_boilerplate.zefix_sources.http import SourceUnavailable
+from mcp_boilerplate.zefix.sources.http import SourceUnavailable
 
 FIXTURES = Path(__file__).parent / "fixtures"
 SEARCH_FIXTURE = json.loads((FIXTURES / "gazette_search.json").read_text())
@@ -37,7 +37,7 @@ async def test_publications_for_uid_parses_the_fixture():
     """PRD §6.4 field list, A4 URL pattern. Fixture: tests/fixtures/gazette_search.json
     (2 entries, HR/HR03), copied verbatim from register-mcp; meta.title/content are
     redacted placeholders per tests/fixtures/PROVENANCE.md, structure is real."""
-    from mcp_boilerplate.zefix_sources import gazette
+    from mcp_boilerplate.zefix.sources import gazette
 
     with respx.mock(assert_all_called=True) as mocked:
         mocked.get(f"{settings.gazette_base_url}/publications").respond(200, json=SEARCH_FIXTURE)
@@ -61,7 +61,7 @@ async def test_publications_for_uid_parses_the_fixture():
 
 async def test_publications_for_uid_retries_on_503_then_succeeds():
     """PRD §6.4: "Retry on 429, 502, 503, 504 and network errors ... max 3 attempts."."""
-    from mcp_boilerplate.zefix_sources import gazette
+    from mcp_boilerplate.zefix.sources import gazette
 
     responses = [httpx.Response(503), httpx.Response(200, json=SEARCH_FIXTURE)]
 
@@ -78,7 +78,7 @@ async def test_publications_for_uid_retries_on_503_then_succeeds():
 
 async def test_publications_for_uid_gives_up_after_max_three_attempts():
     """PRD §6.4: "max 3 attempts" then the failure surfaces as source_unavailable."""
-    from mcp_boilerplate.zefix_sources import gazette
+    from mcp_boilerplate.zefix.sources import gazette
 
     with respx.mock(assert_all_called=True) as mocked:
         mocked.get(f"{settings.gazette_base_url}/publications").respond(503)
@@ -92,7 +92,7 @@ async def test_publications_for_uid_gives_up_after_max_three_attempts():
 async def test_publications_for_uid_raises_gazette_filter_ignored_when_total_implausible():
     """PRD §6.4 quirk 1: "if total exceeds 95% of the known corpus size the filter
     was ignored; raise, do not return." Corpus size from tests/fixtures/gazette_corpus_total.json."""
-    from mcp_boilerplate.zefix_sources import gazette
+    from mcp_boilerplate.zefix.sources import gazette
 
     implausible_total = int(CORPUS_TOTAL * 0.99)
     payload = {**SEARCH_FIXTURE, "total": implausible_total}
@@ -106,7 +106,7 @@ async def test_publications_for_uid_raises_gazette_filter_ignored_when_total_imp
 async def test_publications_for_uid_never_sends_a_non_allow_listed_param():
     """PRD §6.4: "Query built only from an allow-list of parameter names; unknown
     parameters are silently ignored upstream and would return the whole corpus."."""
-    from mcp_boilerplate.zefix_sources import gazette
+    from mcp_boilerplate.zefix.sources import gazette
 
     with respx.mock(assert_all_called=True) as mocked:
         route = mocked.get(f"{settings.gazette_base_url}/publications").respond(200, json=SEARCH_FIXTURE)
@@ -121,7 +121,7 @@ async def test_publications_for_uid_never_sends_a_non_allow_listed_param():
 def test_is_deletion_matches_deletion_subrubrics_only():
     """PRD §5.2 step 3b, §6.4: "Deletion detection ... uses subRubric codes for
     Löschung; the exact codes are taken from the cached rubric taxonomy" (A6)."""
-    from mcp_boilerplate.zefix_sources import gazette
+    from mcp_boilerplate.zefix.sources import gazette
 
     deletion_code = next(iter(gazette.DELETION_SUBRUBRICS))
     deletion_pub = gazette.Publication(
@@ -155,7 +155,7 @@ async def test_rubrics_parses_hr_deletion_code_from_the_taxonomy_fixture():
     """PRD action A6: the deletion sub-rubric code(s) come from the live taxonomy.
     tests/fixtures/gazette_rubrics.json's HR rubric lists HR03 with
     name.de == "Löschung", which is where DELETION_SUBRUBRICS must originate."""
-    from mcp_boilerplate.zefix_sources import gazette
+    from mcp_boilerplate.zefix.sources import gazette
 
     rubrics_payload = json.loads((FIXTURES / "gazette_rubrics.json").read_text())
     hr = next(r for r in rubrics_payload if r["code"] == "HR")

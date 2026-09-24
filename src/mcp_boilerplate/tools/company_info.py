@@ -22,11 +22,12 @@ import re
 from time import monotonic
 from typing import Any
 
-from .. import envelope
+from ..zefix import envelope
 from ..config.settings import settings
 from ..server import mcp
-from ..zefix_sources import gazette, lindas, zefix
-from ..zefix_sources.http import SourceUnavailable
+from ..zefix.sources import gazette, lindas
+from ..zefix.sources import rest as zefix
+from ..zefix.sources.http import SourceUnavailable
 from ..utils.logger import setup_logger
 
 logger = setup_logger("mcp_boilerplate.tools.company_info")

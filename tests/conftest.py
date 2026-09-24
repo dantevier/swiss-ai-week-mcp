@@ -17,10 +17,10 @@ from unittest.mock import AsyncMock
 import pytest
 
 from mcp_boilerplate.config import settings as settings_module
-from mcp_boilerplate.zefix_sources import gazette
-from mcp_boilerplate.zefix_sources.gazette import Publication
-from mcp_boilerplate.zefix_sources.lindas import Company
-from mcp_boilerplate.zefix_sources.zefix import Enrichment
+from mcp_boilerplate.zefix.sources import gazette
+from mcp_boilerplate.zefix.sources.gazette import Publication
+from mcp_boilerplate.zefix.sources.lindas import Company
+from mcp_boilerplate.zefix.sources.rest import Enrichment
 
 # ---------------------------------------------------------------------------
 # Settings
@@ -242,7 +242,7 @@ def patch_sources(
 ):
     """Monkeypatch the source-module functions as seen from tools.company_info.
 
-    tools/company_info.py does `from ..zefix_sources import lindas, zefix, gazette` and
+    tools/company_info.py does `from ..zefix.sources import gazette, lindas` / `from ..zefix.sources import rest as zefix` and
     calls them as `lindas.find_by_uid(...)` etc. (interfaces.md), so patching the
     attribute on the module object patches every caller, including company_info.
 

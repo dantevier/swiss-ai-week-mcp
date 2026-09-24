@@ -23,7 +23,7 @@ from dataclasses import dataclass, field
 
 import httpx
 
-from ..config.settings import settings
+from ...config.settings import settings
 from .http import SourceUnavailable, classify_error, make_client
 
 # Same 26 cantons as register-mcp's CANTON_CODES (server.py L275-302).
