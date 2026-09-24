@@ -21,9 +21,9 @@ import respx
 
 from mcp_boilerplate import envelope
 from mcp_boilerplate.config.settings import Settings
-from mcp_boilerplate.sources import gazette
-from mcp_boilerplate.sources.http import EgressDenied, SourceUnavailable, make_client
-from mcp_boilerplate.sources.zefix import format_uid
+from mcp_boilerplate.zefix_sources import gazette
+from mcp_boilerplate.zefix_sources.http import EgressDenied, SourceUnavailable, make_client
+from mcp_boilerplate.zefix_sources.zefix import format_uid
 from mcp_boilerplate.tools.company_info import company_info
 
 from .conftest import patch_sources
@@ -207,7 +207,7 @@ async def test_q3b_uid_lookup_with_enrichment_when_robots_disabled(swisscom, enr
 async def test_q4_publications_attached_newest_first_capped(swisscom, monkeypatch):
     """PRD §5.2 step 5, §4 Q4: gazette publications are attached newest first and
     capped at max_publications; publications_status is "answered" on success."""
-    from mcp_boilerplate.sources.gazette import Publication
+    from mcp_boilerplate.zefix_sources.gazette import Publication
 
     six_newest_first = [
         Publication(
@@ -494,7 +494,7 @@ def _ubs_seats():
     Mirrors the live shape reported by the verifier: ehraid 415520 (Basel)
     and 421132 (Zürich), both CHE101329561, both legalName "UBS AG".
     """
-    from mcp_boilerplate.sources.lindas import Company
+    from mcp_boilerplate.zefix_sources.lindas import Company
 
     common = {
         "uid": "CHE101329561",
@@ -566,7 +566,7 @@ async def test_mixed_ambiguous_candidates_are_deduplicated_by_uid(monkeypatch):
     """F2: a genuinely ambiguous prefix search (two distinct legal entities) still
     de-duplicates need_info candidates by uid, joining the seats of a
     multi-seat uid into one candidate row rather than listing it twice."""
-    from mcp_boilerplate.sources.lindas import Company
+    from mcp_boilerplate.zefix_sources.lindas import Company
 
     basel, zurich = _ubs_seats()
     fund_mgmt = Company(

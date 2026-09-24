@@ -25,8 +25,8 @@ from typing import Any
 from .. import envelope
 from ..config.settings import settings
 from ..server import mcp
-from ..sources import gazette, lindas, zefix
-from ..sources.http import SourceUnavailable
+from ..zefix_sources import gazette, lindas, zefix
+from ..zefix_sources.http import SourceUnavailable
 from ..utils.logger import setup_logger
 
 logger = setup_logger("mcp_boilerplate.tools.company_info")

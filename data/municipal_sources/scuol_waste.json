@@ -1,0 +1,21 @@
+{
+  "source": "scuol_waste",
+  "authority_level": "municipal",
+  "authority": "Municipality of Scuol",
+  "url": "https://www.scuol.net/de/informationen/abfallentsorgung.html/108",
+  "crawled_at": "2026-09-24T14:49:53.850875+00:00",
+  "markdown": "# Abfallentsorgung\n\nFür die Abfallentsorgung ist die [Region Engiadina Bassa / Val Müstair](https://www.regiunebvm.ch/de/kehricht/ \"Dieser Link wird in einem neuen Fenster geöffnet.\") verantwortlich.\n\nDie Sammelstellen in den einzelnen Fraktionen der Gemeinde Scuol finden sich auf den folgenden Merkblättern.\n\n[Ardez](https://www.scuol.net/public/upload/assets/11437/Kehrichtplan_2026_Ardez.pdf?fp=1 \"Plazzals da ramassamaint Ardez\")  \n[Ftan](https://www.scuol.net/public/upload/assets/11438/Kehrichtplan_2026_Ftan.pdf?fp=1 \"Plazzals da ramassamaint Ftan\")  \n[Guarda](https://www.scuol.net/public/upload/assets/11439/Kehrichtplan_2026_Guarda.pdf?fp=1 \"Plazzals da ramassamaint Guarda\")  \n[Scuol](https://www.scuol.net/public/upload/assets/11440/Kehrichtplan_2026_Scuol.pdf?fp=1 \"Plazzals da ramassamaint Scuol\")  \n[Sent](https://www.scuol.net/public/upload/assets/11441/Kehrichtplan_2026_Sent.pdf?fp=1 \"Plazzals da ramassamaint Sent\")  \n[Tarasp](https://www.scuol.net/public/upload/assets/11442/Kehrichtplan_2026_Tarasp.pdf?fp=1 \"Plazzals da ramassamaint Tarasp\")\n\nBei der [**Firma Crüzer**](https://www.cruezer.ch/)  (Tel. 081 864 15 81) am **neuen Standort [(Sot ruinas)](https://maps.app.goo.gl/bSPauYujAQYyJnPv6)** können Abfälle aller Art abgegeben werden.\n\n- [zum Seitenanfang](# \"an den Anfang der Seite springen\")\n- [Seite drucken](https://www.scuol.net/de/informationen/abfallentsorgung.html/108/print/html \"Seite in druckbarer Form anzeigen\")\n- [Seite als PDF](https://www.scuol.net/de/informationen/abfallentsorgung.html/108/print/pdf \"Seite als PDF speichern\")",
+  "metadata": {
+    "canonical_url": "https://www.scuol.net/de/informationen/abfallentsorgung.html/108",
+    "content_type": "text/html;charset=UTF-8",
+    "language": "de-CH",
+    "source_url": "https://www.scuol.net/de/informationen/abfallentsorgung.html/108",
+    "status_code": 200,
+    "title": "Abfallentsorgung – Gemeinde Scuol"
+  },
+  "scrape": {
+    "cache_state": "miss",
+    "escalated": false,
+    "method": "http"
+  }
+}

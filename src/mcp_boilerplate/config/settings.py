@@ -12,7 +12,8 @@ class Settings(BaseSettings):
     model_config = ConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=False
+        case_sensitive=False,
+        extra="ignore",
     )
 
     # Server Configuration
@@ -38,6 +39,9 @@ class Settings(BaseSettings):
     # External Service Configuration
     api_base_url: str | None = Field(default=None, description="Base URL for external APIs")
     api_key: str | None = Field(default=None, description="API key for external services")
+    crawlora_api_key: str | None = Field(default=None, description="Crawlora API key")
+    openai_api_key: str | None = Field(default=None, description="OpenAI embeddings API key")
+    knowledge_db_path: str | None = Field(default=None, description="Writable SQLite knowledge base path")
 
     # Swiss company data sources (docs/prd-zefix-company-info.md §6)
     lindas_endpoint: str = Field(

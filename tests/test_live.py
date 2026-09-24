@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from mcp_boilerplate.sources import gazette, lindas
+from mcp_boilerplate.zefix_sources import gazette, lindas
 from mcp_boilerplate.tools.company_info import company_info
 
 UID = "CHE101654423"

@@ -221,6 +221,7 @@ secrets.json
 *.db
 *.sqlite
 *.sqlite3
+!src/mcp_boilerplate/knowledge_seed.sqlite3
 
 # MCP specific
 mcp_config.json

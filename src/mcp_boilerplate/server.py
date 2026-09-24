@@ -14,16 +14,19 @@ logger = setup_logger("mcp_boilerplate.server")
 mcp = FastMCP(
     name=settings.server_name,
     instructions=(
-        "Answers questions about Swiss companies in the federal commercial register "
-        "index (Zefix) and their SHAB publications. Use company_info. It asks back "
-        "when a name is ambiguous and says when a source is unavailable."
+        "Answers Swiss public-service questions grounded in official sources. "
+        "Use company_info for companies in the federal commercial register (Zefix) "
+        "and their SHAB publications. Use swiss_health_insurance_premiums for 2026 "
+        "KVG minimum premiums by age, municipality and deductible. Use "
+        "search_knowledge and get_source for the reviewed authority pages on health "
+        "insurance, the reference interest rate, foreign driving licences, school "
+        "holidays, waste and arrival registration. Every tool asks back when input "
+        "is ambiguous and says when a source is unavailable."
     ),
 )
 
 # Import all components to register them with the mcp instance
 from .tools import *  # This will register all tools
-from .resources import *  # This will register all resources  
-from .prompts import *  # This will register all prompts
 
 logger.info(f"Initialized FastMCP server: {settings.server_name}")
 
