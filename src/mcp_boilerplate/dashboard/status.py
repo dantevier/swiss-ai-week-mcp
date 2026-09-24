@@ -4,10 +4,10 @@ import os
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .knowledge import KnowledgeBase
-from .sources import SOURCES
+from ..knowledge import KnowledgeBase
+from ..sources import SOURCES
 
-KVG_FILE = Path(__file__).resolve().parents[2] / "data" / "kvg_minimum_premiums_2026.csv"
+KVG_FILE = Path(__file__).resolve().parents[3] / "data" / "kvg_minimum_premiums_2026.csv"
 
 
 def stale_after_days() -> int:
@@ -25,10 +25,10 @@ def _age_days(timestamp: str | None, now: datetime) -> float | None:
 
 def _state(last_refresh, last_failure, age, threshold) -> str:
     if last_refresh is None:
-        return "missing"
+        return "never_crawled"
     if last_failure and last_failure > last_refresh:
         return "failed"
-    return "stale" if age is not None and age > threshold else "fresh"
+    return "outdated" if age is not None and age > threshold else "up_to_date"
 
 
 def get_status(database: KnowledgeBase | None = None, now: datetime | None = None) -> dict:

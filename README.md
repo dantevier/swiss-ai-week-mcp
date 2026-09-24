@@ -16,7 +16,7 @@ Manual equivalent for Claude Code: `claude mcp add --scope user mcp-swiss-info -
 
 ## Check data freshness
 
-Ask the assistant "how fresh is your data?" (tool `source_status`), or "open the dashboard" (tool `open_dashboard`) for a local page at http://127.0.0.1:8765 with each source's last refresh, failures, and a Refresh button. Outside a harness: `make dashboard`. Sources older than 30 days show as stale (`STALE_AFTER_DAYS` to change).
+Ask the assistant "how fresh is your data?" (tool `source_status`), or "open the dashboard" (tool `open_dashboard`) for a local page at http://127.0.0.1:8765 with each source's last refresh, failures, and a Refresh button. Outside a harness: `make dashboard`. Sources older than 30 days show as outdated (`STALE_AFTER_DAYS` to change).
 
 ## Run
 

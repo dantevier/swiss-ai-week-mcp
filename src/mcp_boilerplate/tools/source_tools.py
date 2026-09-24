@@ -1,10 +1,10 @@
 """Crawl approved Swiss sources and retrieve saved evidence."""
 
 from ..crawler import Crawler
-from ..knowledge import KnowledgeBase
 from ..dashboard import ensure_running
+from ..dashboard.status import get_status
+from ..knowledge import KnowledgeBase
 from ..server import mcp
-from ..status import get_status
 
 
 @mcp.tool

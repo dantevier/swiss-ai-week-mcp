@@ -4,10 +4,10 @@ from datetime import UTC, datetime, timedelta
 
 from starlette.testclient import TestClient
 
-from mcp_boilerplate import dashboard
+from mcp_boilerplate.dashboard import server as dashboard
 from mcp_boilerplate.knowledge import KnowledgeBase
 from mcp_boilerplate.sources import SOURCES
-from mcp_boilerplate.status import get_status
+from mcp_boilerplate.dashboard.status import get_status
 
 NOW = datetime(2026, 9, 24, tzinfo=UTC)
 
@@ -28,11 +28,11 @@ def test_states(tmp_path):
     _save(kb, "federal", "health_insurance_premiums", NOW - timedelta(days=5))
     kb.failed("federal", "health_insurance_premiums", "boom")
     rows = {(r["level"], r["source"]): r for r in get_status(kb, NOW)["sources"]}
-    assert rows[("federal", "reference_interest_rate")]["state"] == "fresh"
-    assert rows[("federal", "premium_regions_2026")]["state"] == "stale"
+    assert rows[("federal", "reference_interest_rate")]["state"] == "up_to_date"
+    assert rows[("federal", "premium_regions_2026")]["state"] == "outdated"
     failed = rows[("federal", "health_insurance_premiums")]
     assert failed["state"] == "failed" and failed["error"] == "boom"
-    assert rows[("federal", "reference_interest_rate_law")]["state"] == "missing"
+    assert rows[("federal", "reference_interest_rate_law")]["state"] == "never_crawled"
     assert len(rows) >= sum(len(v) for v in SOURCES.values())
 
 

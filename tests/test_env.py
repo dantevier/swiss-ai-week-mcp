@@ -3,7 +3,7 @@
 import pytest
 from starlette.testclient import TestClient
 
-from mcp_boilerplate import dashboard
+from mcp_boilerplate.dashboard import server as dashboard
 from mcp_boilerplate.config import env
 
 
