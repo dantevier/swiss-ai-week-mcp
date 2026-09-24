@@ -2,11 +2,10 @@
 
 import asyncio
 
+from mcp_boilerplate import customs, migration
+from mcp_boilerplate import political_rights as political
+from mcp_boilerplate.authority_pages import MainParagraphs
 from mcp_boilerplate.server import mcp
-from mcp_boilerplate.tools import customs_tools as customs
-from mcp_boilerplate.tools import migration_tools as migration
-from mcp_boilerplate.tools import political_rights_tools as political
-from mcp_boilerplate.tools._authority_pages import MainParagraphs
 
 
 def test_authority_tools_are_registered() -> None:
