@@ -21,7 +21,9 @@ def test_registration_and_invalid_arguments(monkeypatch):
         for name in ("canton", "school_year", "holiday_type", "municipality")
     )
     monkeypatch.setattr(
-        holidays, "_fetch_json", lambda url: (_ for _ in ()).throw(AssertionError("network called"))
+        holidays.SchoolHolidayService,
+        "_fetch_json",
+        lambda self, url: (_ for _ in ()).throw(AssertionError("network called")),
     )
     assert call("XX")["status"] == "invalid_input"
     assert call("ZH", school_year=2019)["status"] == "invalid_input"
@@ -51,11 +53,11 @@ def test_lookup_keeps_school_types_and_filters_name(monkeypatch):
     ]
     urls = []
 
-    def fetch(url):
+    def fetch(self, url):
         urls.append(url)
         return rows
 
-    monkeypatch.setattr(holidays, "_fetch_json", fetch)
+    monkeypatch.setattr(holidays.SchoolHolidayService, "_fetch_json", fetch)
     result = call("BE", 2026, "autumn")
     assert result["status"] == "answered"
     assert result["school_year"] == "2026/27"
@@ -91,11 +93,11 @@ def test_local_variation_needs_municipality_and_scopes_result(monkeypatch):
     ]
     urls = []
 
-    def fetch(url):
+    def fetch(self, url):
         urls.append(url)
         return tree if "/Subdivisions?" in url else [row]
 
-    monkeypatch.setattr(holidays, "_fetch_json", fetch)
+    monkeypatch.setattr(holidays.SchoolHolidayService, "_fetch_json", fetch)
     assert call("GR", 2026)["status"] == "municipality_required"
     result = call("GR", 2026, municipality="Bregaglia")
     assert result["status"] == "answered"
@@ -106,10 +108,10 @@ def test_local_variation_needs_municipality_and_scopes_result(monkeypatch):
 
 
 def test_upstream_failure_is_not_empty_result(monkeypatch):
-    def fail(url):
+    def fail(self, url):
         raise URLError("offline")
 
-    monkeypatch.setattr(holidays, "_fetch_json", fail)
+    monkeypatch.setattr(holidays.SchoolHolidayService, "_fetch_json", fail)
     result = call("BE", 2026)
     assert result["status"] == "source_unavailable"
     assert result["source"]["name"] == "OpenHolidays API"

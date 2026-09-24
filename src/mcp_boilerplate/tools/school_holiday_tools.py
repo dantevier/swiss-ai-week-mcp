@@ -1,6 +1,6 @@
 """MCP registration for live Swiss school holidays."""
 
-from ..school_holiday import get_school_holidays
+from ..school_holiday import SchoolHolidayService
 from ..server import mcp
 
 
@@ -20,4 +20,4 @@ async def swiss_school_holidays(
     municipality: optional exact municipality name or OpenHolidays subdivision code.
     Local variation requires a municipality; school types remain separate records.
     """
-    return await get_school_holidays(canton, school_year, holiday_type, municipality)
+    return await SchoolHolidayService().get(canton, school_year, holiday_type, municipality)
