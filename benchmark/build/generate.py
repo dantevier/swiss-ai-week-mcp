@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generate benchmark questions from the offline places and 2026 premiums database.
+"""Generate a balanced sector suite and the full offline-data benchmark corpus.
 
     python scripts/build_knowledge_db.py
     python benchmark/build/generate.py
 
 The database was built from BAG, Fedlex and BFS official data. This generator does not
-access the network. Runtime and evaluation therefore use the same deterministic facts.
-Standard library only. Same seed, same data -> same output.
+access the network. Lower-data sectors use question framings grounded in verified QA
+items; these variants retain their source fact cluster. Standard library only.
 """
 
 from __future__ import annotations
@@ -23,6 +23,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DB = ROOT / "data" / "swiss_places_premiums_2026.sqlite"
 OUT = ROOT / "benchmark" / "data" / "generated.jsonl"
+FULL_OUT = ROOT / "benchmark" / "data" / "generated_full.jsonl"
+FULL_SECTOR_OUT = ROOT / "benchmark" / "data" / "generated_full_by_sector"
+QA_SEEDS = ROOT / "benchmark" / "data" / "qa.jsonl"
+SECTOR_OUT = ROOT / "benchmark" / "data" / "generated_by_sector"
 TODAY = "2026-09-24"
 REGISTER_DATE = "24-09-2026"
 PREMIUM_PAGE = "https://opendata.swiss/de/dataset/health-insurance-premiums"
@@ -46,6 +50,38 @@ CANTON_NAMES = {
     "JU": ["Jura", "Giura"],
 }
 LANG_OF_REGION = {1: "de", 2: "fr", 3: "it", 4: "de"}
+AREA_SLUGS = {
+    1: "health-insurance-premiums", 2: "taxes-and-duties", 3: "law-and-regulations",
+    4: "waste-and-recycling", 5: "residence-and-civil-status", 6: "migration",
+    7: "social-insurance-and-pensions", 8: "work-and-unemployment", 9: "schools-and-education",
+    10: "public-transport", 11: "road-traffic-and-licences", 12: "housing-and-rental",
+    13: "voting-and-political-rights", 14: "companies-and-vat", 15: "customs",
+    16: "statistics-and-open-data",
+}
+CONTEXT_PREFIX = {
+    "de": "Kannst du mir bitte helfen? ",
+    "fr": "Pouvez-vous m'aider ? ",
+    "it": "Può aiutarmi? ",
+    # Keep Romansh prompts intact until a Romansh reviewer can verify variants.
+    "rm": "",
+}
+QUESTION_FRAMINGS = {
+    "de": ["Bitte beantworte kurz: ", "Ich brauche dazu eine verlässliche Auskunft: ",
+           "Ich möchte gern wissen: ", "Kannst du mir bitte sagen: ",
+           "Bitte erkläre mir Folgendes: ", "Ich habe eine Frage: ",
+           "Bitte prüfe folgende Frage: ", "Wie lautet die Auskunft dazu? ",
+           "Kannst du mir weiterhelfen? ", "Ich suche die offizielle Information: "],
+    "fr": ["Veuillez répondre brièvement : ", "J'aimerais obtenir un renseignement fiable : ",
+           "Je voudrais savoir : ", "Pouvez-vous me préciser : ",
+           "Veuillez m'expliquer ceci : ", "J'ai une question : ",
+           "Veuillez vérifier la question suivante : ", "Quelle est l'information officielle ? ",
+           "Pouvez-vous m'aider ? ", "Je cherche une information fiable : "],
+    "it": ["Risponda brevemente, per favore: ", "Vorrei un'informazione affidabile: ",
+           "Vorrei sapere: ", "Può precisarmi: ",
+           "Mi spieghi per favore quanto segue: ", "Ho una domanda: ",
+           "Verifichi per favore questa domanda: ", "Qual è l'informazione ufficiale? ",
+           "Può aiutarmi? ", "Cerco un'informazione affidabile: "],
+}
 
 
 def base_name(name: str) -> str:
@@ -84,6 +120,106 @@ def item(**kw) -> dict:
     }
     base.update(kw)
     return base
+
+
+def read_verified_seeds() -> list[dict]:
+    if not QA_SEEDS.exists():
+        raise SystemExit(f"verified benchmark seeds not found: {QA_SEEDS}")
+    with QA_SEEDS.open(encoding="utf-8") as stream:
+        return [json.loads(line) for line in stream if line.strip()]
+
+
+def gen_context_variants(seeds: list[dict]) -> list[dict]:
+    """Add a light prompt-context case for each non-Romansh verified seed."""
+    out = []
+    for seed in seeds:
+        prefix = CONTEXT_PREFIX.get(seed["lang"])
+        if not prefix:
+            continue
+        row = dict(seed)
+        row["id"] = f"gen-context-{seed['id']}"
+        row["question"] = prefix + seed["question"]
+        row["sample"] = seed.get("sample", False)
+        row["generated_variant"] = "context_prefix"
+        row["source_item_id"] = seed["id"]
+        row["fact_cluster_id"] = seed["id"]
+        row["verified_by"] = "generated prompt variant from verified benchmark item; answer and evidence retained"
+        out.append(row)
+    return out
+
+
+def make_balanced_sector_suite(items: list[dict], seeds: list[dict], per_area: int) -> list[dict]:
+    """Build an equal-sized sector suite from official rows and verified seed variants."""
+    by_area: dict[int, list[dict]] = defaultdict(list)
+    for row in items:
+        by_area[int(row["topic_area"])].append(row)
+    seed_by_area: dict[int, list[dict]] = defaultdict(list)
+    for row in seeds:
+        seed_by_area[int(row["topic_area"])].append(row)
+
+    suite = []
+    for area, slug in AREA_SLUGS.items():
+        pool = sorted(by_area.get(area, []), key=lambda row: row["id"])
+        chosen: list[dict] = []
+        chosen_clusters: set[str] = set()
+        # Give each available verified fact one seat before drawing more data rows.
+        for row in pool:
+            if row.get("generated_variant") != "context_prefix":
+                continue
+            cluster = row.get("fact_cluster_id", row["id"])
+            if cluster not in chosen_clusters:
+                chosen.append(row)
+                chosen_clusters.add(cluster)
+        direct = [row for row in pool if row.get("generated_variant") != "context_prefix"]
+        direct = [row for row in direct if row["id"] not in {item["id"] for item in chosen}]
+        needed = max(0, per_area - len(chosen))
+        if len(direct) > needed:
+            direct = random.Random(2026 + area).sample(direct, needed)
+        chosen.extend(direct[:needed])
+
+        variants = []
+        for seed in seed_by_area.get(area, []):
+            for variant_no, prefix in enumerate(QUESTION_FRAMINGS.get(seed["lang"], []), 1):
+                row = dict(seed)
+                row["id"] = f"gen-balanced-{area:02d}-{seed['id']}-{variant_no:02d}"
+                row["question"] = prefix + seed["question"]
+                row["sample"] = seed.get("sample", False)
+                row["generated_variant"] = "question_framing"
+                row["source_item_id"] = seed["id"]
+                row["fact_cluster_id"] = seed["id"]
+                row["verified_by"] = "generated question framing from verified benchmark item; answer and evidence retained"
+                variants.append(row)
+        seen_questions = {row["question"] for row in chosen}
+        for row in variants:
+            if len(chosen) >= per_area:
+                break
+            if row["question"] not in seen_questions:
+                chosen.append(row)
+                seen_questions.add(row["question"])
+        if len(chosen) != per_area:
+            raise SystemExit(
+                f"topic area {area} ({slug}) has {len(chosen)} distinct grounded questions; "
+                f"cannot meet target {per_area}. Add verified seeds or reduce --questions-per-area."
+            )
+        for row in chosen:
+            row = dict(row)
+            row.setdefault("fact_cluster_id", row.get("source_item_id", row["id"]))
+            row["sector_suite"] = "balanced_sector"
+            suite.append(row)
+    return suite
+
+
+def write_sector_files(items: list[dict], directory: Path) -> dict[int, int]:
+    directory.mkdir(parents=True, exist_ok=True)
+    counts = {}
+    for area, slug in AREA_SLUGS.items():
+        rows = [it for it in items if int(it["topic_area"]) == area]
+        path = directory / f"area-{area:02d}-{slug}.jsonl"
+        with path.open("w", encoding="utf-8") as stream:
+            for row in rows:
+                stream.write(json.dumps(row, ensure_ascii=False) + "\n")
+        counts[area] = len(rows)
+    return counts
 
 
 class Data:
@@ -532,7 +668,16 @@ def main() -> int:
     parser.add_argument("--cantons", type=int, default=150)
     parser.add_argument("--mergers", type=int, default=150)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
-    parser.add_argument("--out", type=Path, default=OUT)
+    parser.add_argument("--out", type=Path, default=OUT,
+                        help="balanced generated set (default: 10 cases per area)")
+    parser.add_argument("--full-out", type=Path, default=FULL_OUT,
+                        help="preserve the full data-derived corpus as a separate file")
+    parser.add_argument("--sector-dir", type=Path, default=SECTOR_OUT,
+                        help="balanced per-area test files")
+    parser.add_argument("--full-sector-dir", type=Path, default=FULL_SECTOR_OUT,
+                        help="per-area partitions of the full, unbalanced corpus")
+    parser.add_argument("--questions-per-area", type=int, default=10,
+                        help="target generated cases in each balanced sector file")
     args = parser.parse_args()
 
     data = Data(args.db)
@@ -542,9 +687,11 @@ def main() -> int:
         raise SystemExit(f"self-check failed: Lugano adult 2500 no accident should be 449.9, got {check and check['Prämie']}")
 
     rng = random.Random(args.seed)
-    items = (gen_premiums(data, rng, args.premiums_per_canton) + gen_regions(data, rng, args.regions)
-             + gen_cantons(data, rng, args.cantons) + gen_mergers(data, rng, args.mergers)
-             + gen_same_name(data) + gen_foreign(data) + gen_askback(data))
+    seeds = read_verified_seeds()
+    full_items = (gen_premiums(data, rng, args.premiums_per_canton) + gen_regions(data, rng, args.regions)
+                  + gen_cantons(data, rng, args.cantons) + gen_mergers(data, rng, args.mergers)
+                  + gen_same_name(data) + gen_foreign(data) + gen_askback(data) + gen_context_variants(seeds))
+    items = make_balanced_sector_suite(full_items, seeds, args.questions_per_area)
     ids = [i["id"] for i in items]
     dupes = {i for i in ids if ids.count(i) > 1}
     if dupes:
@@ -557,10 +704,20 @@ def main() -> int:
     with args.out.open("w", encoding="utf-8") as f:
         for it in items:
             f.write(json.dumps(it, ensure_ascii=False) + "\n")
-    counts = defaultdict(int)
-    for it in items:
-        counts[it["id"].split("-")[1]] += 1
-    print(f"wrote {len(items)} items to {args.out}: " + ", ".join(f"{k} {v}" for k, v in sorted(counts.items())))
+    with args.full_out.open("w", encoding="utf-8") as f:
+        for it in full_items:
+            f.write(json.dumps(it, ensure_ascii=False) + "\n")
+    sector_counts = write_sector_files(items, args.sector_dir)
+    full_sector_counts = write_sector_files(full_items, args.full_sector_dir)
+    if any(count != args.questions_per_area for count in sector_counts.values()):
+        raise SystemExit(f"balanced sector counts do not match target: {sector_counts}")
+    ids = [row["id"] for row in items]
+    if len(ids) != len(set(ids)):
+        raise SystemExit("duplicate ids in balanced sector suite")
+    print(f"wrote balanced {len(items)} items to {args.out}: "
+          + ", ".join(f"area {area}={count}" for area, count in sorted(sector_counts.items())))
+    print(f"preserved full {len(full_items)}-item corpus at {args.full_out}; full per-area counts: "
+          + ", ".join(f"{area}={count}" for area, count in sorted(full_sector_counts.items())))
     return 0
 
 

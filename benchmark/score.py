@@ -138,6 +138,8 @@ def main() -> int:
     parser.add_argument("answers", nargs="?", type=Path, help="JSONL with {\"id\", \"answer\"} per line")
     parser.add_argument("--data", type=Path, nargs="+", default=DEFAULT_DATA,
                         help="question files (default: data/qa.jsonl data/generated.jsonl)")
+    parser.add_argument("--topic-area", type=int, choices=range(1, 17),
+                        help="score only one challenge topic area (1-16)")
     parser.add_argument("--template", type=Path, help="write a blank answers file and exit")
     parser.add_argument("--today", type=dt.date.fromisoformat, default=dt.date.today(),
                         help="date used to skip expired questions (default: today)")
@@ -148,6 +150,10 @@ def main() -> int:
     args = parser.parse_args()
 
     questions = load_questions(args.data)
+    if args.topic_area is not None:
+        questions = [row for row in questions if int(row["topic_area"]) == args.topic_area]
+        if not questions:
+            parser.error(f"no questions found for topic area {args.topic_area}")
 
     if args.template:
         args.template.parent.mkdir(parents=True, exist_ok=True)
