@@ -23,6 +23,7 @@ from . import (
     migration_tools,
     opendata_tools,
     political_rights_tools,
+    school_holiday_tools,
     source_tools,
     weather_tools,
 )
@@ -34,6 +35,7 @@ __all__ = [
     "driving_licence_tools",
     "geo_tools",
     "health_insurance_tools",
+    "school_holiday_tools",
     "housing_tools",
     "migration_tools",
     "opendata_tools",
