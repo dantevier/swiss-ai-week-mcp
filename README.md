@@ -473,3 +473,5 @@ Knowledge base and premium lookup:
 - The premium table is frozen to 2026; the tool returns `invalid_input`/
   `no_data` rather than an outdated figure once a new premium year applies,
   and a fresh CSV has to be regenerated and shipped, not auto-refreshed.
+
+The MCP response includes a readable holiday list for chat clients and the original structured fields for programmatic use. [AGENTS.md](AGENTS.md) directs Codex to use this tool first for school holiday questions. Codex web search remains available for other questions or when you explicitly request independent verification. Start a new Codex session after changing its guidance.
