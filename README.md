@@ -183,17 +183,20 @@ These three tools fetch the selected authority page at query time and return its
 
 ## Data sources
 
-Two different things share the word "source" here, and they don't overlap:
+Two different things share the word "source" here:
 `src/mcp_boilerplate/zefix/sources/` holds the **live API clients**
 (`LindasClient`, `ZefixClient`, `GazetteClient`) that `company_info` calls
 fresh on every request and stores nothing; `src/mcp_boilerplate/sources.py`
-is the **single registry of reviewed authorities**, `SOURCES`, whose rows
-come in two kinds: `Source` pages, which the crawler and `get_source` are
-restricted to, and `ApiSource` APIs (`zefix_lindas`, `zefix_web`, `gazette`),
-which `company_info` calls live. `API_SOURCES` is the view of the API rows and
-feeds the egress allow-list; the crawler, the knowledge base and the dashboard
-skip API rows. A page is fetched only when a `crawl_*_sources` call asks for
-it, and the result is saved, not proxied.
+is the **single registry of reviewed authorities**, `SOURCES`, so every source
+the server reads is reviewed and attributed in one place. Most rows are pages,
+fetched only when a `crawl_*_sources` call asks for them and saved, not
+proxied. `SOURCES["federal"]` also lists the three commercial-register API
+endpoints (`zefix_lindas`, `zefix_web`, `gazette`) as plain `Source` rows
+whose expected text is the `NOT_A_PAGE` sentinel: a crawl of one fails
+validation and saves nothing, `get_source` reports it as not crawled, and
+`company_info` calls it live, never through the crawler. The companion table
+`API_SOURCES` holds each endpoint's base URL, authority, allowed hosts and
+terms; the three rows are built from it, and it feeds the egress allow-list.
 
 ### Commercial register (`zefix/sources/`)
 
@@ -214,6 +217,9 @@ the PRD).
 
 | Level | Source id | Authority | Publishes |
 |---|---|---|---|
+| Federal | `zefix_lindas` | Federal Office of Justice (EHRA), via LINDAS | Commercial-register SPARQL endpoint; API, called live by `company_info`, never crawled |
+| Federal | `zefix_web` | Federal Office of Justice (EHRA) | Zefix web API; API, called live by `company_info`, never crawled |
+| Federal | `gazette` | Swiss Official Gazette of Commerce (SHAB), SECO | Amtsblattportal API; API, called live by `company_info`, never crawled |
 | Federal | `health_insurance_premiums` | Federal Office of Public Health (BAG), via opendata.swiss | 2026 basic-insurance premium archive package |
 | Federal | `premium_regions_2026` | Federal Department of Home Affairs (FDHA), via Fedlex | Premium-region assignment ordinance |
 | Federal | `reference_interest_rate` | Federal Office for Housing (BWO) | Current mortgage reference interest rate |
@@ -270,10 +276,11 @@ every request (including redirects). The allow-list is derived from
 The crawler has no `RESPECT_ROBOTS_TXT`-equivalent setting; it is compliant
 by construction instead. `check_url()` in `src/mcp_boilerplate/crawler.py`
 rejects any URL — including a redirect target — that is not exactly one of
-the 13 page URLs in `sources.py`; `crawl_*_sources` and `get_source` take a
-source name, never a URL, so no tool call can reach an arbitrary or
-user-supplied page. Direct and PDF fetches identify themselves with a fixed
-`User-Agent: swiss-ai-week-mcp/0.1`. Each of the 13 URLs was reviewed by
+the 16 URLs listed in `sources.py` (13 pages and the 3 commercial-register API
+endpoints, whose crawl fails validation and saves nothing); `crawl_*_sources`
+and `get_source` take a source name, never a URL, so no tool call can reach an
+arbitrary or user-supplied page. Direct and PDF fetches identify themselves with a fixed
+`User-Agent: swiss-ai-week-mcp/0.1`. Each of the 16 URLs was reviewed by
 hand before being added; the code itself does not parse `robots.txt`.
 
 ## Credentials

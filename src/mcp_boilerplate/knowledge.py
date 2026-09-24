@@ -13,7 +13,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from .config.settings import settings
-from .sources import pages
+from .sources import SOURCES
 
 MODEL = "text-embedding-3-small"
 SEED = Path(__file__).with_name("knowledge_seed.sqlite3")
@@ -173,8 +173,7 @@ class KnowledgeBase:
             )
 
     def get(self, level: str, source: str) -> dict:
-        entry = pages(level).get(source)
-        if entry is None:
+        if level not in SOURCES or source not in SOURCES[level]:
             raise ValueError("Unknown approved source")
         with self.connect() as db:
             row = db.execute(
@@ -185,7 +184,7 @@ class KnowledgeBase:
                 """,
                 (level, source),
             ).fetchone()
-        if row is None or row["url"] != entry.url:
+        if row is None or row["url"] != SOURCES[level][source].url:
             raise ValueError("Source has not been crawled")
         result = dict(row)
         result["metadata"] = json.loads(result["metadata"])
@@ -249,8 +248,7 @@ class KnowledgeBase:
     @staticmethod
     def _approved(row: sqlite3.Row) -> bool:
         level, source = row["level"], row["source"]
-        entry = pages(level).get(source)
-        return entry is not None and entry.url == row["url"]
+        return level in SOURCES and source in SOURCES[level] and SOURCES[level][source].url == row["url"]
 
     @staticmethod
     def _result(row: sqlite3.Row, score: float | None = None) -> dict:

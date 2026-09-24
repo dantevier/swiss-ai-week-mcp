@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from ..knowledge import KnowledgeBase
-from ..sources import SOURCES, pages
+from ..sources import SOURCES
 
 KVG_FILE = Path(__file__).resolve().parents[3] / "data" / "kvg_minimum_premiums_2026.csv"
 
@@ -32,7 +32,7 @@ def _state(last_refresh, last_failure, age, threshold) -> str:
 
 
 def get_status(database: KnowledgeBase | None = None, now: datetime | None = None) -> dict:
-    """One row per crawled page source, plus read-only rows for static data files."""
+    """One row per approved source, plus read-only rows for static data files."""
     now = now or datetime.now(UTC)
     threshold = stale_after_days()
     with (database or KnowledgeBase()).connect() as db:
@@ -50,8 +50,8 @@ def get_status(database: KnowledgeBase | None = None, now: datetime | None = Non
         failures = {(r["level"], r["source"]): r for r in db.execute("SELECT * FROM failures")}
 
     rows = []
-    for level in SOURCES:
-        for name, entry in pages(level).items():
+    for level, entries in SOURCES.items():
+        for name, entry in entries.items():
             row = saved.get((level, name))
             failure = failures.get((level, name))
             last_refresh = row["crawled_at"] if row else None

@@ -322,7 +322,7 @@ tests/
   test_zefix_sources_lindas.py  respx; UID hit, prefix search, zero hits, escaping, timeout
   test_zefix_sources_zefix.py   respx; detail parse, 404, timeout → enrichment degraded (covers zefix/sources/rest.py)
   test_zefix_sources_gazette.py respx; quirks 1-3, retry, budget, deletion detection
-  test_sources.py               every `API_SOURCES` host is in `http.allowed_hosts()`; crawler/API registries stay separate
+  test_sources.py               every `API_SOURCES` host is in `http.allowed_hosts()`; the three endpoints are rows of `SOURCES["federal"]` with `expected = NOT_A_PAGE`; `API_SOURCES` holds base URL, hosts, authority and terms
   test_company_info.py          state machine: each of the 5 states from injected fakes; ambiguity; rm→de; persons; robots switch
   test_company_info_registration.py  the tool is registered on the MCP server with the documented signature
   test_live.py                  @pytest.mark.live, excluded by default

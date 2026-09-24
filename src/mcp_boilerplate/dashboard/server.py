@@ -21,7 +21,7 @@ from starlette.staticfiles import StaticFiles
 from ..config import env
 from ..config.settings import settings
 from ..crawler import Crawler
-from ..sources import SOURCES, pages
+from ..sources import SOURCES
 from .status import get_status
 
 HERE = Path(__file__).resolve().parent
@@ -84,7 +84,7 @@ async def refresh(request: Request) -> JSONResponse:
         )
     level = request.path_params["level"]
     source = request.path_params["source"]
-    if level not in SOURCES or (source != "all" and source not in pages(level)):
+    if level not in SOURCES or (source != "all" and source not in SOURCES[level]):
         return JSONResponse({"error": "Unknown approved source"}, status_code=404)
     if _crawl_lock.locked():
         return JSONResponse({"error": "Another refresh is already running"}, status_code=409)

@@ -1,13 +1,11 @@
-"""Registry checks for SOURCES and its API_SOURCES view (docs/prd-company-info-refactor.md S3, T5)."""
+"""Registry checks for SOURCES and API_SOURCES (docs/prd-company-info-refactor.md S3, T5)."""
 
 import pytest
 
 from mcp_boilerplate.config.settings import settings
 from mcp_boilerplate.crawler import Crawler, check_url
 from mcp_boilerplate.knowledge import KnowledgeBase
-from mcp_boilerplate.server import mcp
-from mcp_boilerplate.sources import API_SOURCES, SOURCES, ApiSource, Source, pages
-from mcp_boilerplate.tools import source_tools  # noqa: F401  registers the crawl tools
+from mcp_boilerplate.sources import API_SOURCES, NOT_A_PAGE, SOURCES, Source
 from mcp_boilerplate.zefix.sources import http
 from tests.test_crawler import FakeEmbedder, FakeFetcher
 
@@ -15,21 +13,12 @@ API_NAMES = ("zefix_lindas", "zefix_web", "gazette")
 
 
 @pytest.mark.parametrize("name", API_NAMES)
-def test_api_source_is_a_federal_row(name):
-    assert isinstance(SOURCES["federal"][name], ApiSource)
-    assert SOURCES["federal"][name] is API_SOURCES[name]
-
-
-def test_api_sources_is_the_api_view_of_sources():
-    assert API_SOURCES == {
-        name: entry
-        for entries in SOURCES.values()
-        for name, entry in entries.items()
-        if isinstance(entry, ApiSource)
-    }
-    for level in SOURCES:
-        assert all(isinstance(entry, Source) for entry in pages(level).values())
-        assert not set(pages(level)) & set(API_SOURCES)
+def test_api_source_is_listed_as_a_federal_row(name):
+    row = SOURCES["federal"][name]
+    assert isinstance(row, Source)
+    assert row.url == API_SOURCES[name].base_url
+    assert row.authority == API_SOURCES[name].authority
+    assert row.expected == NOT_A_PAGE
 
 
 def test_every_api_source_host_is_allowed():
@@ -39,9 +28,10 @@ def test_every_api_source_host_is_allowed():
             assert host in allowed, f"{name} host {host!r} missing from allowed_hosts()"
 
 
-def test_zefix_lindas_base_url_is_not_a_crawlable_source():
+def test_check_url_accepts_listed_api_url_only():
+    check_url("federal", API_SOURCES["zefix_lindas"].base_url)
     with pytest.raises(ValueError):
-        check_url("federal", API_SOURCES["zefix_lindas"].base_url)
+        check_url("federal", "https://lindas.admin.ch/other")
 
 
 @pytest.mark.parametrize(
@@ -57,36 +47,43 @@ def test_settings_defaults_match_registry_base_urls(settings_field, registry_key
 
 
 @pytest.mark.asyncio
-async def test_crawl_tool_rejects_api_source_as_unknown():
-    with pytest.raises(Exception, match="Unknown federal source: zefix_lindas"):
-        await mcp.call_tool("crawl_federal_sources", {"source": "zefix_lindas"})
+async def test_crawling_an_api_row_fails_validation_and_saves_nothing(tmp_path):
+    db = KnowledgeBase(tmp_path / "kb.sqlite3")
+    row = SOURCES["federal"]["zefix_lindas"]
+    db.save(
+        {
+            "authority_level": "federal", "source": "zefix_lindas",
+            "authority": row.authority, "url": row.url,
+            "crawled_at": "2026-09-24T00:00:00+00:00",
+            "markdown": "previous", "metadata": {},
+        },
+        ["previous"],
+        [[1.0, 0.0]],
+    )
+    fetcher = FakeFetcher()
+    fetcher.text = "any API response text"
+    crawler = Crawler(fetcher, fetcher, db, FakeEmbedder())
+
+    with pytest.raises(ValueError, match="Expected source content missing: zefix_lindas"):
+        await crawler.crawl("federal", "zefix_lindas")
+
+    saved = db.get("federal", "zefix_lindas")
+    assert saved["markdown"] == "previous"
+    assert saved["crawled_at"] == "2026-09-24T00:00:00+00:00"
+    assert saved["refresh_error"] == "Expected source content missing: zefix_lindas"
+    assert saved["refresh_failed_at"]
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("name", API_NAMES)
-async def test_crawler_rejects_api_source_like_unknown_source(tmp_path, name):
+async def test_full_federal_refresh_reports_api_rows_as_failed(tmp_path):
+    db = KnowledgeBase(tmp_path / "kb.sqlite3")
     fetcher = FakeFetcher()
-    crawler = Crawler(fetcher, fetcher, KnowledgeBase(tmp_path / "kb.sqlite3"), FakeEmbedder())
-    with pytest.raises(ValueError, match=f"Unknown federal source: {name}"):
-        await crawler.crawl("federal", name)
-    assert not fetcher.calls
+    crawler = Crawler(fetcher, fetcher, db, FakeEmbedder())
 
+    result = await crawler.crawl("federal", "all")
 
-@pytest.mark.asyncio
-async def test_crawl_all_never_touches_an_api_source(tmp_path):
-    fetcher = FakeFetcher()
-    crawler = Crawler(fetcher, fetcher, KnowledgeBase(tmp_path / "kb.sqlite3"), FakeEmbedder())
-    await crawler.crawl("federal", "all")
-    fetched = {url for url, _ in fetcher.calls}
-    assert fetched == {entry.url for entry in pages("federal").values()}
-    assert not fetched & {source.base_url for source in API_SOURCES.values()}
-
-
-@pytest.mark.parametrize("name", API_NAMES)
-def test_get_source_treats_api_source_as_unknown(tmp_path, name):
-    kb = KnowledgeBase(tmp_path / "kb.sqlite3")
-    with pytest.raises(ValueError) as unknown:
-        kb.get("federal", "nope")
-    with pytest.raises(ValueError) as api:
-        kb.get("federal", name)
-    assert str(api.value) == str(unknown.value) == "Unknown approved source"
+    by_name = {entry["source"]: entry for entry in result["sources"]}
+    for name in API_NAMES:
+        assert by_name[name]["error"] == f"Expected source content missing: {name}"
+        with pytest.raises(ValueError, match="Source has not been crawled"):
+            db.get("federal", name)
