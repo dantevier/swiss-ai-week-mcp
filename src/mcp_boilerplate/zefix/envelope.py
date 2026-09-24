@@ -83,6 +83,15 @@ NEED_INFO_QUESTIONS: dict[str, dict[str, str]] = {
     },
 }
 
+_ASK_NAME_QUESTION: dict[str, str] = {
+    "de": "Wie lautet der Name der gesuchten Firma oder deren UID (CHE-xxx.xxx.xxx)?",
+    "fr": "Quel est le nom de la société recherchée, ou son numéro IDE (CHE-xxx.xxx.xxx) ?",
+    "it": "Qual è il nome dell'azienda cercata, oppure il suo numero IDI (CHE-xxx.xxx.xxx)?",
+    "en": "What is the name of the company you're asking about, or its UID (CHE-xxx.xxx.xxx)?",
+}
+
+_ROMANSH_ASSUMPTION = "Romansh not available upstream; answered in German"
+
 # `out_of_scope` sentences, by reason. Each states what this tool covers (or,
 # for `persons`, points at the cantonal excerpt as the authoritative source).
 OUT_OF_SCOPE_SENTENCES: dict[str, dict[str, str]] = {
@@ -230,6 +239,33 @@ SOURCE_UNAVAILABLE_SENTENCES: dict[str, dict[str, str]] = {
             "This does not mean the company does not exist."
         ),
     },
+}
+
+# Addendum (coordinator, mid-S4): lindas.search_by_name raises
+# SourceUnavailable(error_class="timeout_scan") when a name scan (STRSTARTS/
+# CONTAINS full-table scan) blows its budget. That failure mode is
+# actionable by the caller (unlike a generic network outage): give a UID or
+# an exact name+canton instead of a fuzzy prefix, so the answer sentence for
+# it is a distinct, more specific override of the generic lindas sentence.
+_TIMEOUT_SCAN_SENTENCES: dict[str, str] = {
+    "de": (
+        "Der Firmenindex konnte die Namenssuche nicht rechtzeitig abschliessen. "
+        "Bitte UID (CHE-xxx.xxx.xxx) oder exakten Firmennamen und Kanton angeben."
+    ),
+    "fr": (
+        "L'index des entreprises n'a pas pu terminer la recherche par nom à temps. "
+        "Veuillez indiquer le numéro IDE (CHE-xxx.xxx.xxx) ou le nom exact de "
+        "l'entreprise et le canton."
+    ),
+    "it": (
+        "L'indice delle aziende non è riuscito a completare la ricerca per nome in "
+        "tempo. Indicare l'IDI (CHE-xxx.xxx.xxx) oppure il nome esatto dell'azienda "
+        "e il cantone."
+    ),
+    "en": (
+        "The company index could not complete the name search in time. Provide the "
+        "UID (CHE-xxx.xxx.xxx) or the exact registered name and canton."
+    ),
 }
 
 # `no_match` sentence: "the active-entity index as of {date} holds no entry for …".

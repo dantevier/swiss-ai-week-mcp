@@ -19,7 +19,7 @@ import json
 import pytest
 import respx
 
-from mcp_boilerplate.zefix import envelope
+from mcp_boilerplate.zefix import envelope, gates
 from mcp_boilerplate.config.settings import Settings
 from mcp_boilerplate.zefix.sources import gazette
 from mcp_boilerplate.zefix.sources.http import EgressDenied, SourceUnavailable, make_client
@@ -344,6 +344,55 @@ async def test_q8_analytics_question_is_out_of_scope(monkeypatch):
     result = await company_info(question="Wie viele AGs gibt es im Kanton Zug?", language="de")
     assert result["status"] == "out_of_scope"
     assert result["reason"] == "analytics"
+
+
+# ---------------------------------------------------------------------------
+# gates.classify() (S5: step-0 gates moved to zefix/gates.py): one case per
+# `Reason` plus the None case, using the same inputs as the black-box
+# out_of_scope tests above (Q5/Q6/Q8), now exercised directly and offline.
+# ---------------------------------------------------------------------------
+
+
+def test_classify_persons_reason():
+    """Same input as test_q5_persons_question_is_out_of_scope_and_resolves_company_first."""
+    reason = gates.classify(
+        "Wer sitzt im Verwaltungsrat der Swisscom (Schweiz) AG?", None, None, True
+    )
+    assert reason == "persons"
+
+
+def test_classify_jurisdiction_reason_from_foreign_country_question():
+    """Same input as test_q6_foreign_jurisdiction_question_is_out_of_scope."""
+    reason = gates.classify("Ist die Firma XY in Deutschland eingetragen?", None, None, False)
+    assert reason == "jurisdiction"
+
+
+def test_classify_jurisdiction_reason_from_non_che_uid():
+    """Same input as test_q6_non_che_uid_is_out_of_scope_jurisdiction."""
+    reason = gates.classify(None, "DE123456789", None, True)
+    assert reason == "jurisdiction"
+
+
+def test_classify_analytics_reason():
+    """Same input as test_q8_analytics_question_is_out_of_scope."""
+    reason = gates.classify("Wie viele AGs gibt es im Kanton Zug?", None, None, False)
+    assert reason == "analytics"
+
+
+def test_classify_topic_reason_when_no_identifier_and_not_company_like():
+    """No name/uid and a question with no company-register hint -> "topic",
+    the branch `_looks_company_like` gates and that only applies without an
+    identifier (PRD §5.2 step 0)."""
+    reason = gates.classify("Wie wird das Wetter morgen in Zürich?", None, None, False)
+    assert reason == "topic"
+
+
+def test_classify_returns_none_when_no_gate_fires():
+    """Same input as test_no_params_and_no_question_asks_for_name (no gate fires;
+    the tool, not classify(), turns this into need_info) and a resolvable case
+    (name given, no gate-triggering question)."""
+    assert gates.classify(None, None, None, False) is None
+    assert gates.classify(None, None, None, True) is None
 
 
 # ---------------------------------------------------------------------------

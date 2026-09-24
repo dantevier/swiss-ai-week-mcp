@@ -18,11 +18,10 @@ exception's class name as `error_class` (PRD contract: no leaking internals).
 
 from __future__ import annotations
 
-import re
 from time import monotonic
 from typing import Any
 
-from ..zefix import envelope
+from ..zefix import envelope, gates
 from ..config.settings import settings
 from ..server import mcp
 from ..zefix.sources import gazette, lindas
@@ -33,7 +32,7 @@ from ..utils.logger import setup_logger
 logger = setup_logger("mcp_boilerplate.tools.company_info")
 
 # ---------------------------------------------------------------------------
-# Module constants: word lists for the step-0 gates (PRD §5.2, §5.4)
+# Module constants
 # ---------------------------------------------------------------------------
 
 # Gazette rubrics that are commercial-register publications (HR = Handelsregister).
@@ -43,170 +42,6 @@ REGISTER_RUBRICS: list[str] = ["HR"]
 
 AUTHORITY = "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz"
 
-_PERSON_TERMS: tuple[str, ...] = (
-    "verwaltungsrat",
-    "geschäftsführer",
-    "geschaeftsfuehrer",
-    "zeichnungsberechtigt",
-    "revisionsstelle",
-    "inhaber",
-    "conseil d'administration",
-    "conseil d’administration",
-    "administrateur",
-    "gérant",
-    "gerant",
-    "signature",
-    "organe de révision",
-    "organe de revision",
-    "consiglio di amministrazione",
-    "amministratore",
-    "gerente",
-    "firma sociale",
-    "ufficio di revisione",
-    "board",
-    "director",
-    "signatory",
-    "auditor",
-)
-
-_ANALYTICS_TERMS: tuple[str, ...] = (
-    "wie viele",
-    "combien",
-    "quante",
-    "how many",
-    "alle firmen",
-    "toutes les sociétés",
-    "toutes les societes",
-    "tutte le aziende",
-    "list all",
-)
-
-_TOPIC_HINTS: tuple[str, ...] = (
-    "firma",
-    "société",
-    "societe",
-    "azienda",
-    "handelsregister",
-    "registre du commerce",
-    "registro di commercio",
-    "shab",
-    "fosc",
-    "fusc",
-)
-
-_LEGAL_FORM_SUFFIXES: tuple[str, ...] = (
-    "ag",
-    "gmbh",
-    "sa",
-    "sagl",
-    "sàrl",
-    "sarl",
-    "snc",
-    "scs",
-    "genossenschaft",
-)
-
-_FOREIGN_REGISTER_IDS: tuple[str, ...] = (
-    "hrb",
-    "siren",
-    "siret",
-    "rea",
-    "companies house",
-    "handelsregister b",
-)
-
-# Hand-written, ~40 common country names (minus Switzerland) in de/fr/it/en.
-# Compact by design (interfaces.md deltas): a hint list, not an ISO table.
-_COUNTRY_NAMES: frozenset[str] = frozenset(
-    {
-        "deutschland", "allemagne", "germania", "germany",
-        "österreich", "oesterreich", "autriche", "austria",
-        "frankreich", "france", "francia",
-        "italien", "italie", "italy",
-        "liechtenstein",
-        "spanien", "espagne", "spagna", "spain",
-        "portugal",
-        "grossbritannien", "royaume-uni", "regno unito", "united kingdom",
-        "england", "angleterre", "inghilterra",
-        "vereinigte staaten", "états-unis", "etats-unis", "stati uniti", "united states", "usa",
-        "niederlande", "pays-bas", "paesi bassi", "netherlands",
-        "belgien", "belgique", "belgio", "belgium",
-        "luxemburg", "luxembourg", "lussemburgo",
-        "polen", "pologne", "polonia", "poland",
-        "schweden", "suède", "suede", "svezia", "sweden",
-        "norwegen", "norvège", "norvegia", "norway",
-        "dänemark", "danemark", "danimarca", "denmark",
-        "finnland", "finlande", "finlandia", "finland",
-        "irland", "irlande", "irlanda", "ireland",
-        "griechenland", "grèce", "grecia", "greece",
-        "türkei", "turquie", "turchia", "turkey",
-        "russland", "russie", "russia",
-        "china", "chine", "cina",
-        "japan", "japon", "giappone",
-        "indien", "inde", "india",
-        "brasilien", "brésil", "brasile", "brazil",
-        "kanada", "canada",
-        "mexiko", "mexique", "messico", "mexico",
-        "tschechien", "république tchèque", "repubblica ceca", "czech republic",
-        "ungarn", "hongrie", "ungheria", "hungary",
-        "kroatien", "croatie", "croazia", "croatia",
-        "ukraine",
-        "rumänien", "roumanie", "romania",
-    }
-)
-
-_SWISS_WORDS: frozenset[str] = frozenset({"schweiz", "suisse", "svizzera", "switzerland", "che"})
-
-_CANTON_NAMES: frozenset[str] = frozenset(
-    {
-        "zürich", "zuerich", "zurich", "bern", "berne", "luzern", "lucerne", "uri",
-        "schwyz", "obwalden", "nidwalden", "glarus", "zug", "freiburg", "fribourg",
-        "solothurn", "basel", "bâle", "basilea", "schaffhausen", "appenzell",
-        "st. gallen", "st gallen", "san gallo", "graubünden", "grigioni", "grisons",
-        "aargau", "argovie", "argovia", "thurgau", "thurgovie", "turgovia",
-        "ticino", "tessin", "vaud", "waadt", "wallis", "valais", "vallese",
-        "neuchâtel", "neuenburg", "neuchatel", "genf", "genève", "geneve", "ginevra", "jura",
-    }
-)
-
-_FOREIGN_UID_PREFIX_RE = re.compile(r"^[A-Z]{2,}")
-
-_ASK_NAME_QUESTION: dict[str, str] = {
-    "de": "Wie lautet der Name der gesuchten Firma oder deren UID (CHE-xxx.xxx.xxx)?",
-    "fr": "Quel est le nom de la société recherchée, ou son numéro IDE (CHE-xxx.xxx.xxx) ?",
-    "it": "Qual è il nome dell'azienda cercata, oppure il suo numero IDI (CHE-xxx.xxx.xxx)?",
-    "en": "What is the name of the company you're asking about, or its UID (CHE-xxx.xxx.xxx)?",
-}
-
-_ROMANSH_ASSUMPTION = "Romansh not available upstream; answered in German"
-
-# Addendum (coordinator, mid-S4): lindas.search_by_name raises
-# SourceUnavailable(error_class="timeout_scan") when a name scan (STRSTARTS/
-# CONTAINS full-table scan) blows its budget. That failure mode is
-# actionable by the caller (unlike a generic network outage): give a UID or
-# an exact name+canton instead of a fuzzy prefix, so the answer sentence for
-# it is a distinct, more specific override of the generic lindas sentence.
-_TIMEOUT_SCAN_SENTENCES: dict[str, str] = {
-    "de": (
-        "Der Firmenindex konnte die Namenssuche nicht rechtzeitig abschliessen. "
-        "Bitte UID (CHE-xxx.xxx.xxx) oder exakten Firmennamen und Kanton angeben."
-    ),
-    "fr": (
-        "L'index des entreprises n'a pas pu terminer la recherche par nom à temps. "
-        "Veuillez indiquer le numéro IDE (CHE-xxx.xxx.xxx) ou le nom exact de "
-        "l'entreprise et le canton."
-    ),
-    "it": (
-        "L'indice delle aziende non è riuscito a completare la ricerca per nome in "
-        "tempo. Indicare l'IDI (CHE-xxx.xxx.xxx) oppure il nome esatto dell'azienda "
-        "e il cantone."
-    ),
-    "en": (
-        "The company index could not complete the name search in time. Provide the "
-        "UID (CHE-xxx.xxx.xxx) or the exact registered name and canton."
-    ),
-}
-
 
 # ---------------------------------------------------------------------------
 # Small helpers
@@ -215,70 +50,6 @@ _TIMEOUT_SCAN_SENTENCES: dict[str, str] = {
 
 def _remaining(deadline: float) -> float:
     return max(0.0, deadline - monotonic())
-
-
-def _uid_is_foreign(raw: str) -> bool:
-    """True if `raw` carries a non-CHE alphabetic UID prefix (e.g. "DE...")."""
-    s = raw.strip().upper()
-    if s.startswith("CHE"):
-        return False
-    return bool(_FOREIGN_UID_PREFIX_RE.match(s))
-
-
-def _has_swiss_anchor(question: str, canton: str | None) -> bool:
-    if canton:
-        return True
-    q_lower = question.lower()
-    if any(word in q_lower for word in _SWISS_WORDS):
-        return True
-    if any(name in q_lower for name in _CANTON_NAMES):
-        return True
-    q_upper = question.upper()
-    for code in zefix.CANTON_CODES:
-        if re.search(rf"\b{code}\b", q_upper):
-            return True
-    return False
-
-
-def _has_persons_terms(question: str | None) -> bool:
-    if not question:
-        return False
-    q = question.lower()
-    return any(term in q for term in _PERSON_TERMS)
-
-
-def _is_jurisdiction_gate(uid: str | None, question: str | None, canton: str | None) -> bool:
-    if uid and zefix.normalize_uid(uid) is None and _uid_is_foreign(uid):
-        return True
-    if not question:
-        return False
-    q_lower = question.lower()
-    has_country = any(country in q_lower for country in _COUNTRY_NAMES)
-    has_foreign_id = any(fid in q_lower for fid in _FOREIGN_REGISTER_IDS)
-    if not (has_country or has_foreign_id):
-        return False
-    return not _has_swiss_anchor(question, canton)
-
-
-def _has_analytics_terms(question: str | None) -> bool:
-    if not question:
-        return False
-    q = question.lower()
-    return any(term in q for term in _ANALYTICS_TERMS)
-
-
-def _looks_company_like(question: str) -> bool:
-    q = question.lower()
-    if any(hint in q for hint in _TOPIC_HINTS):
-        return True
-    if zefix.normalize_uid(question) is not None:
-        return True
-    if re.search(r"\bche[-\s]?\d{3}[.\s]?\d{3}[.\s]?\d{3}\b", q):
-        return True
-    for suffix in _LEGAL_FORM_SUFFIXES:
-        if re.search(rf"\b{re.escape(suffix)}\b", q):
-            return True
-    return False
 
 
 async def _call_source(source_name: str, awaitable: Any) -> tuple[str, Any]:
@@ -655,7 +426,7 @@ async def _build_answered_envelope(
         assumptions.append("effective_from from the LINDAS dataset_modified date")
 
     if is_romansh:
-        assumptions.append(_ROMANSH_ASSUMPTION)
+        assumptions.append(envelope._ROMANSH_ASSUMPTION)
 
     company_dict = _build_company_dict(company, lang, status=status, deleted_on=deleted_on, old_names=old_names)
 
@@ -712,7 +483,7 @@ async def _build_derived_deleted_envelope(
 
     assumptions = ["effective_from from the gazette deletion publication (no LINDAS record for this UID)"]
     if is_romansh:
-        assumptions.append(_ROMANSH_ASSUMPTION)
+        assumptions.append(envelope._ROMANSH_ASSUMPTION)
 
     citation = {
         "authority": AUTHORITY,
@@ -819,7 +590,14 @@ async def company_info(
     # --- Step 0: gates, evaluated on question + parameters, no network call
     # except the persons gate's own (optional) company resolution. ----------
 
-    if _has_persons_terms(question):
+    has_identifier = bool(name or uid)
+    reason = gates.classify(question, uid, canton, has_identifier)
+
+    if reason == "persons":
+        # classify() cannot express this in a single reason: the persons gate
+        # is the one gate that does its own (optional) I/O before answering,
+        # so it can still return the cantonal-excerpt link when a company was
+        # given. That resolution stays here, not in gates.py (pure).
         cantonal_excerpt_url: str | None = None
         if name or uid:
             resolution = await _resolve_company(name=name, uid=uid, canton=canton, deadline=deadline, language=lang)
@@ -834,28 +612,31 @@ async def company_info(
             language=lang,
         )
 
-    if _is_jurisdiction_gate(uid, question, canton):
+    if reason == "jurisdiction":
         return envelope.out_of_scope(
             reason="jurisdiction",
             covered=envelope.OUT_OF_SCOPE_SENTENCES["jurisdiction"][lang],
             language=lang,
         )
 
-    if _has_analytics_terms(question):
+    if reason == "analytics":
         return envelope.out_of_scope(
             reason="analytics",
             covered=envelope.OUT_OF_SCOPE_SENTENCES["analytics"][lang],
             language=lang,
         )
 
-    if not name and not uid:
-        if question and not _looks_company_like(question):
-            return envelope.out_of_scope(
-                reason="topic",
-                covered=envelope.OUT_OF_SCOPE_SENTENCES["topic"][lang],
-                language=lang,
-            )
-        return envelope.need_info(question=_ASK_NAME_QUESTION[lang], candidates=[], missing="name", language=lang)
+    if reason == "topic":
+        return envelope.out_of_scope(
+            reason="topic",
+            covered=envelope.OUT_OF_SCOPE_SENTENCES["topic"][lang],
+            language=lang,
+        )
+
+    if not has_identifier:
+        return envelope.need_info(
+            question=envelope._ASK_NAME_QUESTION[lang], candidates=[], missing="name", language=lang
+        )
 
     # --- Steps 1-6: resolve, enrich, attach publications, build envelope. --
 
@@ -870,7 +651,7 @@ async def company_info(
             language=lang,
         )
         if resolution["error_class"] == "timeout_scan":
-            result["answer"] = _TIMEOUT_SCAN_SENTENCES[lang]
+            result["answer"] = envelope._TIMEOUT_SCAN_SENTENCES[lang]
         return result
 
     if kind == "ambiguous":
