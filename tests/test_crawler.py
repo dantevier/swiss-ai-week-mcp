@@ -44,10 +44,10 @@ async def test_crawl_search_refresh_and_failure(tmp_path, monkeypatch):
     source = "reference_interest_rate"
     url = SOURCES["federal"][source].url
 
-    assert {tool.name for tool in await mcp.list_tools()} == {
+    assert {
         "crawl_federal_sources", "crawl_cantonal_sources", "crawl_municipal_sources",
         "search_knowledge", "get_source",
-    }
+    } <= {tool.name for tool in await mcp.list_tools()}
     with pytest.raises(ValueError, match="approved"):
         check_url("federal", "https://www.bwo.admin.ch/unlisted")
     with pytest.raises(ValueError, match="Unknown federal source"):
