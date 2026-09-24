@@ -10,6 +10,41 @@ class Source:
     expected: str
 
 
+@dataclass(frozen=True)
+class ApiSource:
+    base_url: str
+    hosts: tuple[str, ...]
+    authority: str
+    terms: str
+
+
+API_SOURCES: dict[str, ApiSource] = {
+    "zefix_lindas": ApiSource(
+        "https://lindas.admin.ch/query",
+        ("lindas.admin.ch", "register.ld.admin.ch"),
+        "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
+        "LINDAS: open use, provide the source. Not legally binding.",
+    ),
+    "zefix_web": ApiSource(
+        "https://www.zefix.admin.ch/ZefixREST/api/v1",
+        ("www.zefix.admin.ch",),
+        "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
+        "Undocumented web endpoint; called only when RESPECT_ROBOTS_TXT=false or credentials are set.",
+    ),
+    "gazette": ApiSource(
+        "https://amtsblattportal.ch/api/v1",
+        ("amtsblattportal.ch",),
+        "Schweizerisches Handelsamtsblatt (SHAB), SECO",
+        "The signed PDF is the binding version.",
+    ),
+}
+
+
+def api_hosts() -> frozenset[str]:
+    """Union of every host any registered API source (or its redirects) may reach."""
+    return frozenset(host for source in API_SOURCES.values() for host in source.hosts)
+
+
 SOURCES: dict[str, dict[str, Source]] = {
     "federal": {
         "health_insurance_premiums": Source(

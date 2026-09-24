@@ -269,7 +269,7 @@ Neither LINDAS nor the Zefix record has structured person fields (verified again
 
 ### 6.7 Egress
 
-Outbound hosts are limited to `lindas.admin.ch`, `register.ld.admin.ch`, `www.zefix.admin.ch`, and `amtsblattportal.ch` by an httpx event hook that also inspects redirects. Setting `ALLOWED_HOSTS` extends the list, for example for the Zefix test host `www.zefixintg.admin.ch`.
+Outbound hosts are limited to `lindas.admin.ch`, `register.ld.admin.ch`, `www.zefix.admin.ch`, and `amtsblattportal.ch` by an httpx event hook that also inspects redirects. The allow-list is derived from `API_SOURCES` in `src/mcp_boilerplate/sources.py`.
 
 ## 7. Storage
 
@@ -290,7 +290,7 @@ Rejected: cache-on-read (SQLite). It would let the tool answer during an upstrea
 ```
 src/mcp_boilerplate/
   config/settings.py            + LINDAS_ENDPOINT, ZEFIX_BASE_URL, ZEFIX_USERNAME, ZEFIX_PASSWORD, GAZETTE_BASE_URL,
-                                  ALLOWED_HOSTS, RESPECT_ROBOTS_TXT, USER_AGENT, LINDAS_TIMEOUT_S, ZEFIX_TIMEOUT_S,
+                                  RESPECT_ROBOTS_TXT, USER_AGENT, LINDAS_TIMEOUT_S, ZEFIX_TIMEOUT_S,
                                   CALL_BUDGET_S, REFERENCE_CACHE_TTL_S
   zefix_sources/                (named to avoid colliding with the crawler's unrelated sources.py)
     __init__.py

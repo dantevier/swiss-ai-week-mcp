@@ -241,10 +241,10 @@ one individual, user-triggered request per tool call against a published API
 endpoint, in response to a specific question, never an unattended traversal
 of pages.
 
-Outbound requests are further restricted by `ALLOWED_HOSTS`, an egress
-allow-list enforced on every request (including redirects). Default:
-`lindas.admin.ch`, `register.ld.admin.ch`, `www.zefix.admin.ch`,
-`amtsblattportal.ch`.
+Outbound requests are further restricted by an egress allow-list enforced on
+every request (including redirects). The allow-list is derived from
+`API_SOURCES` in `src/mcp_boilerplate/sources.py`: `lindas.admin.ch`,
+`register.ld.admin.ch`, `www.zefix.admin.ch`, `amtsblattportal.ch`.
 
 ### Knowledge base
 

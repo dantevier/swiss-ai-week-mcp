@@ -5,6 +5,8 @@ Configuration settings for the MCP server.
 from pydantic import ConfigDict, Field
 from pydantic_settings import BaseSettings
 
+from ..sources import API_SOURCES
+
 
 class Settings(BaseSettings):
     """Application settings with environment variable support."""
@@ -45,22 +47,18 @@ class Settings(BaseSettings):
 
     # Swiss company data sources (docs/prd-zefix-company-info.md §6)
     lindas_endpoint: str = Field(
-        default="https://lindas.admin.ch/query",
+        default=API_SOURCES["zefix_lindas"].base_url,
         description="SPARQL endpoint holding the Zefix graph. Primary source.",
     )
     zefix_base_url: str = Field(
-        default="https://www.zefix.admin.ch/ZefixREST/api/v1",
+        default=API_SOURCES["zefix_web"].base_url,
         description="Zefix REST base URL used for enrichment (status, SHAB date, excerpt link).",
     )
     zefix_username: str | None = Field(default=None, description="Basic-auth user for the documented ZefixPublicREST API")
     zefix_password: str | None = Field(default=None, description="Basic-auth password for the documented ZefixPublicREST API")
     gazette_base_url: str = Field(
-        default="https://amtsblattportal.ch/api/v1",
+        default=API_SOURCES["gazette"].base_url,
         description="Amtsblattportal (SHAB + cantonal gazettes) API base URL.",
-    )
-    allowed_hosts: list[str] = Field(
-        default=["lindas.admin.ch", "register.ld.admin.ch", "www.zefix.admin.ch", "amtsblattportal.ch"],
-        description="Egress allow-list. Every outbound request, including redirects, must target one of these hosts.",
     )
     respect_robots_txt: bool = Field(
         default=True,

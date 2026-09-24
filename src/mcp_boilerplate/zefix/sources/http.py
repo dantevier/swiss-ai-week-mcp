@@ -11,12 +11,13 @@ import logging
 import httpx
 
 from ...config.settings import settings
+from ...sources import api_hosts
 
 logger = logging.getLogger("mcp_boilerplate.sources.http")
 
 
 class EgressDenied(httpx.RequestError):
-    """Raised when a request targets a host outside settings.allowed_hosts."""
+    """Raised when a request targets a host outside the registered API sources."""
 
 
 class SourceUnavailable(Exception):
@@ -35,7 +36,7 @@ class SourceUnavailable(Exception):
 
 
 def allowed_hosts() -> frozenset[str]:
-    return frozenset(h.strip().lower() for h in settings.allowed_hosts if h.strip())
+    return api_hosts()
 
 
 async def _enforce_egress_allowlist(request: httpx.Request) -> None:
@@ -48,7 +49,7 @@ async def _enforce_egress_allowlist(request: httpx.Request) -> None:
     hosts = allowed_hosts()
     if host not in hosts:
         logger.error("egress_denied host=%s url=%s allowed=%s", host, request.url, sorted(hosts))
-        raise EgressDenied(f"Egress to host {host!r} is not in ALLOWED_HOSTS", request=request)
+        raise EgressDenied(f"Egress to host {host!r} is not a registered API source host", request=request)
 
 
 def make_client(timeout: float, *, accept: str = "application/json", auth: httpx.Auth | None = None) -> httpx.AsyncClient:
