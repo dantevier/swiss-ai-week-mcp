@@ -1,10 +1,12 @@
 # MCP Boilerplate Server Makefile
 
-.PHONY: help install install-dev test lint format type-check clean run build docs
+.PHONY: help setup dashboard install install-dev test lint format type-check clean run build docs
 
 # Default target
 help:
 	@echo "Available commands:"
+	@echo "  setup          - Install, save API keys, register the MCP in Claude Code/Codex/opencode"
+	@echo "  dashboard      - Open the data-source dashboard"
 	@echo "  install        - Install production dependencies"
 	@echo "  install-dev    - Install development dependencies"
 	@echo "  test           - Run tests"
@@ -22,6 +24,12 @@ help:
 	@echo "  build          - Build the package"
 
 # Installation
+setup:
+	uv run python scripts/setup.py
+
+dashboard:
+	uv run python -m mcp_boilerplate.dashboard
+
 install:
 	uv sync --no-dev
 

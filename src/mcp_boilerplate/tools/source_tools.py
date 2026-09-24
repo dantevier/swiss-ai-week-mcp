@@ -2,7 +2,9 @@
 
 from ..crawler import Crawler
 from ..knowledge import KnowledgeBase
+from ..dashboard import ensure_running
 from ..server import mcp
+from ..status import get_status
 
 
 @mcp.tool
@@ -33,3 +35,15 @@ async def search_knowledge(query: str, limit: int = 5) -> dict:
 def get_source(level: str, source: str) -> dict:
     """Read the complete saved page for an approved source."""
     return KnowledgeBase().get(level, source)
+
+
+@mcp.tool
+def source_status() -> dict:
+    """Report when each data source was last refreshed, its age, and any failed refresh."""
+    return get_status()
+
+
+@mcp.tool
+def open_dashboard() -> dict:
+    """Start the local data-source dashboard (status table and refresh buttons) and return its URL."""
+    return {"url": ensure_running()}
