@@ -41,6 +41,21 @@ Set both `CRAWLORA_API_KEY` and `OPENAI_API_KEY` before refreshing. The three `c
 
 The shipped seed contains all 13 sources. MCP crawl tools update the writable local database; they do not change the packaged seed or import the older JSON snapshots. The `scuol_waste` entry uses the responsible regional authority linked by Scuol, since Scuol's own page blocks direct retrieval.
 
+## Housing and driving licence facts
+
+These tools read `var/swissproject.sqlite3`, which is not in Git. The server builds it from the reviewed data in `data/` every time it starts, so no manual step is needed; re-running is idempotent. To rebuild it by hand:
+
+```sh
+uv run python scripts/import_housing.py
+uv run python scripts/import_driving_licence.py
+```
+
+- `swiss_reference_interest_rate(as_of=None, language="it")` returns the BWO mortgage reference rate publication in force on `as_of`. It does not answer dates before 2 September 2026 or from the next announced publication on.
+- `swiss_housing_info(question=None, language="it", topic=None, limit=5)` returns BWO renting guidance (rent adjustments, deposit, termination, defects and more) in Italian, German, French or Romansh. Romansh covers the eight guide topics only. Each result includes a verbatim passage, source URL, locator and conditions.
+- `get_driving_licence_exchange_info(canton="CH", fact_type="all")` returns documented fees, deadlines and requirements for exchanging a foreign licence. `CH` returns federal rules; a canton code adds cantonal facts. A missing fee or requirement means unknown, not free or waived.
+
+Source data: `data/housing_knowledge.json` and `data/driving_licence/`. Run `uv run python scripts/import_housing.py --verify-sources` to refetch the BWO sources and check every housing passage. Set `HOUSING_DB_PATH` or `DRIVING_LICENCE_DB_PATH` when the database is elsewhere.
+
 Run `uv run pytest -q` for local checks. Credentials belong in local environment variables or `.env`, never in the repository.
 
 ## MeteoSwiss weather

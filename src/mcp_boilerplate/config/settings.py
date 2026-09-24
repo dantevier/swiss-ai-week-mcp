@@ -44,6 +44,14 @@ class Settings(BaseSettings):
     crawlora_api_key: str | None = Field(default=None, description="Crawlora API key")
     openai_api_key: str | None = Field(default=None, description="OpenAI embeddings API key")
     knowledge_db_path: str | None = Field(default=None, description="Writable SQLite knowledge base path")
+    driving_licence_db_path: str | None = Field(
+        default=None,
+        description="SQLite database populated by scripts/import_driving_licence.py",
+    )
+    housing_db_path: str | None = Field(
+        default=None,
+        description="SQLite database populated by scripts/import_housing.py",
+    )
 
 
 

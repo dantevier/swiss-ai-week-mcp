@@ -1,0 +1,2986 @@
+{
+  "country_groups": {
+    "ASTRA_A": [
+      "BE",
+      "BG",
+      "DK",
+      "DE",
+      "EE",
+      "FI",
+      "FR",
+      "GR",
+      "GB",
+      "IE",
+      "IS",
+      "IT",
+      "HR",
+      "LV",
+      "LI",
+      "LT",
+      "LU",
+      "MT",
+      "NL",
+      "NO",
+      "AT",
+      "PL",
+      "PT",
+      "RO",
+      "SE",
+      "SK",
+      "SI",
+      "ES",
+      "CZ",
+      "HU",
+      "CY"
+    ],
+    "ASTRA_B": [
+      "AD",
+      "AU",
+      "IL",
+      "JP",
+      "CA",
+      "KR",
+      "MA",
+      "MC",
+      "NZ",
+      "SM",
+      "SG",
+      "TW",
+      "TN",
+      "US"
+    ],
+    "ASTRA_B_OTHER": [
+      "AD",
+      "AU",
+      "IL",
+      "JP",
+      "CA",
+      "KR",
+      "MA",
+      "MC",
+      "NZ",
+      "SM",
+      "SG",
+      "TN",
+      "US"
+    ],
+    "EU_EFTA": [
+      "BE",
+      "BG",
+      "DK",
+      "DE",
+      "EE",
+      "FI",
+      "FR",
+      "GR",
+      "IE",
+      "IS",
+      "IT",
+      "HR",
+      "LV",
+      "LI",
+      "LT",
+      "LU",
+      "MT",
+      "NL",
+      "NO",
+      "AT",
+      "PL",
+      "PT",
+      "RO",
+      "SE",
+      "SK",
+      "SI",
+      "ES",
+      "CZ",
+      "HU",
+      "CY"
+    ]
+  },
+  "facts": [
+    {
+      "jurisdiction": "AG",
+      "fact_key": "exchange_application_review",
+      "fact_type": "fee",
+      "description_en": "Examination of an application to exchange a foreign driving licence: CHF 20.",
+      "source_url": "https://www.ag.ch/de/themen/mobilitaet-verkehr/strassenverkehr/steuern-gebuehren/gebuehren/lenkerinnen-und-lenker",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 2000,
+      "amount_max_rappen": 2000,
+      "fee_code": "application_review",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "AG",
+      "fact_key": "licence_card_first_issue",
+      "fact_type": "fee",
+      "description_en": "Issue of a card-format driving licence: CHF 25; listed separately from application examination.",
+      "source_url": "https://www.ag.ch/de/themen/mobilitaet-verkehr/strassenverkehr/steuern-gebuehren/gebuehren/lenkerinnen-und-lenker",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 2500,
+      "amount_max_rappen": 2500,
+      "fee_code": "licence_card_first_issue",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "AG",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Submit the exchange application including an eye test.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "AG",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a 35 x 45 mm colour passport photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "AG",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "Provide a translation accepted by the Strassenverkehrsamt if the licence is not in German, French, Italian or English.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "other"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "AI",
+      "fact_key": "control_drive",
+      "fact_type": "fee",
+      "description_en": "Control drive, if required: CHF 120 under tariff item 5.3.4.",
+      "source_url": "https://ai.clex.ch/api/de/versions/2422/pdf_file",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 12000,
+      "amount_max_rappen": 12000,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "AI",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence: CHF 110 under tariff item 2.2.",
+      "source_url": "https://ai.clex.ch/api/de/versions/2422/pdf_file",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 11000,
+      "amount_max_rappen": 11000,
+      "fee_code": "exchange",
+      "fee_model": "bundle"
+    },
+    {
+      "jurisdiction": "AI",
+      "fact_key": "foreign_residence_proof",
+      "fact_type": "requirement",
+      "description_en": "A licence acquired abroad while legally resident in Switzerland can be recognized only with proof of at least 12 consecutive months in the issuing state.",
+      "requirement_code": "foreign_residence_12_months",
+      "requirement_kind": "eligibility",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "applicant_status",
+          "operator": "eq",
+          "value": "Swiss_resident_licence_acquired_abroad"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "AI",
+      "fact_key": "professional_exchange_early",
+      "fact_type": "requirement",
+      "description_en": "Other professional drivers need the Swiss licence before their first professional drive.",
+      "requirement_code": "exchange_before_first_professional_drive",
+      "requirement_kind": "eligibility",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "country_group",
+          "operator": "eq",
+          "value": "non_EU_EFTA"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "AR",
+      "fact_key": "licence_card_first_issue",
+      "fact_type": "fee",
+      "description_en": "New card-format driving licence: CHF 60. The source does not establish the total foreign-licence exchange charge or whether this fee is additional.",
+      "source_url": "https://ar.ch/verwaltung/departement-inneres-und-sicherheit/strassenverkehrsamt/fuehrerausweis/fuehrerausweis-im-kreditkartenformat-fak/",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 6000,
+      "amount_max_rappen": 6000,
+      "fee_code": "licence_card_first_issue",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "AR",
+      "fact_key": "municipal_submission",
+      "fact_type": "requirement",
+      "description_en": "Submit the application personally to the municipality's Einwohneramt with photo identification; it forwards the application.",
+      "requirement_code": "identity_check_in_person",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "AR",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a passport-compliant photo, including a digital photo where accepted.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "AR",
+      "fact_key": "professional_medical",
+      "fact_type": "requirement",
+      "description_en": "Professional categories C, C1, D, D1 or BPT require a level-2 medical examination.",
+      "requirement_code": "medical_exam_level_2",
+      "requirement_kind": "medical",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "BPT"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "BE",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence: CHF 120.",
+      "amount_min_rappen": 12000,
+      "amount_max_rappen": 12000,
+      "fee_code": "exchange",
+      "fee_model": "bundle"
+    },
+    {
+      "jurisdiction": "BE",
+      "fact_key": "eye_test_validity",
+      "fact_type": "deadline",
+      "description_en": "The Swiss eye test remains valid for 24 months.",
+      "period_value": 24,
+      "period_unit": "months",
+      "period_anchor": "eye_test_date",
+      "deadline_code": "eye_test_validity"
+    },
+    {
+      "jurisdiction": "BE",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Complete an eye test with an approved doctor or optometrist in Switzerland.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BE",
+      "fact_key": "first_in_person",
+      "fact_type": "requirement",
+      "description_en": "For the first Swiss licence application, present the documents in person, including at the municipal Einwohnerkontrolle.",
+      "requirement_code": "identity_check_in_person",
+      "requirement_kind": "submission",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "first_application",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "BE",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Include a colour passport photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BE",
+      "fact_key": "probationary_licence",
+      "fact_type": "requirement",
+      "description_en": "A probationary Swiss licence applies when the foreign licence was less than one year old on entry.",
+      "requirement_code": "probationary_licence",
+      "requirement_kind": "eligibility",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_age_years",
+          "operator": "lt",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "BE",
+      "fact_key": "signed_application",
+      "fact_type": "requirement",
+      "description_en": "Submit the signed exchange application.",
+      "requirement_code": "signed_exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BL",
+      "fact_key": "exchange_application_review",
+      "fact_type": "fee",
+      "description_en": "Examination of a foreign-licence exchange application: CHF 45; the authority states that card issuance is additional.",
+      "source_url": "https://www.baselland.ch/politik-und-behorden/direktionen/sicherheitsdirektion/motorfahrzeugkontrolle/motorfahrzeugsteuern-und-gebuehren/gebuehren/gebuehren-und-besondere-abgaben-fuehrerzulassung",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 4500,
+      "amount_max_rappen": 4500,
+      "fee_code": "application_review",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "BL",
+      "fact_key": "licence_card_first_issue",
+      "fact_type": "fee",
+      "description_en": "Issue of the driving-licence card: CHF 42, additional to the CHF 45 exchange application fee.",
+      "source_url": "https://www.baselland.ch/politik-und-behorden/direktionen/sicherheitsdirektion/motorfahrzeugkontrolle/motorfahrzeugsteuern-und-gebuehren/gebuehren/gebuehren-und-besondere-abgaben-fuehrerzulassung",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 4200,
+      "amount_max_rappen": 4200,
+      "fee_code": "licence_card_first_issue",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "BL",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Complete the official application for exchange of a foreign licence.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BL",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Complete a Swiss eye test; an eyeglass prescription is not accepted.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BL",
+      "fact_key": "municipal_identity",
+      "fact_type": "requirement",
+      "description_en": "Confirm personal details at the municipal Einwohnerkontrolle, which forwards the application.",
+      "requirement_code": "identity_check_in_person",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BL",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Provide the original valid foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BL",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a 35 x 45 mm colour photo on photographic paper.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BL",
+      "fact_key": "residence_permit_copy",
+      "fact_type": "requirement",
+      "description_en": "Provide a copy of the foreign residence permit.",
+      "requirement_code": "residence_permit_copy",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "applicant_status",
+          "operator": "eq",
+          "value": "foreign_national"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "application_opening",
+      "fact_type": "fee",
+      "description_en": "Application opening fee: CHF 65.",
+      "amount_min_rappen": 6500,
+      "amount_max_rappen": 6500,
+      "fee_code": "application_opening",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "licence_card_first_issue",
+      "fact_type": "fee",
+      "description_en": "First issue of a card-format licence: CHF 75.",
+      "amount_min_rappen": 7500,
+      "amount_max_rappen": 7500,
+      "fee_code": "licence_card_first_issue",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "application_lead_time",
+      "fact_type": "deadline",
+      "description_en": "Submit the application at least one month before the 12-month period ends.",
+      "period_value": 1,
+      "period_unit": "months",
+      "period_anchor": "end_of_12_month_foreign_licence_period",
+      "deadline_code": "application_submission"
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "eye_test_validity",
+      "fact_type": "deadline",
+      "description_en": "The Swiss eye test remains valid for 24 months.",
+      "period_value": 24,
+      "period_unit": "months",
+      "period_anchor": "eye_test_date",
+      "deadline_code": "eye_test_validity"
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Supply the approved Swiss eye test; eyeglass prescriptions are not accepted.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "in_person_submission",
+      "fact_type": "requirement",
+      "description_en": "Submit the application in person at the Basel-Stadt MFK counter.",
+      "requirement_code": "in_person_application",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Provide the valid foreign driving licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a 35 x 45 mm colour passport photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "professional_medical",
+      "fact_type": "requirement",
+      "description_en": "Categories C, C1, D, D1 and BPT require a level-2 traffic medical examination.",
+      "requirement_code": "medical_exam_level_2",
+      "requirement_kind": "medical",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "BPT"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "signed_recent_form",
+      "fact_type": "requirement",
+      "description_en": "Complete the form electronically, print and sign it; it must be no more than three months old.",
+      "requirement_code": "signed_exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "BS",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "An officially certified translation is required when the licence is not in German, English, French or Italian.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "other"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "CH",
+      "fact_key": "exchange_after_residence",
+      "fact_type": "deadline",
+      "description_en": "A Swiss driving licence is required after 12 months living in Switzerland if the person has not spent more than three consecutive months abroad during that period.",
+      "period_value": 12,
+      "period_unit": "months",
+      "period_anchor": "residence_start",
+      "deadline_code": "right_to_drive",
+      "conditions": [
+        {
+          "field": "max_consecutive_abroad_months",
+          "operator": "lte",
+          "value": "3"
+        }
+      ],
+      "source_url": "https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf"
+    },
+    {
+      "jurisdiction": "CH",
+      "fact_key": "professional_before_first_drive",
+      "fact_type": "deadline",
+      "description_en": "For non-EU/EFTA professional driving of Swiss-registered C, C1, D or D1 vehicles or professional passenger transport, obtain the Swiss licence before the first professional drive.",
+      "period_value": 0,
+      "period_unit": "days",
+      "period_anchor": "first_professional_drive",
+      "deadline_code": "professional_exchange",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "country_group",
+          "operator": "eq",
+          "value": "non_EU_EFTA"
+        }
+      ],
+      "source_url": "https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf"
+    },
+    {
+      "jurisdiction": "CH",
+      "fact_key": "control_drive_default",
+      "fact_type": "requirement",
+      "description_en": "A control drive is the general condition for exchanging a valid foreign driving licence; the ASTRA country exemptions override this general rule.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "required",
+      "source_url": "https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf"
+    },
+    {
+      "jurisdiction": "CH",
+      "fact_key": "control_drive_one_attempt",
+      "fact_type": "requirement",
+      "description_en": "The control drive cannot be repeated; an unjustified absence counts as a failed attempt.",
+      "requirement_code": "control_drive_repeat",
+      "requirement_kind": "eligibility",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "CH",
+      "fact_key": "control_drive_waived_a",
+      "fact_type": "requirement",
+      "description_en": "No control drive for licences from ASTRA Annex 2 group A countries.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "waived",
+      "conditions": [
+        {
+          "field": "country_group",
+          "operator": "eq",
+          "value": "ASTRA_A"
+        }
+      ],
+      "source_url": "https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf"
+    },
+    {
+      "jurisdiction": "CH",
+      "fact_key": "control_drive_waived_b",
+      "fact_type": "requirement",
+      "description_en": "No control drive for licences from ASTRA Annex 2 group B countries other than Taiwan.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "waived",
+      "conditions": [
+        {
+          "field": "country_group",
+          "operator": "eq",
+          "value": "ASTRA_B_OTHER"
+        }
+      ],
+      "source_url": "https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf"
+    },
+    {
+      "jurisdiction": "CH",
+      "fact_key": "control_drive_waived_tw_a1_b",
+      "fact_type": "requirement",
+      "description_en": "Taiwan exemption applies only to Swiss categories A1 and B.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "waived",
+      "conditions": [
+        {
+          "field": "issuing_country",
+          "operator": "eq",
+          "value": "TW"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "A1",
+            "B"
+          ]
+        }
+      ],
+      "source_url": "https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf"
+    },
+    {
+      "jurisdiction": "CH",
+      "fact_key": "professional_theory_default",
+      "fact_type": "requirement",
+      "description_en": "Professional driving requires an additional theory examination unless exempted by ASTRA.",
+      "requirement_code": "professional_theory",
+      "requirement_kind": "exam",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        }
+      ],
+      "source_url": "https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf"
+    },
+    {
+      "jurisdiction": "CH",
+      "fact_key": "professional_theory_waived_a",
+      "fact_type": "requirement",
+      "description_en": "Group A licences are exempt from the additional professional theory examination.",
+      "requirement_code": "professional_theory",
+      "requirement_kind": "exam",
+      "requirement_effect": "waived",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "country_group",
+          "operator": "eq",
+          "value": "ASTRA_A"
+        }
+      ],
+      "source_url": "https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf"
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "exchange_control_b",
+      "fact_type": "fee",
+      "description_en": "Exchange with category B control drive: CHF 260.",
+      "amount_min_rappen": 26000,
+      "amount_max_rappen": 26000,
+      "fee_code": "exchange",
+      "fee_model": "bundle",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": "B"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "exchange_control_d",
+      "fact_type": "fee",
+      "description_en": "Exchange with category D control drive: CHF 400.",
+      "amount_min_rappen": 40000,
+      "amount_max_rappen": 40000,
+      "fee_code": "exchange",
+      "fee_model": "bundle",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": "D"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "exchange_control_professional",
+      "fact_type": "fee",
+      "description_en": "Exchange with control drive for C, C1, D1 or professional passenger transport: CHF 345.",
+      "amount_min_rappen": 34500,
+      "amount_max_rappen": 34500,
+      "fee_code": "exchange",
+      "fee_model": "bundle",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D1",
+            "BPT"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "exchange_no_tests",
+      "fact_type": "fee",
+      "description_en": "Exchange without control drive or theory test: CHF 80.",
+      "amount_min_rappen": 8000,
+      "amount_max_rappen": 8000,
+      "fee_code": "exchange",
+      "fee_model": "bundle",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "false"
+        },
+        {
+          "field": "theory_test",
+          "operator": "eq",
+          "value": "false"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "qualification_certificate",
+      "fact_type": "fee",
+      "description_en": "Issue of the Swiss qualification certificate: CHF 35.",
+      "amount_min_rappen": 3500,
+      "amount_max_rappen": 3500,
+      "fee_code": "qualification_certificate",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D",
+            "D1"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Submit the exchange application.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Provide the original foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a 35 x 45 mm colour photo on photographic paper; emailed photos are not accepted.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "professional_certificate",
+      "fact_type": "requirement",
+      "description_en": "For categories C, C1, D and D1, include the original qualification certificate if held.",
+      "requirement_code": "original_qualification_certificate",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D",
+            "D1"
+          ]
+        },
+        {
+          "field": "has_qualification_certificate",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "FR",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "A licence written in non-Latin characters needs an official translation.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "non_Latin"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "exchange_c_c1_d",
+      "fact_type": "fee",
+      "description_en": "Exchange of categories C, C1 or D: CHF 200.",
+      "amount_min_rappen": 20000,
+      "amount_max_rappen": 20000,
+      "fee_code": "exchange",
+      "fee_model": "bundle",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "exchange_non_c_c1_d",
+      "fact_type": "fee",
+      "description_en": "Exchange except categories C, C1 and D: CHF 150.",
+      "amount_min_rappen": 15000,
+      "amount_max_rappen": 15000,
+      "fee_code": "exchange",
+      "fee_model": "bundle",
+      "conditions": [
+        {
+          "field": "category_group",
+          "operator": "eq",
+          "value": "other_than_C_C1_D"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "eye_test_validity",
+      "fact_type": "deadline",
+      "description_en": "The approved optician's certificate must be less than 24 months old.",
+      "period_value": 24,
+      "period_unit": "months",
+      "period_anchor": "eye_test_date",
+      "deadline_code": "eye_test_validity"
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Provide the exchange form.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Bring an eye-test certificate from an approved optician dated less than 24 months ago.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "identity",
+      "fact_type": "requirement",
+      "description_en": "Bring passport/ID or foreign residence permit as applicable.",
+      "requirement_code": "identity_document",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "in_person",
+      "fact_type": "requirement",
+      "description_en": "Present the exchange application personally at the service des permis de conduire.",
+      "requirement_code": "in_person_application",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Bring the original valid foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a colour passport photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GE",
+      "fact_key": "translation_if_requested",
+      "fact_type": "requirement",
+      "description_en": "Depending on the issuing country, a sworn official translation may be required.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "may_be_required"
+    },
+    {
+      "jurisdiction": "GL",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence, including application and document checks: CHF 100–400.",
+      "source_url": "https://gesetze.gl.ch/app/de/texts_of_law/VII-D.12.3",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 10000,
+      "amount_max_rappen": 40000,
+      "fee_code": "exchange",
+      "fee_model": "bundle"
+    },
+    {
+      "jurisdiction": "GL",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Submit the exchange application with an eye test.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GL",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Include the original foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GL",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Include a colour passport photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GL",
+      "fact_key": "professional_medical",
+      "fact_type": "requirement",
+      "description_en": "Professional categories require a level-2 medical examination.",
+      "requirement_code": "medical_exam_level_2",
+      "requirement_kind": "medical",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "BPT"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "GL",
+      "fact_key": "residence_permit_copy",
+      "fact_type": "requirement",
+      "description_en": "Include a copy of the foreign residence permit.",
+      "requirement_code": "residence_permit_copy",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "applicant_status",
+          "operator": "eq",
+          "value": "foreign_national"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "GR",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence: CHF 80 under Article 6(1)(c).",
+      "source_url": "https://www.gr-lex.gr.ch/app/de/texts_of_law/870.130",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 8000,
+      "amount_max_rappen": 8000,
+      "fee_code": "exchange",
+      "fee_model": "bundle"
+    },
+    {
+      "jurisdiction": "GR",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Use the official application form for exchange of a foreign licence.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GR",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Have an authorized optician or doctor complete the eye test on the form.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "GR",
+      "fact_key": "first_identity_check",
+      "fact_type": "requirement",
+      "description_en": "If the applicant has no Swiss licence yet, appear personally at the Gemeindekanzlei or Einwohnerkontrolle with identification; it forwards the form.",
+      "requirement_code": "identity_check_in_person",
+      "requirement_kind": "submission",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "first_application",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "GR",
+      "fact_key": "medical_questionnaire",
+      "fact_type": "requirement",
+      "description_en": "Complete the medical questionnaire; a medical certificate is needed for a positive response.",
+      "requirement_code": "medical_questionnaire",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "exchange_without_exam",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence without an exam: 215 tariff points × CHF 1.05 per point = CHF 225.75.",
+      "source_url": "https://rsju.jura.ch/fr/viewdocument.html?Download=1&id=36992&idn=20021&v=18",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 22575,
+      "amount_max_rappen": 22575,
+      "fee_code": "exchange",
+      "fee_model": "bundle",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "false"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "authenticity_certificate",
+      "fact_type": "requirement",
+      "description_en": "For a licence from a country outside ASTRA table A, submit a certificate of authenticity or the licence is verified by police.",
+      "requirement_code": "authenticity_certificate",
+      "requirement_kind": "document",
+      "requirement_effect": "may_be_required",
+      "conditions": [
+        {
+          "field": "country_group",
+          "operator": "eq",
+          "value": "outside_A"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "french_rii",
+      "fact_type": "requirement",
+      "description_en": "French licence holders must provide the attestation de droits a conduire securisee (RII).",
+      "requirement_code": "french_rii",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "issuing_country",
+          "operator": "eq",
+          "value": "FR"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "nonlatin_translation",
+      "fact_type": "requirement",
+      "description_en": "Provide a consular or embassy translation for non-Latin characters; a recognized translator is accepted if that is impossible.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "non_Latin"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Provide the original foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a colour passport photo less than one year old.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "professional_criminal_record",
+      "fact_type": "requirement",
+      "description_en": "For professional categories, provide a criminal-record extract from the country of origin dated less than three months ago.",
+      "requirement_code": "criminal_record_extract",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "BPT"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "professional_medical",
+      "fact_type": "requirement",
+      "description_en": "Professional categories require a level-2 medical certificate.",
+      "requirement_code": "medical_exam_level_2",
+      "requirement_kind": "medical",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "BPT"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "residence_permit_copy",
+      "fact_type": "requirement",
+      "description_en": "Provide a copy of the residence permit.",
+      "requirement_code": "residence_permit_copy",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "applicant_status",
+          "operator": "eq",
+          "value": "foreign_national"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JU",
+      "fact_key": "signed_application",
+      "fact_type": "requirement",
+      "description_en": "Provide the signed exchange application.",
+      "requirement_code": "signed_exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "LU",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence: CHF 95.",
+      "source_url": "https://strassenverkehrsamt.lu.ch/strassenverkehr/steuern_gebuehren/gebuehren_und_abgaben",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 9500,
+      "amount_max_rappen": 9500,
+      "fee_code": "exchange",
+      "fee_model": "bundle"
+    },
+    {
+      "jurisdiction": "LU",
+      "fact_key": "form_12a",
+      "fact_type": "requirement",
+      "description_en": "Submit form 12a for the foreign-licence exchange.",
+      "requirement_code": "form_12a",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "LU",
+      "fact_key": "form_13",
+      "fact_type": "requirement",
+      "description_en": "Submit form 13 to waive any categories not exchanged.",
+      "requirement_code": "form_13",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "waive_categories",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "LU",
+      "fact_key": "late_control_drive",
+      "fact_type": "requirement",
+      "description_en": "For an ASTRA group B licence exchanged more than five years after entry, Luzern requires a control drive.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "country_group",
+          "operator": "eq",
+          "value": "ASTRA_B"
+        },
+        {
+          "field": "years_since_entry",
+          "operator": "gt",
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "LU",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Provide the original foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "LU",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a current colour passport photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "LU",
+      "fact_key": "residence_permit_copy",
+      "fact_type": "requirement",
+      "description_en": "Provide a copy of the foreign residence permit.",
+      "requirement_code": "residence_permit_copy",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "applicant_status",
+          "operator": "eq",
+          "value": "foreign_national"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "LU",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "Provide a certified translation for a licence not in Latin script; the office can also require one when it is neither in German nor English.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": [
+            "non_Latin",
+            "other_than_DE_EN"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "NE",
+      "fact_key": "control_drive",
+      "fact_type": "fee",
+      "description_en": "Additional practical control drive: CHF 120.",
+      "amount_min_rappen": 12000,
+      "amount_max_rappen": 12000,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "NE",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange service or licence issue: CHF 105.",
+      "amount_min_rappen": 10500,
+      "amount_max_rappen": 10500,
+      "fee_code": "exchange",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "NE",
+      "fact_key": "approved_eye_test",
+      "fact_type": "requirement",
+      "description_en": "Have an SCAN-approved optician record the eye test on the application.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "NE",
+      "fact_key": "in_person_identity",
+      "fact_type": "requirement",
+      "description_en": "Present yourself at an SCAN counter without an appointment for formal identification.",
+      "requirement_code": "identity_check_in_person",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "NE",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Bring the original valid foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "NE",
+      "fact_key": "photo_signature",
+      "fact_type": "requirement",
+      "description_en": "Transmit the photo and signature digitally.",
+      "requirement_code": "digital_photo_signature",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "NE",
+      "fact_key": "printed_application",
+      "fact_type": "requirement",
+      "description_en": "Complete and print the exchange application.",
+      "requirement_code": "printed_exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "NE",
+      "fact_key": "residence_permit",
+      "fact_type": "requirement",
+      "description_en": "Bring the foreign residence permit.",
+      "requirement_code": "residence_permit",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "applicant_status",
+          "operator": "eq",
+          "value": "foreign_national"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "NE",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "Provide an official translation if the licence is not in a Swiss national language or English.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "other"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "NW",
+      "fact_key": "control_drive_b",
+      "fact_type": "fee",
+      "description_en": "Category B control drive, if required: CHF 150 under the VSZ tariff effective 1 January 2026.",
+      "source_url": "https://www.vsz.ch/10-strasse/40-steuern-und-gebuehren/Gebuehren.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 15000,
+      "amount_max_rappen": 15000,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": "B"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "NW",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence: CHF 100–140 under tariff item 1.2.3.",
+      "source_url": "https://gesetze.nw.ch/app/de/texts_of_law/651.21",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 10000,
+      "amount_max_rappen": 14000,
+      "fee_code": "exchange",
+      "fee_model": "bundle"
+    },
+    {
+      "jurisdiction": "NW",
+      "fact_key": "control_drive_window",
+      "fact_type": "deadline",
+      "description_en": "Complete the control drive within three months of submitting the exchange application; the office assigns the date.",
+      "period_value": 3,
+      "period_unit": "months",
+      "period_anchor": "application_submission",
+      "deadline_code": "control_drive",
+      "source_url": "https://www.vsz.ch/40_formulare-und-merkblaetter/Merkblatt_Umtausch_ausl_FA.pdf"
+    },
+    {
+      "jurisdiction": "NW",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Provide the exchange application form.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "NW",
+      "fact_key": "late_control_drive",
+      "fact_type": "requirement",
+      "description_en": "Complete any required control drive within the office-assigned period.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ],
+      "source_url": "https://www.vsz.ch/40_formulare-und-merkblaetter/Merkblatt_Umtausch_ausl_FA.pdf"
+    },
+    {
+      "jurisdiction": "NW",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Provide the original foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "NW",
+      "fact_key": "photo_signature",
+      "fact_type": "requirement",
+      "description_en": "Provide photo and signature through Photo Collect or at the counter.",
+      "requirement_code": "photo_signature",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "NW",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "Provide an officially certified translation for a licence not in Latin script.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "non_Latin"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "OW",
+      "fact_key": "control_drive_b",
+      "fact_type": "fee",
+      "description_en": "Category B control drive, if required: CHF 150 under the VSZ tariff effective 1 January 2026.",
+      "source_url": "https://www.vsz.ch/10-strasse/40-steuern-und-gebuehren/Gebuehren.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 15000,
+      "amount_max_rappen": 15000,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": "B"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "OW",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence: CHF 100–140 under tariff item 1.2.3.",
+      "source_url": "https://gdb.ow.ch/app/de/texts_of_law/771.411",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 10000,
+      "amount_max_rappen": 14000,
+      "fee_code": "exchange",
+      "fee_model": "bundle"
+    },
+    {
+      "jurisdiction": "OW",
+      "fact_key": "control_drive_window",
+      "fact_type": "deadline",
+      "description_en": "Complete the control drive within three months of submitting the exchange application; the office assigns the date.",
+      "period_value": 3,
+      "period_unit": "months",
+      "period_anchor": "application_submission",
+      "deadline_code": "control_drive",
+      "source_url": "https://www.vsz.ch/40_formulare-und-merkblaetter/Merkblatt_Umtausch_ausl_FA.pdf"
+    },
+    {
+      "jurisdiction": "OW",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Provide the exchange application form.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "OW",
+      "fact_key": "late_control_drive",
+      "fact_type": "requirement",
+      "description_en": "Complete any required control drive within the office-assigned period.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ],
+      "source_url": "https://www.vsz.ch/40_formulare-und-merkblaetter/Merkblatt_Umtausch_ausl_FA.pdf"
+    },
+    {
+      "jurisdiction": "OW",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Provide the original foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "OW",
+      "fact_key": "photo_signature",
+      "fact_type": "requirement",
+      "description_en": "Provide photo and signature through Photo Collect or at the counter.",
+      "requirement_code": "photo_signature",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "OW",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "Provide an officially certified translation for a licence not in Latin script.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "non_Latin"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "SG",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange fee is CHF 80 to CHF 100; any control drive is billed separately.",
+      "amount_min_rappen": 8000,
+      "amount_max_rappen": 10000,
+      "fee_code": "exchange",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "SG",
+      "fact_key": "control_drive_window",
+      "fact_type": "deadline",
+      "description_en": "Complete a required control drive within three months of issuance of the authorization card.",
+      "period_value": 3,
+      "period_unit": "months",
+      "period_anchor": "control_drive_authorization_card_issue",
+      "deadline_code": "control_drive",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "SG",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Have the eye test certified on the form.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SG",
+      "fact_key": "municipal_confirmation",
+      "fact_type": "requirement",
+      "description_en": "Have the resident municipality confirm and sign the exchange application or appear personally at the St. Gallen office.",
+      "requirement_code": "municipal_confirmation",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SG",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a 35 x 45 mm colour photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "exchange_application_review",
+      "fact_type": "fee",
+      "description_en": "Examination of an application to exchange a foreign driving licence: CHF 30.",
+      "source_url": "https://rechtsbuch.sh.ch/app/de/texts_of_law/741.012",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 3000,
+      "amount_max_rappen": 3000,
+      "fee_code": "application_review",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "licence_card_first_issue",
+      "fact_type": "fee",
+      "description_en": "Issue of a card-format driving licence: CHF 60, listed separately from application examination.",
+      "source_url": "https://rechtsbuch.sh.ch/app/de/texts_of_law/741.012",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 6000,
+      "amount_max_rappen": 6000,
+      "fee_code": "licence_card_first_issue",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "eye_test_validity",
+      "fact_type": "deadline",
+      "description_en": "The eye test is valid for 24 months.",
+      "period_value": 24,
+      "period_unit": "months",
+      "period_anchor": "eye_test_date",
+      "deadline_code": "eye_test_validity",
+      "source_url": "https://sh.ch/CMS/get/file/5348d533-d168-4a33-8c6d-1dbdb97ac196"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Download, complete, print and sign the exchange application.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Provide a Swiss eye test from an optician or doctor.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required",
+      "source_url": "https://sh.ch/CMS/get/file/5348d533-d168-4a33-8c6d-1dbdb97ac196"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "identity_check",
+      "fact_type": "requirement",
+      "description_en": "Complete identity verification at the cantonal office or municipality.",
+      "requirement_code": "identity_check_in_person",
+      "requirement_kind": "submission",
+      "requirement_effect": "required",
+      "source_url": "https://sh.ch/CMS/get/file/5348d533-d168-4a33-8c6d-1dbdb97ac196"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "in_person_submission",
+      "fact_type": "requirement",
+      "description_en": "Submit the completed exchange application and documents personally at the cantonal office.",
+      "requirement_code": "in_person_application",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Provide the original foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a 35 x 45 mm colour photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SH",
+      "fact_key": "professional_early",
+      "fact_type": "requirement",
+      "description_en": "For non-EU/EFTA professional driving, obtain a Swiss licence before the first professional journey.",
+      "requirement_code": "exchange_before_first_professional_drive",
+      "requirement_kind": "eligibility",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "D",
+            "D1",
+            "BPT"
+          ]
+        },
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "country_group",
+          "operator": "eq",
+          "value": "non_EU_EFTA"
+        }
+      ],
+      "source_url": "https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf"
+    },
+    {
+      "jurisdiction": "SO",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence: CHF 200–500 under the tariff currently in force; a later CHF 100 proposal has not been applied.",
+      "source_url": "https://bgs.so.ch/app/de/texts_of_law/614.62",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 20000,
+      "amount_max_rappen": 50000,
+      "fee_code": "exchange",
+      "fee_model": "bundle"
+    },
+    {
+      "jurisdiction": "SO",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Apply using the official exchange form under the first learner-licence application procedure.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SO",
+      "fact_key": "foreign_stay_proof",
+      "fact_type": "requirement",
+      "description_en": "Swiss applicants must prove the duration of their stay abroad.",
+      "requirement_code": "foreign_stay_proof",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "applicant_status",
+          "operator": "eq",
+          "value": "Swiss_national"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "SO",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Include the original foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SO",
+      "fact_key": "residence_permit_copy",
+      "fact_type": "requirement",
+      "description_en": "Foreign applicants must provide copies of both sides of their residence permit.",
+      "requirement_code": "residence_permit_copy",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "applicant_status",
+          "operator": "eq",
+          "value": "foreign_national"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "SZ",
+      "fact_key": "exchange_application_review",
+      "fact_type": "fee",
+      "description_en": "Examination of an application to exchange a foreign driving licence: CHF 80.",
+      "source_url": "https://www.sz.ch/public/upload/assets/29546/782_311.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 8000,
+      "amount_max_rappen": 8000,
+      "fee_code": "application_review",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "SZ",
+      "fact_key": "licence_card_first_issue",
+      "fact_type": "fee",
+      "description_en": "First issue of a card-format driving licence: CHF 45, listed separately from exchange application examination.",
+      "source_url": "https://www.sz.ch/public/upload/assets/29546/782_311.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 4500,
+      "amount_max_rappen": 4500,
+      "fee_code": "licence_card_first_issue",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "SZ",
+      "fact_key": "exchange_application",
+      "fact_type": "requirement",
+      "description_en": "Complete and print the exchange form.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SZ",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Have an ophthalmologist or optician record the eye test on the form.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SZ",
+      "fact_key": "in_person",
+      "fact_type": "requirement",
+      "description_en": "Bring the application personally to the Verkehrsamt.",
+      "requirement_code": "in_person_application",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SZ",
+      "fact_key": "municipal_confirmation",
+      "fact_type": "requirement",
+      "description_en": "Have the Einwohneramt confirm the application form.",
+      "requirement_code": "municipal_confirmation",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SZ",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Enclose the original foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SZ",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Upload or enclose a 35 x 45 mm photo; do not glue it to the form.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "SZ",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "Enclose an original certified translation for a licence not in Latin script.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "non_Latin"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "control_drive",
+      "fact_type": "fee",
+      "description_en": "Control drive, if required, for any category: CHF 180.",
+      "source_url": "https://www.rechtsbuch.tg.ch/app/de/texts_of_law/741.11",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 18000,
+      "amount_max_rappen": 18000,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "exchange_application_review",
+      "fact_type": "fee",
+      "description_en": "Examination of an application to exchange a foreign driving licence: CHF 60.",
+      "source_url": "https://www.rechtsbuch.tg.ch/app/de/texts_of_law/741.11",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 6000,
+      "amount_max_rappen": 6000,
+      "fee_code": "application_review",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "licence_card_first_issue",
+      "fact_type": "fee",
+      "description_en": "Issue of a driving licence: CHF 40, listed separately from the exchange application fee.",
+      "source_url": "https://www.rechtsbuch.tg.ch/app/de/texts_of_law/741.11",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 4000,
+      "amount_max_rappen": 4000,
+      "fee_code": "licence_card_first_issue",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Have the eye test entered on the form.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "identity_check",
+      "fact_type": "requirement",
+      "description_en": "Present original documents personally at the municipal Einwohnerkontrolle or Strassenverkehrsamt.",
+      "requirement_code": "identity_check_in_person",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "late_control_drive",
+      "fact_type": "requirement",
+      "description_en": "A control drive may be ordered more than five years after entry.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "may_be_required",
+      "conditions": [
+        {
+          "field": "years_since_entry",
+          "operator": "gt",
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "printed_application",
+      "fact_type": "requirement",
+      "description_en": "Complete and print the interactive exchange application form.",
+      "requirement_code": "printed_exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "professional_medical",
+      "fact_type": "requirement",
+      "description_en": "C, C1, D, D1 or BPT categories require a level-2 medical examination.",
+      "requirement_code": "medical_exam_level_2",
+      "requirement_kind": "medical",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "D",
+            "D1",
+            "BPT"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "TG",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "Provide a certified consular or embassy translation if the licence is not in Latin script.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "non_Latin"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "TI",
+      "fact_key": "exchange_nonprofessional",
+      "fact_type": "fee",
+      "description_en": "Exchange without professional categories: CHF 150; exams and medical examinations are billed separately.",
+      "amount_min_rappen": 15000,
+      "amount_max_rappen": 15000,
+      "fee_code": "exchange",
+      "fee_model": "bundle",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "false"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "TI",
+      "fact_key": "exchange_professional",
+      "fact_type": "fee",
+      "description_en": "Exchange with professional categories: CHF 200; exams and medical examinations are billed separately.",
+      "amount_min_rappen": 20000,
+      "amount_max_rappen": 20000,
+      "fee_code": "exchange",
+      "fee_model": "bundle",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "TI",
+      "fact_key": "online_application",
+      "fact_type": "requirement",
+      "description_en": "File the exchange application through the guided online form; scanned attachments are uploaded digitally.",
+      "requirement_code": "online_application",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "TI",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Mail or hand in the original foreign licence at Camorino; it is the exception to digital submission.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "TI",
+      "fact_key": "photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a recent 35 x 45 mm colour passport photo with a plain light background; the canton states paper photo quality requirements.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "UR",
+      "fact_key": "exchange",
+      "fact_type": "fee",
+      "description_en": "Exchange of a foreign driving licence: CHF 100 under the 2025 tariff.",
+      "source_url": "https://www.ur.ch/_docn/403768/Tarifordnung_2025.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 10000,
+      "amount_max_rappen": 10000,
+      "fee_code": "exchange",
+      "fee_model": "bundle"
+    },
+    {
+      "jurisdiction": "UR",
+      "fact_key": "first_in_person",
+      "fact_type": "requirement",
+      "description_en": "For the first licence application, appear personally at Amt für Strassen- und Schiffsverkehr, Gotthardstrasse 77a, Altdorf.",
+      "requirement_code": "identity_check_in_person",
+      "requirement_kind": "submission",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "first_application",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "UR",
+      "fact_key": "identity_document",
+      "fact_type": "requirement",
+      "description_en": "Bring a passport, identity card or foreign residence permit.",
+      "requirement_code": "identity_document",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "UR",
+      "fact_key": "photo_on_site",
+      "fact_type": "requirement",
+      "description_en": "The office takes the photo on site.",
+      "requirement_code": "photo_on_site",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "VD",
+      "fact_key": "control_drive",
+      "fact_type": "fee",
+      "description_en": "Control drive, if required: CHF 130–190 depending on category.",
+      "source_url": "https://www.vd.ch/mobilite/automobile-et-navigation/frais-des-prestations-du-san/permis-de-conduire",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 13000,
+      "amount_max_rappen": 19000,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VD",
+      "fact_key": "licence_card_first_issue",
+      "fact_type": "fee",
+      "description_en": "Issue of a card-format driving licence: CHF 45; the published tariff does not establish the total foreign-licence exchange charge.",
+      "source_url": "https://www.vd.ch/mobilite/automobile-et-navigation/frais-des-prestations-du-san/permis-de-conduire",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 4500,
+      "amount_max_rappen": 4500,
+      "fee_code": "licence_card_first_issue",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "VD",
+      "fact_key": "form_220",
+      "fact_type": "requirement",
+      "description_en": "Complete Formulaire 220 and the supporting documents listed for the requested category.",
+      "requirement_code": "form_220",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "VD",
+      "fact_key": "late_control_drive",
+      "fact_type": "requirement",
+      "description_en": "After more than five years of residence, a control drive is required if the applicant has not driven regularly.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "years_since_entry",
+          "operator": "gt",
+          "value": "5"
+        },
+        {
+          "field": "regular_driving",
+          "operator": "eq",
+          "value": "false"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VD",
+      "fact_key": "late_practice_proof",
+      "fact_type": "requirement",
+      "description_en": "After five years of residence, provide the attestation de conduite reguliere to avoid a control drive when regular driving is claimed.",
+      "requirement_code": "regular_driving_attestation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "years_since_entry",
+          "operator": "gt",
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VD",
+      "fact_key": "licence_after_entry_contact",
+      "fact_type": "requirement",
+      "description_en": "Contact SAN to determine exchange eligibility if the foreign licence was obtained after entering Switzerland.",
+      "requirement_code": "contact_authority",
+      "requirement_kind": "submission",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_acquired_after_entry",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "authorization_card",
+      "fact_type": "fee",
+      "description_en": "Authorization card: CHF 20, only when a control drive is required.",
+      "amount_min_rappen": 2000,
+      "amount_max_rappen": 2000,
+      "fee_code": "authorization_card",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "control_drive_b",
+      "fact_type": "fee",
+      "description_en": "Category B control drive: CHF 90.",
+      "amount_min_rappen": 9000,
+      "amount_max_rappen": 9000,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": "B"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "control_drive_other",
+      "fact_type": "fee",
+      "description_en": "Control drive for other categories: CHF 90 to CHF 180 depending on category; an exact amount is not specified on this page.",
+      "amount_min_rappen": 9000,
+      "amount_max_rappen": 18000,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category_group",
+          "operator": "eq",
+          "value": "other_than_B"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "exchange_processing",
+      "fact_type": "fee",
+      "description_en": "Processing the exchange application: CHF 70.",
+      "amount_min_rappen": 7000,
+      "amount_max_rappen": 7000,
+      "fee_code": "exchange_processing",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "licence_card",
+      "fact_type": "fee",
+      "description_en": "Issue of the Swiss driving licence: CHF 53.50.",
+      "amount_min_rappen": 5350,
+      "amount_max_rappen": 5350,
+      "fee_code": "licence_card",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "professional_theory",
+      "fact_type": "fee",
+      "description_en": "Supplementary professional theory exam: CHF 60.",
+      "amount_min_rappen": 6000,
+      "amount_max_rappen": 6000,
+      "fee_code": "professional_theory",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "CE",
+            "C1",
+            "D",
+            "D1",
+            "BPT"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "control_drive_vehicle",
+      "fact_type": "requirement",
+      "description_en": "Bring your own suitable vehicle and a companion with a valid licence to the control drive.",
+      "requirement_code": "test_vehicle",
+      "requirement_kind": "exam",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "municipal_submission",
+      "fact_type": "requirement",
+      "description_en": "Submit the documents to the municipality's residents' registration office in Valais.",
+      "requirement_code": "municipal_submission",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Provide the original valid foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Provide a colour passport photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "professional_criminal_record",
+      "fact_type": "requirement",
+      "description_en": "Professional categories require an original criminal-record extract.",
+      "requirement_code": "criminal_record_extract",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "professional_medical",
+      "fact_type": "requirement",
+      "description_en": "Professional categories require a medical certificate.",
+      "requirement_code": "medical_certificate",
+      "requirement_kind": "medical",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "residence_permit_copy",
+      "fact_type": "requirement",
+      "description_en": "Foreign applicants must provide a copy of the residence permit.",
+      "requirement_code": "residence_permit_copy",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "applicant_status",
+          "operator": "eq",
+          "value": "foreign_national"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "VS",
+      "fact_key": "signed_application",
+      "fact_type": "requirement",
+      "description_en": "Submit a signed exchange application.",
+      "requirement_code": "signed_exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "control_drive_a_b",
+      "fact_type": "fee",
+      "description_en": "Category A or B control drive: CHF 90.",
+      "amount_min_rappen": 9000,
+      "amount_max_rappen": 9000,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "A",
+            "B"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "exchange_processing",
+      "fact_type": "fee",
+      "description_en": "Exchange processing: CHF 75.",
+      "amount_min_rappen": 7500,
+      "amount_max_rappen": 7500,
+      "fee_code": "exchange_processing",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "licence_card",
+      "fact_type": "fee",
+      "description_en": "Card-format licence: CHF 30.",
+      "amount_min_rappen": 3000,
+      "amount_max_rappen": 3000,
+      "fee_code": "licence_card",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "qualification_certificate",
+      "fact_type": "fee",
+      "description_en": "Exchange of a qualification certificate: CHF 35.",
+      "amount_min_rappen": 3500,
+      "amount_max_rappen": 3500,
+      "fee_code": "qualification_certificate",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "reschedule",
+      "fact_type": "fee",
+      "description_en": "Rescheduling a control drive at least 10 working days in advance: CHF 50.",
+      "amount_min_rappen": 5000,
+      "amount_max_rappen": 5000,
+      "fee_code": "reschedule",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "supplementary_theory",
+      "fact_type": "fee",
+      "description_en": "Supplementary theory examination: CHF 30.",
+      "amount_min_rappen": 3000,
+      "amount_max_rappen": 3000,
+      "fee_code": "professional_theory",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "professional_use",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "withdrawal",
+      "fact_type": "fee",
+      "description_en": "Withdrawal of the foreign driving entitlement after a failed or missed control drive: CHF 250.",
+      "amount_min_rappen": 25000,
+      "amount_max_rappen": 25000,
+      "fee_code": "withdrawal",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "additional_form",
+      "fact_type": "requirement",
+      "description_en": "Bring the completed Zusatzangaben zum Umtausch form.",
+      "requirement_code": "additional_exchange_information",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "exchange_form",
+      "fact_type": "requirement",
+      "description_en": "Bring the completed exchange application form.",
+      "requirement_code": "exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "identity",
+      "fact_type": "requirement",
+      "description_en": "Bring the original foreign residence permit or Swiss passport/ID as applicable.",
+      "requirement_code": "identity_document",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "in_person",
+      "fact_type": "requirement",
+      "description_en": "Appear personally at Strassenverkehrsamt Zug without an appointment.",
+      "requirement_code": "in_person_application",
+      "requirement_kind": "submission",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "late_control_drive",
+      "fact_type": "requirement",
+      "description_en": "If exchanging more than five years after entry, a control drive is required unless regular driving practice is documented.",
+      "requirement_code": "control_drive",
+      "requirement_kind": "exam",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "years_since_entry",
+          "operator": "gt",
+          "value": "5"
+        },
+        {
+          "field": "regular_driving",
+          "operator": "eq",
+          "value": "false"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "original_foreign_licence",
+      "fact_type": "requirement",
+      "description_en": "Bring the original valid foreign licence.",
+      "requirement_code": "original_foreign_licence",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Bring one colour passport photo.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "test_vehicle",
+      "fact_type": "requirement",
+      "description_en": "Bring a suitable test vehicle; the Strassenverkehrsamt does not supply one.",
+      "requirement_code": "test_vehicle",
+      "requirement_kind": "exam",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZG",
+      "fact_key": "translation",
+      "fact_type": "requirement",
+      "description_en": "Bring a certified translation if the licence is not in Latin script.",
+      "requirement_code": "certified_translation",
+      "requirement_kind": "document",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "licence_language",
+          "operator": "eq",
+          "value": "non_Latin"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "control_drive_d",
+      "fact_type": "fee",
+      "description_en": "Control drive, if required, for categories D: CHF 268.",
+      "source_url": "https://www.zh.ch/content/dam/zhweb/bilder-dokumente/organisation/sicherheitsdirektion/strassenverkehrsamt/organisation/ueber-uns-grundlagen/Geb%C3%BChrenverf%C3%BCgung%2C%20g%C3%BCltig%20ab%201.%20Januar%202026.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 26800,
+      "amount_max_rappen": 26800,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "D"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "control_drive_heavy",
+      "fact_type": "fee",
+      "description_en": "Control drive, if required, for categories C, C1, CE, D1: CHF 201.",
+      "source_url": "https://www.zh.ch/content/dam/zhweb/bilder-dokumente/organisation/sicherheitsdirektion/strassenverkehrsamt/organisation/ueber-uns-grundlagen/Geb%C3%BChrenverf%C3%BCgung%2C%20g%C3%BCltig%20ab%201.%20Januar%202026.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 20100,
+      "amount_max_rappen": 20100,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "C",
+            "C1",
+            "CE",
+            "D1"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "control_drive_light",
+      "fact_type": "fee",
+      "description_en": "Control drive, if required, for categories A, A1, B, B1, F, BE, DE, C1E, D1E, BPT: CHF 134.",
+      "source_url": "https://www.zh.ch/content/dam/zhweb/bilder-dokumente/organisation/sicherheitsdirektion/strassenverkehrsamt/organisation/ueber-uns-grundlagen/Geb%C3%BChrenverf%C3%BCgung%2C%20g%C3%BCltig%20ab%201.%20Januar%202026.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 13400,
+      "amount_max_rappen": 13400,
+      "fee_code": "control_drive",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "control_drive",
+          "operator": "eq",
+          "value": "true"
+        },
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": [
+            "A",
+            "A1",
+            "B",
+            "B1",
+            "F",
+            "BE",
+            "DE",
+            "C1E",
+            "D1E",
+            "BPT"
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "exchange_application_review",
+      "fact_type": "fee",
+      "description_en": "Examination of a foreign-licence exchange application: CHF 50 under the tariff effective 1 January 2026.",
+      "source_url": "https://www.zh.ch/content/dam/zhweb/bilder-dokumente/organisation/sicherheitsdirektion/strassenverkehrsamt/organisation/ueber-uns-grundlagen/Geb%C3%BChrenverf%C3%BCgung%2C%20g%C3%BCltig%20ab%201.%20Januar%202026.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 5000,
+      "amount_max_rappen": 5000,
+      "fee_code": "application_review",
+      "fee_model": "component"
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "identity_check",
+      "fact_type": "fee",
+      "description_en": "Identity check for a first application, if performed by the road traffic office: CHF 20.",
+      "source_url": "https://www.zh.ch/content/dam/zhweb/bilder-dokumente/organisation/sicherheitsdirektion/strassenverkehrsamt/organisation/ueber-uns-grundlagen/Geb%C3%BChrenverf%C3%BCgung%2C%20g%C3%BCltig%20ab%201.%20Januar%202026.pdf",
+      "validated_at": "2026-09-24",
+      "amount_min_rappen": 2000,
+      "amount_max_rappen": 2000,
+      "fee_code": "identity_check",
+      "fee_model": "component",
+      "conditions": [
+        {
+          "field": "first_application",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "eye_test_validity",
+      "fact_type": "deadline",
+      "description_en": "The Swiss eye test remains valid for two years.",
+      "period_value": 24,
+      "period_unit": "months",
+      "period_anchor": "eye_test_date",
+      "deadline_code": "eye_test_validity"
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "eye_test",
+      "fact_type": "requirement",
+      "description_en": "Complete an eye test at a Swiss optician or medical practice.",
+      "requirement_code": "eye_test",
+      "requirement_kind": "medical",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "first_identity_check",
+      "fact_type": "requirement",
+      "description_en": "For a first application, confirm identity personally at the municipal Einwohnerkontrolle or Strassenverkehrsamt.",
+      "requirement_code": "identity_check_in_person",
+      "requirement_kind": "submission",
+      "requirement_effect": "required",
+      "conditions": [
+        {
+          "field": "first_application",
+          "operator": "eq",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "passport_photo",
+      "fact_type": "requirement",
+      "description_en": "Supply a suitable colour passport photo; submission method depends on whether the application is filed at the municipality or Strassenverkehrsamt.",
+      "requirement_code": "colour_passport_photo",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    },
+    {
+      "jurisdiction": "ZH",
+      "fact_key": "printed_application",
+      "fact_type": "requirement",
+      "description_en": "Complete and print the exchange application ZFO104AUSL.",
+      "requirement_code": "printed_exchange_form",
+      "requirement_kind": "document",
+      "requirement_effect": "required"
+    }
+  ]
+}
