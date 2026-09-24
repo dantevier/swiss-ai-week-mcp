@@ -1,14 +1,12 @@
 """
 Tools module for the MCP Boilerplate server.
 
-Import all tool modules to register them with the MCP server.
+Import all tool modules to register them with the MCP server. Only
+`company_info` is registered (docs/prd-zefix-company-info.md S6): the
+boilerplate demo tools (math, text, utility, tax) stay on disk, unregistered,
+so the jury sees a single, well-grounded tool.
 """
 
-# Import all tool modules - the decorators will register them automatically
-from . import math_tools
-from . import tax_tools
-from . import text_tools
-from . import utility_tools
+from . import company_info
 
-# Export the tool modules for potential external use
-__all__ = ['math_tools', 'text_tools', 'utility_tools', 'tax_tools']
+__all__ = ["company_info"]

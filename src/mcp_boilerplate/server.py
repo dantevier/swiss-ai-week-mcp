@@ -13,7 +13,11 @@ logger = setup_logger("mcp_boilerplate.server")
 # Create the main MCP server instance
 mcp = FastMCP(
     name=settings.server_name,
-    instructions=f"This is {settings.server_name} - a robust MCP server with comprehensive tooling for AI applications."
+    instructions=(
+        "Answers questions about Swiss companies in the federal commercial register "
+        "index (Zefix) and their SHAB publications. Use company_info. It asks back "
+        "when a name is ambiguous and says when a source is unavailable."
+    ),
 )
 
 # Import all components to register them with the mcp instance
