@@ -125,6 +125,8 @@ def test_dashboard_serves_the_latest_run(tmp_path, monkeypatch):
     page = client.get("/benchmark").text
     assert 'href="/benchmark" class="on"' in page and "/static/benchmark.js" in page
     assert 'href="/" class="on"' in client.get("/").text
+    flow = client.get("/architecture").text
+    assert 'href="/architecture" class="on"' in flow and "Smurf" in flow and "/static/logo.png" in flow
 
 
 def test_settings_page_saves_the_anthropic_key(tmp_path, monkeypatch):

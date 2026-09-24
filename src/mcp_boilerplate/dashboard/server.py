@@ -29,7 +29,7 @@ HERE = Path(__file__).resolve().parent
 TEMPLATES = HERE / "templates"
 # Written by benchmark/run_mcp.py; each run folder holds a summary.json made by benchmark/interpret.py.
 BENCHMARK_RUNS = Path(os.environ.get("BENCHMARK_RUNS_DIR", HERE.parents[2] / "benchmark" / "runs"))
-TABS = [("/", "Data sources", "main"), ("/benchmark", "Benchmark", "benchmark")]
+TABS = [("/", "Data sources", "main"), ("/benchmark", "Benchmark", "benchmark"), ("/architecture", "Architecture", "architecture")]
 
 # One crawl at a time: they share the SQLite file and the paid API quotas.
 _crawl_lock = asyncio.Lock()
@@ -143,6 +143,10 @@ async def benchmark_page(request: Request) -> HTMLResponse:
     return _page("Benchmark", "/settings", "Settings", "gear.svg", "benchmark.html", "benchmark")
 
 
+async def architecture_page(request: Request) -> HTMLResponse:
+    return HTMLResponse(_template("architecture.html"))
+
+
 async def settings_page(request: Request) -> HTMLResponse:
     return _page("Settings", "/", "Back to data sources", "home.svg", "settings.html", "settings")
 
@@ -151,6 +155,7 @@ app = Starlette(
     routes=[
         Route("/", index),
         Route("/benchmark", benchmark_page),
+        Route("/architecture", architecture_page),
         Route("/settings", settings_page),
         Route("/api/status", status),
         Route("/api/benchmark", benchmark),
