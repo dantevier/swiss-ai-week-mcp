@@ -514,6 +514,16 @@ mcp-inspector uv run python -m your_server_name.main
 5. Run quality checks: `make ci`
 6. Submit a pull request
 
+## Team
+
+- Roberto Cerrone
+- Edoardo
+- Alberto Minetti
+- Vincent Van Loo
+- Victor Bonilla
+- Jesus Sebastian
+- Jiaqi Yu
+
 ## License
 
 MIT License - see LICENSE file for details.
