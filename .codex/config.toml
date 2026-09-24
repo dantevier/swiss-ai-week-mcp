@@ -1,0 +1,5 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+[mcp_servers.mcp-swiss-info]
+command = "uv"
+args = ["run", "--frozen", "python", "-m", "mcp_boilerplate.main"]

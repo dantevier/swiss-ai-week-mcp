@@ -225,6 +225,8 @@ secrets.json
 # MCP specific
 mcp_config.json
 .mcp/
+!.agents/
+!.agents/mcp_config.json
 
 # AI/ML files
 *.pkl
