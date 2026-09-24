@@ -1,0 +1,94 @@
+"""Reviewed Swiss authority sources for the crawler."""
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Source:
+    url: str
+    authority: str
+    expected: str
+
+
+SOURCES: dict[str, dict[str, Source]] = {
+    "federal": {
+        "health_insurance_premiums": Source(
+            "https://opendata.swiss/api/3/action/package_show?id=health-insurance-premiums",
+            "Federal Office of Public Health (BAG)",
+            "Archiv_Praemien_2026.zip",
+        ),
+        "premium_regions_2026": Source(
+            "https://www.fedlex.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/2022/184/"
+            "20260101/de/html/fedlex-data-admin-ch-eli-cc-2022-184-20260101-de-html.html",
+            "Federal Department of Home Affairs (FDHA)",
+            "Prämienregionen",
+        ),
+        "reference_interest_rate": Source(
+            "https://www.bwo.admin.ch/de/referenzzinssatz",
+            "Federal Office for Housing (BWO)",
+            "Hypothekarischer Referenzzinssatz",
+        ),
+        "reference_interest_rate_law": Source(
+            "https://www.fedlex.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/"
+            "1990/835_835_835/20251001/de/html/"
+            "fedlex-data-admin-ch-eli-cc-1990-835_835_835-20251001-de-html.html",
+            "Swiss Confederation (Fedlex)",
+            "Verordnung über die Miete und Pacht",
+        ),
+        "foreign_driving_licence_law": Source(
+            "https://www.fedlex.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/"
+            "1976/2423_2423_2423/20260101/de/html/"
+            "fedlex-data-admin-ch-eli-cc-1976-2423_2423_2423-20260101-de-html.html",
+            "Swiss Confederation (Fedlex)",
+            "Verkehrszulassungsverordnung",
+        ),
+    },
+    "cantonal": {
+        "gr_school_holidays_2026_27": Source(
+            "https://www.gr.ch/DE/institutionen/verwaltung/ekud/avs/Volksschule/"
+            "SB_Ferienplaene_2026_2027_de.pdf",
+            "Canton of Graubünden",
+            "Schul- und Ferienplan",
+        ),
+        "vd_school_holidays_2023_31": Source(
+            "https://www.vd.ch/fileadmin/user_upload/themes/formation/Vacances_scolaires/"
+            "def_calendrier_vacances_scolaires_2023_2031.pdf",
+            "Canton of Vaud",
+            "Vacances scolaires vaudoises",
+        ),
+        "ti_school_holidays_2026_27": Source(
+            "https://www4.ti.ch/fileadmin/DECS/calendario_scolastico/"
+            "Calendario_scolastico_2026_2027.pdf",
+            "Canton of Ticino",
+            "vacanze",
+        ),
+        "zh_school_holidays": Source(
+            "https://www.zh.ch/de/bildung/bildungssystem/schulferien.html",
+            "Canton of Zürich",
+            "Schulferien",
+        ),
+    },
+    "municipal": {
+        "scuol_waste": Source(
+            "https://www.scuol.net/de/informationen/abfallentsorgung.html/108",
+            "Municipality of Scuol",
+            "Abfallentsorgung",
+        ),
+        "bern_arrival": Source(
+            "https://www.bern.ch/themen/zuzug-umzug-wegzug/",
+            "City of Bern",
+            "Zuzug, Umzug und Wegzug",
+        ),
+        "st_gallen_school_holidays": Source(
+            "https://www.stadt.sg.ch/home/schule-bildung/Schulferien.html",
+            "City of St. Gallen",
+            "Schuljahr",
+        ),
+        "lausanne_arrival": Source(
+            "https://www.lausanne.ch/dam/jcr%3A379afd27-3817-4a2f-ab48-6d64f06ead2a/"
+            "Brochure_Contr%C3%B4le_Habitants.pdf",
+            "City of Lausanne",
+            "Contrôle des habitants de Lausanne",
+        ),
+    },
+}
