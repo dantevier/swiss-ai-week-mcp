@@ -1,13 +1,11 @@
 """
 Shared fixtures for the company_info test suite.
 
-docs/prd-zefix-company-info.md is authoritative for behaviour; the module
-interfaces this file imports against are the binding contract for S1-S4
-(config/settings.py and sources/http.py already exist; sources/lindas.py,
-sources/zefix.py, sources/gazette.py, envelope.py, tools/company_info.py do
-not yet exist -- every import below fails with ImportError until they land.
-That failure is expected and is the point of S0: these are acceptance tests
-written before the implementation.
+docs/prd-zefix-company-info.md is authoritative for behaviour. Tests drive
+`zefix.lookup.CompanyLookup` with injected fakes (FakeLindas, FakeZefix,
+FakeGazette) built by `lookup(...)`, the same constructor-injection style as
+`Crawler(fetcher, fetcher, db, FakeEmbedder())` in tests/test_crawler.py. No
+module attribute or settings field is monkeypatched.
 """
 
 from __future__ import annotations
@@ -16,32 +14,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from mcp_boilerplate.config import settings as settings_module
+from mcp_boilerplate.config.settings import Settings
+from mcp_boilerplate.zefix import CompanyLookup
 from mcp_boilerplate.zefix.sources import gazette
 from mcp_boilerplate.zefix.sources.gazette import Publication
 from mcp_boilerplate.zefix.sources.lindas import Company
-from mcp_boilerplate.zefix.sources.rest import Enrichment
-
-# ---------------------------------------------------------------------------
-# Settings
-# ---------------------------------------------------------------------------
-
-
-@pytest.fixture
-def settings_override(monkeypatch):
-    """Return a setter that monkeypatches attributes on the live settings singleton.
-
-    Usage: settings_override(respect_robots_txt=False, zefix_username="u").
-    monkeypatch restores the original values automatically at teardown.
-    """
-
-    def _override(**kwargs):
-        for key, value in kwargs.items():
-            monkeypatch.setattr(settings_module.settings, key, value)
-        return settings_module.settings
-
-    return _override
-
+from mcp_boilerplate.zefix.sources.rest import Enrichment, ZefixClient
 
 # ---------------------------------------------------------------------------
 # Company / Enrichment / Publication fixtures (PRD §5.3)
@@ -205,19 +183,32 @@ def publications() -> list[Publication]:
     ]
 
 
+
 # ---------------------------------------------------------------------------
-# Source-layer monkeypatch helper
+# Fake source clients (T1)
 # ---------------------------------------------------------------------------
 
 
-def _as_async_mock(value):
-    """Wrap a fixed value, an exception, or a callable into an AsyncMock.
+_UNSET = object()  # distinguishes "not configured" from "configured to return None"
+                    # (find_by_uid=None is a legitimate canned return value: a LINDAS miss)
 
-    - Exception instance or exception class -> AsyncMock(side_effect=...) that raises.
+
+def _as_async_mock(owner: str, method: str, value) -> AsyncMock:
+    """Wrap one canned behaviour into an AsyncMock that records its awaits.
+
+    - _UNSET -> fails the test if awaited (pytest.fail raises a BaseException,
+      so CompanyLookup._call_source cannot swallow it).
+    - Exception instance or exception class -> raised when awaited.
     - Any other callable (a plain function, sync or async) -> used as side_effect,
-      so its return value becomes the coroutine's result (AsyncMock supports this).
-    - Anything else (a dataclass instance, list, dict, None, str, ...) -> AsyncMock(return_value=...).
+      so its return value becomes the coroutine's result.
+    - Anything else (a dataclass instance, list, dict, None, str, ...) -> returned.
     """
+    if value is _UNSET:
+
+        def _unconfigured(*_args, **_kwargs):
+            pytest.fail(f"{owner}.{method} was called but not configured")
+
+        return AsyncMock(side_effect=_unconfigured)
     if isinstance(value, BaseException):
         return AsyncMock(side_effect=value)
     if isinstance(value, type) and issubclass(value, BaseException):
@@ -227,57 +218,93 @@ def _as_async_mock(value):
     return AsyncMock(return_value=value)
 
 
-_UNSET = object()  # distinguishes "don't patch this" from "patch it to return None"
-                    # (find_by_uid=None is a legitimate mocked return value: a LINDAS miss)
+class FakeLindas:
+    """Stands in for `LindasClient`. `calls[method]` is the AsyncMock behind
+    each method, for call-count/argument assertions."""
+
+    def __init__(self, *, find_by_uid=_UNSET, search_by_name=_UNSET, dataset_modified=_UNSET):
+        self.calls = {
+            "find_by_uid": _as_async_mock("FakeLindas", "find_by_uid", find_by_uid),
+            "search_by_name": _as_async_mock("FakeLindas", "search_by_name", search_by_name),
+            "dataset_modified": _as_async_mock("FakeLindas", "dataset_modified", dataset_modified),
+        }
+
+    async def find_by_uid(self, uid: str, *, budget_s: float) -> Company | None:
+        return await self.calls["find_by_uid"](uid, budget_s=budget_s)
+
+    async def search_by_name(
+        self, name: str, *, canton: str | None = None, limit: int = 10, budget_s: float
+    ) -> list[Company]:
+        return await self.calls["search_by_name"](name, canton=canton, limit=limit, budget_s=budget_s)
+
+    async def dataset_modified(self) -> str | None:
+        return await self.calls["dataset_modified"]()
 
 
-def patch_sources(
-    monkeypatch,
+class FakeZefix(ZefixClient):
+    """Stands in for `ZefixClient`. Inherits the real `enrichment_allowed()`
+    policy (PRD §6.5), driven by the constructor's respect_robots_txt /
+    username / password; `firm_detail` is canned."""
+
+    def __init__(
+        self,
+        *,
+        firm_detail=_UNSET,
+        respect_robots_txt: bool = True,
+        username: str | None = None,
+        password: str | None = None,
+    ):
+        super().__init__(
+            base_url="https://fake.invalid",
+            username=username,
+            password=password,
+            respect_robots_txt=respect_robots_txt,
+        )
+        self.calls = {"firm_detail": _as_async_mock("FakeZefix", "firm_detail", firm_detail)}
+
+    async def firm_detail(self, ehraid: int, *, budget_s: float) -> Enrichment:
+        return await self.calls["firm_detail"](ehraid, budget_s=budget_s)
+
+
+class FakeGazette:
+    """Stands in for `GazetteClient`."""
+
+    def __init__(self, *, publications_for_uid=_UNSET, rubrics=_UNSET):
+        self.calls = {
+            "publications_for_uid": _as_async_mock("FakeGazette", "publications_for_uid", publications_for_uid),
+            "rubrics": _as_async_mock("FakeGazette", "rubrics", rubrics),
+        }
+
+    async def publications_for_uid(
+        self,
+        uid: str,
+        *,
+        limit: int,
+        budget_s: float,
+        language: str = "de",
+        rubrics: list[str] | None = None,
+    ) -> list[Publication]:
+        return await self.calls["publications_for_uid"](
+            uid, limit=limit, budget_s=budget_s, language=language, rubrics=rubrics
+        )
+
+    async def rubrics(self) -> dict:
+        return await self.calls["rubrics"]()
+
+
+def lookup(
     *,
-    find_by_uid=_UNSET,
-    search_by_name=_UNSET,
-    firm_detail=_UNSET,
-    publications_for_uid=_UNSET,
-    dataset_modified=_UNSET,
-):
-    """Monkeypatch the source-module functions as seen from tools.company_info.
-
-    tools/company_info.py does `from ..zefix.sources import gazette, lindas` / `from ..zefix.sources import rest as zefix` and
-    calls them as `lindas.find_by_uid(...)` etc. (interfaces.md), so patching the
-    attribute on the module object patches every caller, including company_info.
-
-    Pass a Company/list[Company]/Enrichment/list[Publication]/str/None for a
-    fixed return value (find_by_uid=None mocks a LINDAS miss -- it is NOT the
-    same as omitting the argument), an Exception instance/class to make the
-    call raise, or a callable for per-call behaviour. Returns a dict of the
-    AsyncMocks that were installed (keyed by parameter name) so tests can
-    assert on call_count/args.
-
-    Also relevant: enrichment_allowed() is gated purely by settings
-    (respect_robots_txt, zefix_username, zefix_password) per interfaces.md, so
-    tests control it via settings_override rather than patching a function.
-    """
-    from mcp_boilerplate.tools import company_info as company_info_module
-
-    installed: dict[str, AsyncMock] = {}
-    if find_by_uid is not _UNSET:
-        mock = _as_async_mock(find_by_uid)
-        monkeypatch.setattr(company_info_module.lindas, "find_by_uid", mock)
-        installed["find_by_uid"] = mock
-    if search_by_name is not _UNSET:
-        mock = _as_async_mock(search_by_name)
-        monkeypatch.setattr(company_info_module.lindas, "search_by_name", mock)
-        installed["search_by_name"] = mock
-    if firm_detail is not _UNSET:
-        mock = _as_async_mock(firm_detail)
-        monkeypatch.setattr(company_info_module.zefix, "firm_detail", mock)
-        installed["firm_detail"] = mock
-    if publications_for_uid is not _UNSET:
-        mock = _as_async_mock(publications_for_uid)
-        monkeypatch.setattr(company_info_module.gazette, "publications_for_uid", mock)
-        installed["publications_for_uid"] = mock
-    if dataset_modified is not _UNSET:
-        mock = _as_async_mock(dataset_modified)
-        monkeypatch.setattr(company_info_module.lindas, "dataset_modified", mock)
-        installed["dataset_modified"] = mock
-    return installed
+    lindas: FakeLindas | None = None,
+    zefix: FakeZefix | None = None,
+    gazette: FakeGazette | None = None,
+    config: Settings | None = None,
+) -> CompanyLookup:
+    """Build a `CompanyLookup` over fakes. A fake not passed in is an
+    unconfigured one (any call fails the test); `config` defaults to
+    `Settings` built without reading a .env file."""
+    return CompanyLookup(
+        lindas=lindas if lindas is not None else FakeLindas(),
+        zefix=zefix if zefix is not None else FakeZefix(),
+        gazette=gazette if gazette is not None else FakeGazette(),
+        config=config if config is not None else Settings(_env_file=None),
+    )

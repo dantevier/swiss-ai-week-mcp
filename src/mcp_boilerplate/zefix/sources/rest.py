@@ -196,16 +196,3 @@ class ZefixClient:
             old_names=old_names,
             mutation_types=_mutation_types_newest_first(data.get("shabPub") or []),
         )
-
-
-# --- module-level shims ------------------------------------------------------
-
-
-# S4 shim: removed in S6 once CompanyLookup injects the client.
-def enrichment_allowed() -> bool:
-    return ZefixClient().enrichment_allowed()
-
-
-# S4 shim: removed in S6 once CompanyLookup injects the client.
-async def firm_detail(ehraid: int, *, budget_s: float) -> Enrichment:
-    return await ZefixClient().firm_detail(ehraid, budget_s=budget_s)

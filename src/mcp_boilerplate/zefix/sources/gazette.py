@@ -443,27 +443,3 @@ class GazetteClient:
         pubs = [_publication_from_item(item, language=language, base_url=self.base_url) for item in content]
         pubs.sort(key=lambda p: p.date, reverse=True)
         return pubs
-
-
-# ---------------------------------------------------------------------------
-# Module-level shims
-# ---------------------------------------------------------------------------
-
-
-# S4 shim: removed in S6 once CompanyLookup injects the client.
-async def publications_for_uid(
-    uid: str,
-    *,
-    limit: int,
-    budget_s: float,
-    language: str = "de",
-    rubrics: list[str] | None = None,
-) -> list[Publication]:
-    return await GazetteClient().publications_for_uid(
-        uid, limit=limit, budget_s=budget_s, language=language, rubrics=rubrics
-    )
-
-
-# S4 shim: removed in S6 once CompanyLookup injects the client.
-async def rubrics() -> dict:
-    return await GazetteClient().rubrics()

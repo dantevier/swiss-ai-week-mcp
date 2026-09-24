@@ -602,21 +602,3 @@ class LindasClient:
         _dataset_modified_cache["value"] = value
         _dataset_modified_cache["fetched_at"] = now
         return value
-
-
-# --- module-level shims ------------------------------------------------------
-
-
-# S4 shim: removed in S6 once CompanyLookup injects the client.
-async def find_by_uid(uid: str, *, budget_s: float) -> Company | None:
-    return await LindasClient().find_by_uid(uid, budget_s=budget_s)
-
-
-# S4 shim: removed in S6 once CompanyLookup injects the client.
-async def search_by_name(name: str, *, canton: str | None = None, limit: int = 10, budget_s: float) -> list[Company]:
-    return await LindasClient().search_by_name(name, canton=canton, limit=limit, budget_s=budget_s)
-
-
-# S4 shim: removed in S6 once CompanyLookup injects the client.
-async def dataset_modified() -> str | None:
-    return await LindasClient().dataset_modified()

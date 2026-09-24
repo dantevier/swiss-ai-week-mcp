@@ -7,9 +7,9 @@ sources/gazette.py, envelope.py, and tools/company_info.py (S1-S4) land. That
 is expected. These tests are the acceptance criteria for those steps, not a
 description of code that already runs.
 
-Sources are never hit over the network: lindas/zefix/gazette calls are
-monkeypatched via tests.conftest.patch_sources at the module boundary that
-tools/company_info.py itself calls through.
+Sources are never hit over the network: `CompanyLookup` is built by
+tests.conftest.lookup over injected FakeLindas / FakeZefix / FakeGazette
+clients (PRD refactor T1/T2). No module or settings attribute is patched.
 """
 
 from __future__ import annotations
@@ -19,36 +19,25 @@ import json
 import pytest
 import respx
 
-from mcp_boilerplate.zefix import envelope, gates
 from mcp_boilerplate.config.settings import Settings
+from mcp_boilerplate.zefix import envelope, gates
 from mcp_boilerplate.zefix.sources import gazette
 from mcp_boilerplate.zefix.sources.http import EgressDenied, SourceUnavailable, make_client
 from mcp_boilerplate.zefix.sources.rest import format_uid
-from mcp_boilerplate.tools.company_info import company_info
 
-from .conftest import patch_sources
+from .conftest import FakeGazette, FakeLindas, FakeZefix, lookup
 
 FIVE_STATES = {"answered", "need_info", "no_match", "out_of_scope", "source_unavailable"}
 
 
-def _refuses_lookup(monkeypatch):
-    """Install mocks on all four source calls that fail the test if invoked.
+def _refuses_lookup():
+    """A CompanyLookup whose every source call fails the test if invoked.
 
     Used for gate tests (jurisdiction/analytics/topic) where §5.2 step 0 must
     short-circuit before any network call, and for the "no params" case.
+    Unconfigured fakes (tests.conftest) fail the test on any call.
     """
-
-    def _boom(*_args, **_kwargs):
-        raise AssertionError("source layer must not be called")
-
-    return patch_sources(
-        monkeypatch,
-        find_by_uid=_boom,
-        search_by_name=_boom,
-        firm_detail=_boom,
-        publications_for_uid=_boom,
-        dataset_modified=_boom,
-    )
+    return lookup()
 
 
 def _walk_keys(obj):
@@ -76,16 +65,14 @@ def _assert_no_banned_keys(result: dict) -> None:
 # ---------------------------------------------------------------------------
 
 
-async def test_q1_name_lookup_exact_hit_is_answered_with_citation(swisscom, monkeypatch):
+async def test_q1_name_lookup_exact_hit_is_answered_with_citation(swisscom):
     """PRD §4 Q1, §5.2 step 2/3, §5.3: a single exact name hit resolves to `answered`
     with a fully populated citation and a deterministic passage."""
-    patch_sources(
-        monkeypatch,
-        search_by_name=[swisscom],
-        publications_for_uid=[],
-        dataset_modified="2026-09-23",
+    company_lookup = lookup(
+        lindas=FakeLindas(search_by_name=[swisscom], dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=[]),
     )
-    result = await company_info(name="Swisscom (Schweiz) AG", language="de")
+    result = await company_lookup.lookup(name="Swisscom (Schweiz) AG", language="de")
 
     assert result["status"] == "answered"
     company = result["company"]
@@ -113,12 +100,15 @@ async def test_q1_name_lookup_exact_hit_is_answered_with_citation(swisscom, monk
     assert result["notes"] == envelope.NOTES["de"]
 
 
-async def test_q1_passage_is_deterministic_across_calls(swisscom, monkeypatch):
+async def test_q1_passage_is_deterministic_across_calls(swisscom):
     """PRD §5.3: `passage` is rendered from structured fields, never LLM-generated,
     so two calls against the same data produce byte-identical passages."""
-    patch_sources(monkeypatch, search_by_name=[swisscom], publications_for_uid=[], dataset_modified="2026-09-23")
-    first = await company_info(name="Swisscom (Schweiz) AG", language="de")
-    second = await company_info(name="Swisscom (Schweiz) AG", language="de")
+    company_lookup = lookup(
+        lindas=FakeLindas(search_by_name=[swisscom], dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=[]),
+    )
+    first = await company_lookup.lookup(name="Swisscom (Schweiz) AG", language="de")
+    second = await company_lookup.lookup(name="Swisscom (Schweiz) AG", language="de")
     assert first["citation"]["passage"] == second["citation"]["passage"]
     assert first["citation"]["passage"]
 
@@ -128,11 +118,11 @@ async def test_q1_passage_is_deterministic_across_calls(swisscom, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-async def test_q2_ambiguous_name_returns_need_info_with_candidates(nestle_candidates, monkeypatch):
+async def test_q2_ambiguous_name_returns_need_info_with_candidates(nestle_candidates):
     """PRD §4 Q2, §5.2 step 3: several prefix hits with no exact legal_name match
     -> need_info with at most 5 candidates and exactly one question."""
-    patch_sources(monkeypatch, search_by_name=nestle_candidates)
-    result = await company_info(name="Nestlé", language="fr")
+    company_lookup = lookup(lindas=FakeLindas(search_by_name=nestle_candidates))
+    result = await company_lookup.lookup(name="Nestlé", language="fr")
 
     assert result["status"] == "need_info"
     assert len(result["candidates"]) <= 5
@@ -149,23 +139,22 @@ async def test_q2_ambiguous_name_returns_need_info_with_candidates(nestle_candid
 # ---------------------------------------------------------------------------
 
 
-async def test_q3_uid_lookup_formats_uid_and_defaults_to_policy_robots(swisscom, monkeypatch, settings_override):
+async def test_q3_uid_lookup_formats_uid_and_defaults_to_policy_robots(swisscom):
     """PRD §4 Q3, §6.5: default settings (respect_robots_txt=True, no credentials)
     never call the Zefix web endpoint; the answer is still returned, degraded."""
-    settings_override(respect_robots_txt=True, zefix_username=None, zefix_password=None)
 
     def _must_not_be_called(*_args, **_kwargs):
         raise AssertionError("firm_detail must not run when respect_robots_txt=True and no credentials (§6.5)")
 
-    mocks = patch_sources(
-        monkeypatch,
-        find_by_uid=swisscom,
-        firm_detail=_must_not_be_called,
-        publications_for_uid=[],
-        dataset_modified="2026-09-23",
+    zefix = FakeZefix(firm_detail=_must_not_be_called, respect_robots_txt=True, username=None, password=None)
+    mocks = zefix.calls
+    company_lookup = lookup(
+        lindas=FakeLindas(find_by_uid=swisscom, dataset_modified="2026-09-23"),
+        zefix=zefix,
+        gazette=FakeGazette(publications_for_uid=[]),
     )
 
-    result = await company_info(uid="CHE-101.654.423", language="de")
+    result = await company_lookup.lookup(uid="CHE-101.654.423", language="de")
 
     assert result["status"] == "answered"
     assert result["company"]["uid"] == format_uid("CHE101654423")
@@ -177,19 +166,18 @@ async def test_q3_uid_lookup_formats_uid_and_defaults_to_policy_robots(swisscom,
     mocks["firm_detail"].assert_not_awaited()
 
 
-async def test_q3b_uid_lookup_with_enrichment_when_robots_disabled(swisscom, enrichment_active, monkeypatch, settings_override):
+async def test_q3b_uid_lookup_with_enrichment_when_robots_disabled(swisscom, enrichment_active):
     """PRD §5.2 step 4, §6.5: RESPECT_ROBOTS_TXT=false runs the Zefix enrichment
     call and its fields (status, shab_date, cantonal excerpt) reach the envelope."""
-    settings_override(respect_robots_txt=False)
-    mocks = patch_sources(
-        monkeypatch,
-        find_by_uid=swisscom,
-        firm_detail=enrichment_active,
-        publications_for_uid=[],
-        dataset_modified="2026-09-23",
+    zefix = FakeZefix(firm_detail=enrichment_active, respect_robots_txt=False)
+    mocks = zefix.calls
+    company_lookup = lookup(
+        lindas=FakeLindas(find_by_uid=swisscom, dataset_modified="2026-09-23"),
+        zefix=zefix,
+        gazette=FakeGazette(publications_for_uid=[]),
     )
 
-    result = await company_info(uid="CHE101654423", language="de")
+    result = await company_lookup.lookup(uid="CHE101654423", language="de")
 
     assert result["status"] == "answered"
     assert result["enrichment_status"] == "answered"
@@ -204,7 +192,7 @@ async def test_q3b_uid_lookup_with_enrichment_when_robots_disabled(swisscom, enr
 # ---------------------------------------------------------------------------
 
 
-async def test_q4_publications_attached_newest_first_capped(swisscom, monkeypatch):
+async def test_q4_publications_attached_newest_first_capped(swisscom):
     """PRD §5.2 step 5, §4 Q4: gazette publications are attached newest first and
     capped at max_publications; publications_status is "answered" on success."""
     from mcp_boilerplate.zefix.sources.gazette import Publication
@@ -225,9 +213,12 @@ async def test_q4_publications_attached_newest_first_capped(swisscom, monkeypatc
             ["2026-08-14", "2026-07-01", "2026-06-12", "2026-05-01", "2026-04-01", "2026-03-01"]
         )
     ]
-    patch_sources(monkeypatch, find_by_uid=swisscom, publications_for_uid=six_newest_first, dataset_modified="2026-09-23")
+    company_lookup = lookup(
+        lindas=FakeLindas(find_by_uid=swisscom, dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=six_newest_first),
+    )
 
-    result = await company_info(uid="CHE101654423", max_publications=3)
+    result = await company_lookup.lookup(uid="CHE101654423", max_publications=3)
 
     assert result["status"] == "answered"
     assert result["publications_status"] == "answered"
@@ -237,17 +228,15 @@ async def test_q4_publications_attached_newest_first_capped(swisscom, monkeypatc
     assert dates == ["2026-08-14", "2026-07-01", "2026-06-12"]
 
 
-async def test_q4_gazette_unavailable_still_answers_company(swisscom, monkeypatch):
+async def test_q4_gazette_unavailable_still_answers_company(swisscom):
     """PRD §5.2 step 5: gazette failure degrades publications_status only; the
     company answer (resolved via LINDAS) is still returned."""
-    patch_sources(
-        monkeypatch,
-        find_by_uid=swisscom,
-        publications_for_uid=SourceUnavailable(source="gazette", error_class="timeout"),
-        dataset_modified="2026-09-23",
+    company_lookup = lookup(
+        lindas=FakeLindas(find_by_uid=swisscom, dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=SourceUnavailable(source="gazette", error_class="timeout")),
     )
 
-    result = await company_info(uid="CHE101654423")
+    result = await company_lookup.lookup(uid="CHE101654423")
 
     assert result["status"] == "answered"
     assert "company" in result
@@ -261,15 +250,17 @@ async def test_q4_gazette_unavailable_still_answers_company(swisscom, monkeypatc
 
 
 async def test_q5_persons_question_is_out_of_scope_and_resolves_company_first(
-    swisscom, enrichment_active, monkeypatch, settings_override
+    swisscom, enrichment_active
 ):
     """PRD §5.2 step 0 (persons), §6.6: a person-role question resolves the company
     (so the cantonal excerpt link can be returned) then declines with reason
     "persons", never attaching publications or any person data."""
-    settings_override(respect_robots_txt=False)
-    patch_sources(monkeypatch, search_by_name=[swisscom], firm_detail=enrichment_active, dataset_modified="2026-09-23")
+    company_lookup = lookup(
+        lindas=FakeLindas(search_by_name=[swisscom], dataset_modified="2026-09-23"),
+        zefix=FakeZefix(firm_detail=enrichment_active, respect_robots_txt=False),
+    )
 
-    result = await company_info(
+    result = await company_lookup.lookup(
         question="Wer sitzt im Verwaltungsrat der Swisscom (Schweiz) AG?",
         name="Swisscom (Schweiz) AG",
         language="de",
@@ -294,20 +285,18 @@ async def test_q5_persons_question_is_out_of_scope_and_resolves_company_first(
 # ---------------------------------------------------------------------------
 
 
-async def test_q6_foreign_jurisdiction_question_is_out_of_scope(monkeypatch):
+async def test_q6_foreign_jurisdiction_question_is_out_of_scope():
     """PRD §5.2 step 0 (jurisdiction): a non-Swiss-country question with no Swiss
     anchor is declined before any network call."""
-    _refuses_lookup(monkeypatch)
-    result = await company_info(question="Ist die Firma XY in Deutschland eingetragen?", language="de")
+    result = await _refuses_lookup().lookup(question="Ist die Firma XY in Deutschland eingetragen?", language="de")
     assert result["status"] == "out_of_scope"
     assert result["reason"] == "jurisdiction"
 
 
-async def test_q6_non_che_uid_is_out_of_scope_jurisdiction(monkeypatch):
+async def test_q6_non_che_uid_is_out_of_scope_jurisdiction():
     """PRD §5.2 step 0 (jurisdiction): a uid not starting with CHE is a foreign
     identifier, declined before any network call."""
-    _refuses_lookup(monkeypatch)
-    result = await company_info(uid="DE123456789")
+    result = await _refuses_lookup().lookup(uid="DE123456789")
     assert result["status"] == "out_of_scope"
     assert result["reason"] == "jurisdiction"
 
@@ -317,15 +306,16 @@ async def test_q6_non_che_uid_is_out_of_scope_jurisdiction(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-async def test_q7_lindas_unavailable(monkeypatch):
+async def test_q7_lindas_unavailable():
     """PRD §4 Q7, §5.3: LINDAS failure always produces source_unavailable, with no
     cached/stale company record attached (D3)."""
-    patch_sources(
-        monkeypatch,
-        search_by_name=SourceUnavailable(source="lindas", error_class="timeout"),
-        dataset_modified="2026-09-23",
+    company_lookup = lookup(
+        lindas=FakeLindas(
+            search_by_name=SourceUnavailable(source="lindas", error_class="timeout"),
+            dataset_modified="2026-09-23",
+        )
     )
-    result = await company_info(name="Swisscom (Schweiz) AG")
+    result = await company_lookup.lookup(name="Swisscom (Schweiz) AG")
     assert result["status"] == "source_unavailable"
     assert result["source"] == "lindas"
     assert "error_class" in result
@@ -337,11 +327,10 @@ async def test_q7_lindas_unavailable(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-async def test_q8_analytics_question_is_out_of_scope(monkeypatch):
+async def test_q8_analytics_question_is_out_of_scope():
     """PRD §4 Q8, §5.2 step 0 (analytics), N1: counting/listing over a criterion is
     declined before any network call."""
-    _refuses_lookup(monkeypatch)
-    result = await company_info(question="Wie viele AGs gibt es im Kanton Zug?", language="de")
+    result = await _refuses_lookup().lookup(question="Wie viele AGs gibt es im Kanton Zug?", language="de")
     assert result["status"] == "out_of_scope"
     assert result["reason"] == "analytics"
 
@@ -400,11 +389,10 @@ def test_classify_returns_none_when_no_gate_fires():
 # ---------------------------------------------------------------------------
 
 
-async def test_no_params_and_no_question_asks_for_name(monkeypatch):
+async def test_no_params_and_no_question_asks_for_name():
     """PRD §5.1: name and uid both missing (and no question to self-detect from)
     -> need_info asking for the company name, never a schema-validation error."""
-    _refuses_lookup(monkeypatch)
-    result = await company_info()
+    result = await _refuses_lookup().lookup()
     assert result["status"] == "need_info"
     assert "name" in result["question"].lower() or "firma" in result["question"].lower() or "société" in result["question"].lower()
 
@@ -414,18 +402,19 @@ async def test_no_params_and_no_question_asks_for_name(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-async def test_name_search_zero_hits_is_no_match(monkeypatch):
+async def test_name_search_zero_hits_is_no_match():
     """PRD §5.2 step 2: prefix then CONTAINS both empty (internal to
     lindas.search_by_name) -> no_match, and the gazette is never consulted for a
     bare name search (only the uid branch 3b checks it)."""
-    mocks = patch_sources(monkeypatch, search_by_name=[], dataset_modified="2026-09-23")
-    result = await company_info(name="Ganz Unbekannte GmbH XYZ")
+    gazette_fake = FakeGazette()  # unconfigured: any call fails the test
+    company_lookup = lookup(lindas=FakeLindas(search_by_name=[], dataset_modified="2026-09-23"), gazette=gazette_fake)
+    result = await company_lookup.lookup(name="Ganz Unbekannte GmbH XYZ")
 
     assert result["status"] == "no_match"
     assert result["gazette_checked"] is False
     assert result["searched"]["name"] == "Ganz Unbekannte GmbH XYZ"
     assert result["searched"].get("uid") is None
-    assert "publications_for_uid" not in mocks
+    gazette_fake.calls["publications_for_uid"].assert_not_awaited()
 
 
 # ---------------------------------------------------------------------------
@@ -433,13 +422,16 @@ async def test_name_search_zero_hits_is_no_match(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-async def test_uid_zero_hits_gazette_deletion_publication_is_answered_deleted(publications, monkeypatch):
+async def test_uid_zero_hits_gazette_deletion_publication_is_answered_deleted(publications):
     """PRD §5.2 step 3b: uid resolves to nothing on LINDAS, but the gazette holds a
     deletion publication for that uid -> answered, status DELETED, derived."""
     deletion_pub = next(p for p in publications if p.sub_rubric in gazette.DELETION_SUBRUBRICS)
-    patch_sources(monkeypatch, find_by_uid=None, publications_for_uid=[deletion_pub], dataset_modified="2026-09-23")
+    company_lookup = lookup(
+        lindas=FakeLindas(find_by_uid=None, dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=[deletion_pub]),
+    )
 
-    result = await company_info(uid="CHE101654423")
+    result = await company_lookup.lookup(uid="CHE101654423")
 
     assert result["status"] == "answered"
     assert result["company"]["status"] == "DELETED"
@@ -448,42 +440,45 @@ async def test_uid_zero_hits_gazette_deletion_publication_is_answered_deleted(pu
     assert result["citation"]["effective_from"] == deletion_pub.date
 
 
-async def test_uid_zero_hits_gazette_non_deletion_is_no_match_gazette_checked(publications, monkeypatch):
+async def test_uid_zero_hits_gazette_non_deletion_is_no_match_gazette_checked(publications):
     """PRD §5.2 step 3b: uid resolves to nothing on LINDAS and the gazette has no
     deletion publication -> no_match, but gazette_checked is True (it was consulted)."""
     non_deletion_pub = next(p for p in publications if p.sub_rubric not in gazette.DELETION_SUBRUBRICS)
-    patch_sources(monkeypatch, find_by_uid=None, publications_for_uid=[non_deletion_pub], dataset_modified="2026-09-23")
+    company_lookup = lookup(
+        lindas=FakeLindas(find_by_uid=None, dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=[non_deletion_pub]),
+    )
 
-    result = await company_info(uid="CHE101654423")
+    result = await company_lookup.lookup(uid="CHE101654423")
 
     assert result["status"] == "no_match"
     assert result["gazette_checked"] is True
 
 
-async def test_uid_zero_hits_gazette_checked_even_with_include_publications_false(publications, monkeypatch):
+async def test_uid_zero_hits_gazette_checked_even_with_include_publications_false(publications):
     """PRD §5.2 step 3b: "always query the gazette for that UID, regardless of
     include_publications (that flag only controls whether the list is attached)"."""
     deletion_pub = next(p for p in publications if p.sub_rubric in gazette.DELETION_SUBRUBRICS)
-    mocks = patch_sources(monkeypatch, find_by_uid=None, publications_for_uid=[deletion_pub], dataset_modified="2026-09-23")
+    gazette_fake = FakeGazette(publications_for_uid=[deletion_pub])
+    mocks = gazette_fake.calls
+    company_lookup = lookup(lindas=FakeLindas(find_by_uid=None, dataset_modified="2026-09-23"), gazette=gazette_fake)
 
-    result = await company_info(uid="CHE101654423", include_publications=False)
+    result = await company_lookup.lookup(uid="CHE101654423", include_publications=False)
 
     mocks["publications_for_uid"].assert_awaited_once()
     assert result["status"] == "answered"
     assert result["company"]["status"] == "DELETED"
 
 
-async def test_uid_zero_hits_gazette_unavailable_is_source_unavailable_gazette(monkeypatch):
+async def test_uid_zero_hits_gazette_unavailable_is_source_unavailable_gazette():
     """PRD §5.2 step 3b, §5.3: in this branch the gazette is the only source that
     can settle the question, so its failure is a hard source_unavailable(gazette)."""
-    patch_sources(
-        monkeypatch,
-        find_by_uid=None,
-        publications_for_uid=SourceUnavailable(source="gazette", error_class="timeout"),
-        dataset_modified="2026-09-23",
+    company_lookup = lookup(
+        lindas=FakeLindas(find_by_uid=None, dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=SourceUnavailable(source="gazette", error_class="timeout")),
     )
 
-    result = await company_info(uid="CHE101654423")
+    result = await company_lookup.lookup(uid="CHE101654423")
 
     assert result["status"] == "source_unavailable"
     assert result["source"] == "gazette"
@@ -494,18 +489,19 @@ async def test_uid_zero_hits_gazette_unavailable_is_source_unavailable_gazette(m
 # ---------------------------------------------------------------------------
 
 
-async def test_name_search_timeout_scan_gives_actionable_source_unavailable(monkeypatch):
+async def test_name_search_timeout_scan_gives_actionable_source_unavailable():
     """Addendum (mid-S4): lindas.search_by_name raises
     SourceUnavailable(error_class="timeout_scan") when the name scan (STRSTARTS/
     CONTAINS full-table scan) exceeds its budget. company_info surfaces
     error_class "timeout_scan" unchanged, but overrides the answer sentence with
     one telling the caller to provide the UID or the exact name + canton instead."""
-    patch_sources(
-        monkeypatch,
-        search_by_name=SourceUnavailable(source="lindas", error_class="timeout_scan"),
-        dataset_modified="2026-09-23",
+    company_lookup = lookup(
+        lindas=FakeLindas(
+            search_by_name=SourceUnavailable(source="lindas", error_class="timeout_scan"),
+            dataset_modified="2026-09-23",
+        )
     )
-    result = await company_info(name="Ganz Unbekannte GmbH XYZ", language="de")
+    result = await company_lookup.lookup(name="Ganz Unbekannte GmbH XYZ", language="de")
 
     assert result["status"] == "source_unavailable"
     assert result["source"] == "lindas"
@@ -519,12 +515,15 @@ async def test_name_search_timeout_scan_gives_actionable_source_unavailable(monk
 # ---------------------------------------------------------------------------
 
 
-async def test_ambiguous_prefix_with_one_exact_legal_name_match_is_answered(nestle_candidates, monkeypatch):
+async def test_ambiguous_prefix_with_one_exact_legal_name_match_is_answered(nestle_candidates):
     """PRD §5.2 step 3: "several hits, exactly one whose legalName equals the input
     case-insensitively -> step 4 with assumptions: [selected the exact-name match...]"."""
-    patch_sources(monkeypatch, search_by_name=nestle_candidates, publications_for_uid=[], dataset_modified="2026-09-23")
+    company_lookup = lookup(
+        lindas=FakeLindas(search_by_name=nestle_candidates, dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=[]),
+    )
 
-    result = await company_info(name="nestlé s.a.")  # case-insensitive match to candidate[0].legal_name
+    result = await company_lookup.lookup(name="nestlé s.a.")  # case-insensitive match to candidate[0].legal_name
 
     assert result["status"] == "answered"
     assert result["company"]["uid"] == format_uid(nestle_candidates[0].uid)
@@ -580,15 +579,18 @@ def _ubs_seats():
     return basel, zurich
 
 
-async def test_uid_with_multiple_registered_seats_exact_match_is_answered(monkeypatch):
+async def test_uid_with_multiple_registered_seats_exact_match_is_answered():
     """F2: two Company rows sharing one uid (two registered seats of UBS AG) with
     an exact legal_name match resolve to `answered`, not `need_info` -- they are
     one legal entity, not an ambiguity. The lower ehraid (Basel) is shown by
     default, and the assumption names both seats."""
     basel, zurich = _ubs_seats()
-    patch_sources(monkeypatch, search_by_name=[basel, zurich], publications_for_uid=[], dataset_modified="2026-09-23")
+    company_lookup = lookup(
+        lindas=FakeLindas(search_by_name=[basel, zurich], dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=[]),
+    )
 
-    result = await company_info(name="UBS AG", language="de")
+    result = await company_lookup.lookup(name="UBS AG", language="de")
 
     assert result["status"] == "answered"
     assert result["company"]["uid"] == format_uid("CHE101329561")
@@ -599,19 +601,22 @@ async def test_uid_with_multiple_registered_seats_exact_match_is_answered(monkey
     )
 
 
-async def test_uid_with_multiple_registered_seats_prefers_canton_match(monkeypatch):
+async def test_uid_with_multiple_registered_seats_prefers_canton_match():
     """F2: when `canton` narrows to one of the uid's registered seats, that seat
     is shown instead of the lowest-ehraid default."""
     basel, zurich = _ubs_seats()
-    patch_sources(monkeypatch, search_by_name=[basel, zurich], publications_for_uid=[], dataset_modified="2026-09-23")
+    company_lookup = lookup(
+        lindas=FakeLindas(search_by_name=[basel, zurich], dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=[]),
+    )
 
-    result = await company_info(name="UBS AG", canton="ZH", language="de")
+    result = await company_lookup.lookup(name="UBS AG", canton="ZH", language="de")
 
     assert result["status"] == "answered"
     assert result["company"]["seat"] == "Zürich"
 
 
-async def test_mixed_ambiguous_candidates_are_deduplicated_by_uid(monkeypatch):
+async def test_mixed_ambiguous_candidates_are_deduplicated_by_uid():
     """F2: a genuinely ambiguous prefix search (two distinct legal entities) still
     de-duplicates need_info candidates by uid, joining the seats of a
     multi-seat uid into one candidate row rather than listing it twice."""
@@ -630,9 +635,9 @@ async def test_mixed_ambiguous_candidates_are_deduplicated_by_uid(monkeypatch):
         canton="BS",
         source_url="https://register.ld.admin.ch/zefix/company/430500",
     )
-    patch_sources(monkeypatch, search_by_name=[basel, zurich, fund_mgmt])
+    company_lookup = lookup(lindas=FakeLindas(search_by_name=[basel, zurich, fund_mgmt]))
 
-    result = await company_info(name="UBS")  # prefix match, no exact legal_name hit
+    result = await company_lookup.lookup(name="UBS")  # prefix match, no exact legal_name hit
 
     assert result["status"] == "need_info"
     assert len(result["candidates"]) == 2
@@ -646,11 +651,14 @@ async def test_mixed_ambiguous_candidates_are_deduplicated_by_uid(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-async def test_romansh_falls_back_to_german_with_a_note(swisscom, monkeypatch):
+async def test_romansh_falls_back_to_german_with_a_note(swisscom):
     """PRD G4, R9: a Romansh (rm) request is answered with German-labelled data and
     an explicit note about the fallback."""
-    patch_sources(monkeypatch, find_by_uid=swisscom, publications_for_uid=[], dataset_modified="2026-09-23")
-    result = await company_info(uid="CHE101654423", language="rm")
+    company_lookup = lookup(
+        lindas=FakeLindas(find_by_uid=swisscom, dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=[]),
+    )
+    result = await company_lookup.lookup(uid="CHE101654423", language="rm")
 
     assert result["status"] == "answered"
     assert result["notes"] == envelope.NOTES["de"]
@@ -659,10 +667,13 @@ async def test_romansh_falls_back_to_german_with_a_note(swisscom, monkeypatch):
     assert "rm" in assumptions_and_notes.lower() or "romansh" in assumptions_and_notes.lower() or "rätoromanisch" in assumptions_and_notes.lower() or "romanche" in assumptions_and_notes.lower()
 
 
-async def test_french_language_notes_is_the_french_sentence(swisscom, monkeypatch):
+async def test_french_language_notes_is_the_french_sentence(swisscom):
     """PRD G4: language="fr" renders notes (and by extension the answer) in French."""
-    patch_sources(monkeypatch, find_by_uid=swisscom, publications_for_uid=[], dataset_modified="2026-09-23")
-    result = await company_info(uid="CHE101654423", language="fr")
+    company_lookup = lookup(
+        lindas=FakeLindas(find_by_uid=swisscom, dataset_modified="2026-09-23"),
+        gazette=FakeGazette(publications_for_uid=[]),
+    )
+    result = await company_lookup.lookup(uid="CHE101654423", language="fr")
 
     assert result["status"] == "answered"
     assert result["notes"] == envelope.NOTES["fr"]
@@ -674,29 +685,35 @@ async def test_french_language_notes_is_the_french_sentence(swisscom, monkeypatc
 
 
 async def test_no_envelope_ever_serialises_message_or_content_keys(
-    swisscom, nestle_candidates, enrichment_active, monkeypatch, settings_override
+    swisscom, nestle_candidates, enrichment_active
 ):
     """PRD §6.3, §6.4: `shabPub[].message` and gazette `content` are never read, so
     they can never leak into any envelope, in any of the five states."""
-    settings_override(respect_robots_txt=False)
 
-    patch_sources(monkeypatch, search_by_name=[swisscom], firm_detail=enrichment_active, publications_for_uid=[], dataset_modified="2026-09-23")
-    answered = await company_info(name="Swisscom (Schweiz) AG")
+    def _lookup_with(search_by_name):
+        # Every step shares the same enrichment/gazette/freshness fakes; only
+        # the LINDAS name search result changes.
+        return lookup(
+            lindas=FakeLindas(search_by_name=search_by_name, dataset_modified="2026-09-23"),
+            zefix=FakeZefix(firm_detail=enrichment_active, respect_robots_txt=False),
+            gazette=FakeGazette(publications_for_uid=[]),
+        )
+
+    answered = await _lookup_with([swisscom]).lookup(name="Swisscom (Schweiz) AG")
     _assert_no_banned_keys(answered)
 
-    patch_sources(monkeypatch, search_by_name=nestle_candidates)
-    need_info = await company_info(name="Nestlé")
+    need_info = await _lookup_with(nestle_candidates).lookup(name="Nestlé")
     _assert_no_banned_keys(need_info)
 
-    patch_sources(monkeypatch, search_by_name=[])
-    no_match = await company_info(name="Ganz Unbekannte GmbH XYZ")
+    no_match = await _lookup_with([]).lookup(name="Ganz Unbekannte GmbH XYZ")
     _assert_no_banned_keys(no_match)
 
-    out_of_scope = await company_info(question="Wie viele AGs gibt es im Kanton Zug?")
+    out_of_scope = await _lookup_with([]).lookup(question="Wie viele AGs gibt es im Kanton Zug?")
     _assert_no_banned_keys(out_of_scope)
 
-    patch_sources(monkeypatch, search_by_name=SourceUnavailable(source="lindas", error_class="timeout"))
-    unavailable = await company_info(name="Swisscom (Schweiz) AG")
+    unavailable = await _lookup_with(SourceUnavailable(source="lindas", error_class="timeout")).lookup(
+        name="Swisscom (Schweiz) AG"
+    )
     _assert_no_banned_keys(unavailable)
 
     for result in (answered, need_info, no_match, out_of_scope, unavailable):
