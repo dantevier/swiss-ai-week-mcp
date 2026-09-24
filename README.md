@@ -4,13 +4,13 @@ A Python/FastMCP server with a local SQLite knowledge base of 13 reviewed Swiss 
 
 ## Install
 
-Requires [uv](https://docs.astral.sh/uv/). From a clone of this repo:
+Requires [uv](https://docs.astral.sh/uv/). From a clone of this repo, in PowerShell:
 
-```sh
-uv run python scripts/setup.py      # or: make setup
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
-It installs dependencies, asks for the two API keys (optional, saved to the git-ignored `.env`), and registers the server in whichever of Claude Code, Codex and opencode it finds. Restart the harness afterwards. Use `--yes` to skip prompts.
+It installs dependencies, asks for the two API keys (optional, saved to the git-ignored `.env`), and registers the server in whichever of Claude Code, Codex and opencode it finds. Restart the harness afterwards. Use `-Yes` to skip prompts (keys are then read from `$env:CRAWLORA_API_KEY` and `$env:OPENAI_API_KEY`), and `-Uninstall` to remove the server from every harness.
 
 Manual equivalent for Claude Code: `claude mcp add --scope user mcp-swiss-info -- uv run --directory <path-to-this-repo> python -m mcp_boilerplate.main`.
 

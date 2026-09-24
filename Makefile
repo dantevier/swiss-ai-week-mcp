@@ -25,7 +25,7 @@ help:
 
 # Installation
 setup:
-	uv run python scripts/setup.py
+	powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1
 
 dashboard:
 	uv run python -m mcp_boilerplate.dashboard
