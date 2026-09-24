@@ -517,7 +517,7 @@ mcp-inspector uv run python -m your_server_name.main
 ## Team
 
 - Roberto Cerrone
-- Edoardo
+- Edoardo Diana
 - Alberto Minetti
 - Vincent Van Loo
 - Victor Bonilla
