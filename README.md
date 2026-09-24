@@ -43,7 +43,7 @@ The shipped seed contains all 13 sources. MCP crawl tools update the writable lo
 
 ## Housing and driving licence facts
 
-These tools read `var/swissproject.sqlite3`, which is not in Git. Build it from the reviewed data in `data/` before starting the server:
+These tools read `var/swissproject.sqlite3`, which is not in Git. The server builds it from the reviewed data in `data/` every time it starts, so no manual step is needed; re-running is idempotent. To rebuild it by hand:
 
 ```sh
 uv run python scripts/import_housing.py
