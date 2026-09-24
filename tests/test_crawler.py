@@ -6,6 +6,7 @@ from mcp_boilerplate import knowledge
 from mcp_boilerplate.crawler import Crawler, check_url
 from mcp_boilerplate.knowledge import KnowledgeBase
 from mcp_boilerplate.server import mcp
+from mcp_boilerplate.source_access import SourceAccess
 from mcp_boilerplate.sources import SOURCES
 from mcp_boilerplate.tools import source_tools
 
@@ -45,8 +46,11 @@ async def test_crawl_search_refresh_and_failure(tmp_path, monkeypatch):
     url = SOURCES["federal"][source].url
 
     assert {
-        "crawl_federal_sources", "crawl_cantonal_sources", "crawl_municipal_sources",
-        "search_knowledge", "get_source",
+        "crawl_federal_sources",
+        "crawl_cantonal_sources",
+        "crawl_municipal_sources",
+        "search_knowledge",
+        "get_source",
     } <= {tool.name for tool in await mcp.list_tools()}
     with pytest.raises(ValueError, match="approved"):
         check_url("federal", "https://www.bwo.admin.ch/unlisted")
@@ -96,7 +100,11 @@ async def test_crawl_search_refresh_and_failure(tmp_path, monkeypatch):
         await crawler.crawl("federal", source)
     assert db.get("federal", source)["markdown"] == "Hypothekarischer Referenzzinssatz: neuer Wert."
 
-    monkeypatch.setattr(source_tools, "KnowledgeBase", lambda: db)
+    monkeypatch.setattr(
+        source_tools,
+        "sources",
+        SourceAccess(Crawler, lambda: db, source_tools.get_status, source_tools.ensure_running),
+    )
     monkeypatch.setattr(knowledge, "OpenAIEmbedder", OfflineEmbedder)
     got = await mcp.call_tool("get_source", {"level": "federal", "source": source})
     found = await mcp.call_tool("search_knowledge", {"query": "Referenzzinssatz"})
@@ -112,7 +120,8 @@ def test_seed_copied_once(tmp_path, monkeypatch):
     original = KnowledgeBase(seed)
     original.save(
         {
-            "authority_level": "federal", "source": "reference_interest_rate",
+            "authority_level": "federal",
+            "source": "reference_interest_rate",
             "authority": "Federal Office for Housing (BWO)",
             "url": SOURCES["federal"]["reference_interest_rate"].url,
             "crawled_at": "2026-09-24T00:00:00+00:00",
@@ -126,10 +135,14 @@ def test_seed_copied_once(tmp_path, monkeypatch):
     monkeypatch.setattr(knowledge, "SEED", seed)
     monkeypatch.setattr(knowledge.settings, "knowledge_db_path", str(target))
     db = KnowledgeBase()
-    assert db.get("federal", "reference_interest_rate")["markdown"] == "Hypothekarischer Referenzzinssatz"
+    assert (
+        db.get("federal", "reference_interest_rate")["markdown"]
+        == "Hypothekarischer Referenzzinssatz"
+    )
     original.save(
         {
-            "authority_level": "federal", "source": "reference_interest_rate",
+            "authority_level": "federal",
+            "source": "reference_interest_rate",
             "authority": "Federal Office for Housing (BWO)",
             "url": SOURCES["federal"]["reference_interest_rate"].url,
             "crawled_at": "2026-09-25T00:00:00+00:00",
@@ -139,4 +152,7 @@ def test_seed_copied_once(tmp_path, monkeypatch):
         ["Changed seed"],
         [[1.0, 0.0]],
     )
-    assert KnowledgeBase().get("federal", "reference_interest_rate")["markdown"] == "Hypothekarischer Referenzzinssatz"
+    assert (
+        KnowledgeBase().get("federal", "reference_interest_rate")["markdown"]
+        == "Hypothekarischer Referenzzinssatz"
+    )
