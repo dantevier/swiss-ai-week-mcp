@@ -2,6 +2,22 @@
 
 A Python/FastMCP server with a local SQLite knowledge base of 13 reviewed Swiss authority pages. The starter coverage spans five federal, four cantonal, and four local or regional sources; it is not complete Swiss coverage.
 
+## Install
+
+Requires [uv](https://docs.astral.sh/uv/). From a clone of this repo, in PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+It installs dependencies, asks for the two API keys (optional, saved to the git-ignored `.env`), and registers the server in whichever of Claude Code, Codex and opencode it finds. Restart the harness afterwards. Use `-Yes` to skip prompts (keys are then read from `$env:CRAWLORA_API_KEY` and `$env:OPENAI_API_KEY`), and `-Uninstall` to remove the server from every harness.
+
+Manual equivalent for Claude Code: `claude mcp add --scope user mcp-swiss-info -- uv run --directory <path-to-this-repo> python -m mcp_boilerplate.main`.
+
+## Check data freshness
+
+Ask the assistant "how fresh is your data?" (tool `source_status`), or "open the dashboard" (tool `open_dashboard`) for a local page at http://127.0.0.1:8765 with each source's last refresh, failures, and a Refresh button. Outside a harness: `make dashboard`. Sources older than 30 days show as outdated (`STALE_AFTER_DAYS` to change).
+
 ## Run
 
 Install dependencies with `uv sync --all-extras --dev`, then start the stdio server:
