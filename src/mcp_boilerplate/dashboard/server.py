@@ -2,6 +2,7 @@
 
 import asyncio
 import hmac
+import json
 import os
 import socket
 import subprocess
@@ -26,6 +27,9 @@ from .status import get_status
 
 HERE = Path(__file__).resolve().parent
 TEMPLATES = HERE / "templates"
+# Written by benchmark/run_mcp.py; each run folder holds a summary.json made by benchmark/interpret.py.
+BENCHMARK_RUNS = Path(os.environ.get("BENCHMARK_RUNS_DIR", HERE.parents[2] / "benchmark" / "runs"))
+TABS = [("/", "Data sources", "main"), ("/benchmark", "Benchmark", "benchmark")]
 
 # One crawl at a time: they share the SQLite file and the paid API quotas.
 _crawl_lock = asyncio.Lock()
@@ -52,6 +56,7 @@ async def status(request: Request) -> JSONResponse:
     data["keys"] = {
         "CRAWLORA_API_KEY": env.describe(settings.crawlora_api_key),
         "OPENAI_API_KEY": env.describe(settings.openai_api_key),
+        "ANTHROPIC_API_KEY": env.describe(settings.anthropic_api_key),
     }
     data["needs_token"] = bool(os.environ.get("DASHBOARD_TOKEN"))
     return JSONResponse(data)
@@ -96,13 +101,33 @@ async def refresh(request: Request) -> JSONResponse:
     return JSONResponse(result)
 
 
+def latest_benchmark(runs: Path | None = None) -> dict | None:
+    """The most recent run's summary, or None when no run has been made yet."""
+    runs = runs or BENCHMARK_RUNS
+    folders = sorted(p for p in runs.iterdir() if (p / "summary.json").is_file()) if runs.is_dir() else []
+    if not folders:
+        return None
+    summary = json.loads((folders[-1] / "summary.json").read_text(encoding="utf-8"))
+    summary["folder"] = str(folders[-1])
+    summary["run_count"] = len(folders)
+    return summary
+
+
+async def benchmark(request: Request) -> JSONResponse:
+    return JSONResponse({"run": latest_benchmark()})
+
+
 def _template(name: str) -> str:
     return (TEMPLATES / name).read_text(encoding="utf-8")
 
 
 def _page(title: str, href: str, label: str, icon: str, body: str, script: str) -> HTMLResponse:
+    tabs = "".join(
+        f'<a href="{path}"' + (' class="on" aria-current="page"' if key == script else "") + f">{text}</a>"
+        for path, text, key in TABS
+    )
     html = (
-        _template("shell.html")
+        _template("shell.html").replace("__TABS__", tabs)
         .replace("__TITLE__", title).replace("__HREF__", href).replace("__LABEL__", label)
         .replace("__ICON__", _template(icon)).replace("__BODY__", _template(body))
         .replace("__SCRIPT__", script)
@@ -114,6 +139,10 @@ async def index(request: Request) -> HTMLResponse:
     return _page("Data sources", "/settings", "Settings", "gear.svg", "main.html", "main")
 
 
+async def benchmark_page(request: Request) -> HTMLResponse:
+    return _page("Benchmark", "/settings", "Settings", "gear.svg", "benchmark.html", "benchmark")
+
+
 async def settings_page(request: Request) -> HTMLResponse:
     return _page("Settings", "/", "Back to data sources", "home.svg", "settings.html", "settings")
 
@@ -121,8 +150,10 @@ async def settings_page(request: Request) -> HTMLResponse:
 app = Starlette(
     routes=[
         Route("/", index),
+        Route("/benchmark", benchmark_page),
         Route("/settings", settings_page),
         Route("/api/status", status),
+        Route("/api/benchmark", benchmark),
         Route("/api/settings", save_settings, methods=["POST"]),
         Route("/api/refresh/{level}/{source}", refresh, methods=["POST"]),
         Mount("/static", StaticFiles(directory=HERE / "static"), name="static"),

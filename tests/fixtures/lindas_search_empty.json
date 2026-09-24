@@ -1,0 +1,23 @@
+{
+  "head" : {
+    "vars" : [
+      "company",
+      "name",
+      "legalName",
+      "idType",
+      "idValue",
+      "lfCode",
+      "lfLabel",
+      "seat",
+      "bfs",
+      "street",
+      "zip",
+      "city",
+      "canton",
+      "purpose"
+    ]
+  },
+  "results" : {
+    "bindings" : [ ]
+  }
+}

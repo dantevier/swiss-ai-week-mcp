@@ -186,6 +186,23 @@ The patterns accept German, French, Italian and English wording, but a regex can
 
 To compare an assistant with and without your MCP server, collect two answer files for the same questions and score each.
 
+## Running a model against the MCP
+
+`run_mcp.py` does the whole loop: it starts this project's MCP server, lets a model answer each question with the tools, scores the answers with `score.py`, and appends an interpretation (why each item failed, how the tools were used, what to fix next). The dashboard's **Benchmark** tab shows the latest run.
+
+```bash
+uv sync --extra bench
+uv run python benchmark/run_mcp.py --per-area 2                          # uses whichever key is set, 2 questions per topic area
+uv run python benchmark/run_mcp.py --model gpt-5 --per-area 2            # OpenAI
+uv run python benchmark/run_mcp.py --model gpt-5 --per-area 2 --no-mcp   # same questions without tools
+uv run python benchmark/run_mcp.py --model claude-opus-5 --topic-area 1
+uv run python benchmark/run_mcp.py --model ollama:qwen3 --limit 10
+```
+
+It works with an OpenAI or an Anthropic key: without `--model` it uses `claude-opus-5` when `ANTHROPIC_API_KEY` is set, otherwise `gpt-5` when `OPENAI_API_KEY` is set. Keys come from the environment or the project's `.env` (the dashboard's Settings page saves both there). `--help` lists the providers, including any OpenAI-compatible endpoint via `--model compat:NAME --base-url URL`. Each run is saved under `benchmark/runs/<time>-<model>-<mcp|no-mcp>/` with the answers, full tool traces, `report.txt` and `summary.json`; `python benchmark/interpret.py [run folder]` re-creates the interpretation.
+
+Failure causes in the interpretation: API error, no final answer, wrong fact stated, guessed instead of asking, answered without tools, **MCP had the fact but the answer missed it** (a tool result matches a missing `must_include` pattern: retrieval problem), **said it could not find it** and **fact never returned by a tool** (coverage gaps).
+
 ## Freshness
 
 Swiss facts change: rates on 1 January, the reference interest rate every quarter, school calendars every year. Items past `valid_until` are skipped automatically; use `--today YYYY-MM-DD` to simulate a date, or `--include-stale` to score them anyway. Re-verify an expired item against its `source_url`, then update `evidence`, `verified_at` and `valid_until`.

@@ -40,6 +40,9 @@ def setup_logger(
     console_handler = logging.StreamHandler(sys.stderr)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
+    # Each named logger owns its handlers; do not also bubble up to
+    # "mcp_boilerplate", which has its own handler and would print twice.
+    logger.propagate = False
 
     # File handler (if specified)
     file_path = log_file or settings.log_file

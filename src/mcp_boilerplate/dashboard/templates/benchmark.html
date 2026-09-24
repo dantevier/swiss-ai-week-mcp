@@ -1,0 +1,21 @@
+<div class="card settings" id="empty" hidden>
+<h2>No benchmark run yet</h2>
+<div class="sub">Save an OpenAI or Anthropic API key in <a href="/settings">Settings</a>, run this from the project folder, then reload this page.</div>
+<pre>uv sync --extra bench
+uv run python benchmark/run_mcp.py --per-area 2</pre>
+</div>
+<div id="bench" hidden>
+<div class="bar">
+<div><div class="pills" id="bpills"></div><div class="sub" id="bsub">Loading...</div></div>
+<div class="score" id="bscore"></div>
+</div>
+<div class="card settings"><h2>What happened</h2><div id="headline"></div><div id="causes"></div></div>
+<div class="card settings"><h2>What to do next</h2><ul class="todo" id="todo"></ul></div>
+<div class="cols">
+<div class="card"><div class="wrap"><table><thead><tr><th>Topic</th><th>Passed</th></tr></thead><tbody id="topics"></tbody></table></div></div>
+<div class="card"><div class="wrap"><table><thead><tr><th>Tool</th><th>Calls</th><th>Errors</th><th>Empty</th></tr></thead><tbody id="tools"></tbody></table></div></div>
+</div>
+<div class="bar"><h2 class="h">Questions</h2>
+<div class="sub filter">Show: <button data-f="failed" class="on">Failed</button> <button data-f="all">All</button></div></div>
+<div class="card"><div class="wrap"><table><thead><tr><th>Result</th><th>Question</th><th>Why</th><th>Tools used</th></tr></thead><tbody id="qrows"></tbody></table></div></div>
+</div>

@@ -1,4 +1,14 @@
-"""Reviewed Swiss authority sources for the crawler."""
+"""Reviewed Swiss authorities: the registry of every source the server reads.
+
+``SOURCES`` maps each authority level to its named ``Source`` rows. It lists the pages
+the crawler fetches, validates and saves, and the three commercial-register API
+endpoints that company_info calls live. The API rows are listed for review and
+attribution; their ``expected`` text is ``NOT_A_PAGE``, so they fail crawl validation
+by construction and nothing is saved for them.
+
+``API_SOURCES`` is the companion table the three API rows are built from: base URL,
+authority, the hosts for the egress allow-list (``api_hosts()``) and the terms of use.
+"""
 
 from dataclasses import dataclass
 
@@ -10,8 +20,57 @@ class Source:
     expected: str
 
 
+@dataclass(frozen=True)
+class ApiSource:
+    base_url: str
+    hosts: tuple[str, ...]
+    authority: str
+    terms: str
+
+
+API_SOURCES: dict[str, ApiSource] = {
+    "zefix_lindas": ApiSource(
+        "https://lindas.admin.ch/query",
+        ("lindas.admin.ch", "register.ld.admin.ch"),
+        "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
+        "LINDAS: open use, provide the source. Not legally binding.",
+    ),
+    "zefix_web": ApiSource(
+        "https://www.zefix.admin.ch/ZefixREST/api/v1",
+        ("www.zefix.admin.ch",),
+        "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
+        "Undocumented web endpoint; called only when RESPECT_ROBOTS_TXT=false or credentials are set.",
+    ),
+    "gazette": ApiSource(
+        "https://amtsblattportal.ch/api/v1",
+        ("amtsblattportal.ch",),
+        "Schweizerisches Handelsamtsblatt (SHAB), SECO",
+        "The signed PDF is the binding version.",
+    ),
+}
+
+
+def api_hosts() -> frozenset[str]:
+    """Union of every host any registered API source (or its redirects) may reach."""
+    return frozenset(host for source in API_SOURCES.values() for host in source.hosts)
+
+
+# The API rows in SOURCES are live endpoints that company_info calls. The crawler validates
+# ``expected`` against fetched text, so a full federal refresh fails and saves nothing for them.
+NOT_A_PAGE = "\x00not-a-page"
+
+
 SOURCES: dict[str, dict[str, Source]] = {
     "federal": {
+        "zefix_lindas": Source(
+            API_SOURCES["zefix_lindas"].base_url, API_SOURCES["zefix_lindas"].authority, NOT_A_PAGE
+        ),
+        "zefix_web": Source(
+            API_SOURCES["zefix_web"].base_url, API_SOURCES["zefix_web"].authority, NOT_A_PAGE
+        ),
+        "gazette": Source(
+            API_SOURCES["gazette"].base_url, API_SOURCES["gazette"].authority, NOT_A_PAGE
+        ),
         "health_insurance_premiums": Source(
             "https://ckan.opendata.swiss/api/3/action/package_show?id=health-insurance-premiums",
             "Federal Office of Public Health (BAG)",

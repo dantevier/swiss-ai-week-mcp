@@ -26,7 +26,16 @@ async def lifespan(server: FastMCP):
 # Create the main MCP server instance
 mcp = FastMCP(
     name=settings.server_name,
-    instructions=f"This is {settings.server_name} - a robust MCP server with comprehensive tooling for AI applications.",
+    instructions=(
+        "Answers Swiss public-service questions grounded in official sources. "
+        "Use company_info for companies in the federal commercial register (Zefix) "
+        "and their SHAB publications. Use swiss_health_insurance_premiums for 2026 "
+        "KVG minimum premiums by age, municipality and deductible. Use "
+        "search_knowledge and get_source for the reviewed authority pages on health "
+        "insurance, the reference interest rate, foreign driving licences, school "
+        "holidays, waste and arrival registration. Every tool asks back when input "
+        "is ambiguous and says when a source is unavailable."
+    ),
     lifespan=lifespan,
 )
 
