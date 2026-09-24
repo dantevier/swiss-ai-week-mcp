@@ -72,16 +72,16 @@ It tests whether an assistant (an LLM on its own, or an LLM connected to an MCP 
 |---|---|
 | `wrong_jurisdiction` | Gives a national answer where the rule depends on the canton or municipality, or asks for a location that does not change the answer |
 | `outdated` | Gives the VAT rate, pension amount or customs allowance of an earlier year |
-| `invisible_data` | The answer exists only on a cantonal or municipal website that general models rarely know |
+| `invisible_data` | The fact is on an official table, FAQ or leaflet that models rarely memorise: a BAG premium cell, a BWO 3 % / 30-day rule, a GTFS coverage window, a Romansh housing leaflet |
 | `foreign_confusion` | Answers a question about Konstanz or Austria as if it were Swiss, or applies German or Italian rules |
 
 ## Dataset configurations
 
 | config | items | how the answers were obtained |
 |---|---|---|
-| `verified` (`data/qa.jsonl`) | 35 | checked against the responsible authority's page; all 16 briefing topic areas |
+| `verified` (`data/qa.jsonl`) | 43 | checked against the responsible authority's page; all 16 briefing topic areas; German, French, Italian and Romansh |
 | `generated` (`data/generated.jsonl`) | 160 | balanced suite: exactly 10 cases for each of the 16 topic areas; some lower-data areas use question framings from verified facts |
-| `generated_full` (`data/generated_full.jsonl`) | 904 | complete data-derived corpus plus 34 context variants; intentionally uneven, retained for broader place-level stress tests |
+| `generated_full` (`data/generated_full.jsonl`) | 913 | complete data-derived corpus plus context variants; intentionally uneven, retained for broader place-level stress tests |
 
 The full corpus's 870 data-derived items come from `../data/swiss_places_premiums_2026.sqlite`.
 That reusable runtime database was built from the BAG health insurance premiums
@@ -102,7 +102,7 @@ items where a sector has fewer than 10 cases.
 | `gen-samename-*` | 35 | a municipality name that exists in several cantons with different premiums: the assistant must ask which one (`ask_back`) |
 | `gen-foreign-*` | 87 | premium, registration and school-holiday questions about 29 towns in Germany, France, Italy, Austria and Liechtenstein (`not_switzerland`) |
 | `gen-askback-*` | 8 | premium questions with no place given |
-| `gen-context-*` | 34 | one language-matched request-context variant for each non-Romansh verified item; keeps the original answer, evidence, and scoring checks |
+| `gen-context-*` | 43 | one language-matched request-context variant for each verified item, including Romansh; keeps the original answer, evidence, and scoring checks |
 | `gen-balanced-*` | varies | additional language-matched question framings used only where needed to reach 10 generated cases in a topic area; reuses a verified fact and carries `source_item_id` / `fact_cluster_id` |
 
 Regenerate, for example after the BAG publishes new premiums:
@@ -122,8 +122,7 @@ and partition the balanced generated set by topic area. Use these files or
 `--data benchmark/data/generated.jsonl` for an even sector comparison. The separate
 `generated_full_by_sector/` files retain the larger, uneven corpus. Framing variants
 exercise prompt wording and answer the same underlying fact; use `fact_cluster_id`
-to avoid treating them as independent factual evidence. Romansh variants are omitted
-until a fluent reviewer can verify them.
+to avoid treating them as independent factual evidence.
 Data-derived items whose answer a regex
 cannot separate from the typical wrong answer are left out, for example mergers
 where the new name is part of the old one (Bad Zurzach became Zurzach).
@@ -190,10 +189,11 @@ Swiss facts change: rates on 1 January, the reference interest rate every quarte
 
 ## Coverage and limits
 
-- The balanced generated set has exactly 10 questions per area (160 total). Combined with all 35 verified items, the `all` config has 195 rows and is not exactly balanced by area.
-- The full generated corpus has 904 items and remains heavily weighted toward premiums (514/904). Use it for broad stress testing, not equal-weight sector comparisons.
-- Several areas have only one to four underlying verified facts. Their balanced files contain distinct language-matched question framings but share `fact_cluster_id`; they provide wording robustness, not 10 independent facts. More source research is needed for broad factual coverage in those areas.
-- Romansh phrasing variants are omitted until a fluent reviewer can verify them.
+- The balanced generated set has exactly 10 questions per area (160 total). Combined with the verified items, the `all` config is not exactly balanced by area or language.
+- The full generated corpus remains heavily weighted toward premiums. Use it for broad stress testing, not equal-weight sector comparisons.
+- Several areas have only one to four underlying verified facts. Their balanced files contain distinct language-matched question framings but share `fact_cluster_id`; they provide wording robustness, not 10 independent facts.
+- Romansh items are included where an official Romansh source exists (Scuol school calendar; BWO leaflet *Abitar en Svizra* for the deposit cap and the 30-day termination challenge). There is still no Romansh seed for every topic area.
+- `invisible_data` is the mode that fails most often without a local table or leaflet. Premium cells and BWO percentages are in the offline stores; GTFS coverage, AHV minimum contributions and some licence fees are not. A language-only sector file (for example 8 Italian housing framings) is not a four-language test.
 - The reference answers are in English; the questions are in the national languages.
 - Every verified fact was checked against the official page on 2026-09-24, except `premiums-lugano-it`, which comes from team research on 2026-09-21 against the BAG premium data.
 - Premium items ask for the lowest premium "offered" in the region. For alternative models the generator requires the insurer to list the region in `Einzugsgebiete.csv`; the standard model is offered everywhere. In 2026 no offer is restricted to specific municipalities.

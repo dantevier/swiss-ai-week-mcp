@@ -62,8 +62,7 @@ CONTEXT_PREFIX = {
     "de": "Kannst du mir bitte helfen? ",
     "fr": "Pouvez-vous m'aider ? ",
     "it": "Può aiutarmi? ",
-    # Keep Romansh prompts intact until a Romansh reviewer can verify variants.
-    "rm": "",
+    "rm": "Pudais Vus m'agidar? ",
 }
 QUESTION_FRAMINGS = {
     "de": ["Bitte beantworte kurz: ", "Ich brauche dazu eine verlässliche Auskunft: ",
@@ -81,6 +80,8 @@ QUESTION_FRAMINGS = {
            "Mi spieghi per favore quanto segue: ", "Ho una domanda: ",
            "Verifichi per favore questa domanda: ", "Qual è l'informazione ufficiale? ",
            "Può aiutarmi? ", "Cerco un'informazione affidabile: "],
+    "rm": ["Jau hai ina dumonda: ", "Pudais Vus m'instruir: ",
+           "Pudais Vus m'agidar: ", "Jau tschertsch l'infurmaziun uffiziala: "],
 }
 
 
@@ -130,7 +131,7 @@ def read_verified_seeds() -> list[dict]:
 
 
 def gen_context_variants(seeds: list[dict]) -> list[dict]:
-    """Add a light prompt-context case for each non-Romansh verified seed."""
+    """Add a light prompt-context case for each verified seed."""
     out = []
     for seed in seeds:
         prefix = CONTEXT_PREFIX.get(seed["lang"])
