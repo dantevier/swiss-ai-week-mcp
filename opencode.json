@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "mcp-boilerplate": {
+      "type": "local",
+      "command": ["uv", "run", "--frozen", "python", "-m", "mcp_boilerplate.main"],
+      "enabled": true
+    }
+  }
+}
