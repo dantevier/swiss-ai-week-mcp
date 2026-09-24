@@ -1,53 +1,56 @@
-# Checklist di avvio e di lavoro — hackathon 24–25/09/2026
+# Startup and work checklist — hackathon 24–25/09/2026
 
-Checklist personale del team lead. Da spuntare in ordine. Ogni fase dice **come** si
-fa e **come si verifica** che è fatta. Contesto: `TEAM.md` (per i compagni),
-`AGENTS.md` (regole per tutti), `STATUS.md` (stato e difetti).
+> Historical on-site checklist for the Node/TypeScript rehearsal. The current
+> Python/FastMCP repository differs; use [STATUS.md](STATUS.md) for its actual state.
 
-Scadenza vera: **venerdì 25/09 alle 12:00**, Submission Round 1.
+Personal checklist for the team lead. Work through it in order. Each stage explains
+what to do and how to verify completion. Context: `TEAM.md` (team briefing),
+`AGENTS.md` (rehearsal rules), `STATUS.md` (current repository state).
+
+Rehearsal deadline: **Friday 25/09 at 12:00**, Submission Round 1 (from the non-public handbook; confirm with organizers).
 
 ---
 
-## 0. Stasera (23/09)
+## 0. Tonight (23/09)
 
-- [ ] **Chiarire la regola del lavoro sul posto.** Chiedi agli organizzatori (Discord o
-      email) cosa si può portare: solo ricerca e documenti, oppure anche codice e dati
-      preparati prima. Decide se domattina segui la **traccia A** o la **B** (fase 1).
-- [ ] **Controllare il portatile:**
+- [ ] **Clarify the work-on-site rule.** Ask the organizers (Discord or
+      email) what you can bring: just research and documents, or also code and data
+      prepared beforehand. Decide whether to follow **track A** or **B** tomorrow morning (phase 1).
+- [ ] **Check laptop:**
   ```powershell
-  node --version     # deve essere >= 24
+  node --version     # must be >= 24
   python --version   # >= 3.11
   git --version
-  gh auth status     # se usi GitHub CLI
+  gh auth status     # if you use GitHub CLI
   ```
-- [ ] **Salvare il kit fuori da questa cartella**, per esempio su una chiavetta o nel
-      cloud: la cartella `kit/` e i tre documenti `CHALLENGE.md`, `CONTRACT.md`,
+- [ ] **Save the kit outside this folder**, for example on a flash drive or in
+      cloud: the `kit/` folder and the three documents `CHALLENGE.md`, `CONTRACT.md`,
       `SOURCES.md`.
-- [ ] Portare la **risposta di Codex** alla revisione delle descrizioni, se arriva.
-- [ ] Documento d'identità e QR del biglietto: senza, niente ingresso e niente giuria.
+- [ ] Bring **Codex response** to review descriptions, if it arrives.
+- [ ] Identity document and ticket QR: without, no entry and no jury.
 
 ---
 
-## 1. Giovedì 08:00–09:30 — Avvio del progetto nuovo
+## 1. Thursday 08:00–09:30 — Start of new project
 
-### 1.1 Cartella e file
+### 1.1 Folder and files
 
-La cartella nuova **senza spazi nel percorso**, per esempio `C:\hack\swiss-grounding-mcp`.
+The new folder **without spaces in the path**, for example `C:\hack\swiss-grounding-mcp`.
 
-**Traccia A — portare tutto è ammesso:**
+**Track A — bringing everything is allowed:**
 ```powershell
 robocopy "C:\Users\User\Progetti\Lavoro\Hackathon\Swiss AI Zurigo\Swiss new" C:\hack\swiss-grounding-mcp /E /XD node_modules logs __pycache__ kit .venv
 Copy-Item "C:\Users\User\Progetti\Lavoro\Hackathon\Swiss AI Zurigo\Swiss new\kit\*.md" C:\hack\swiss-grounding-mcp\
 ```
-`robocopy` termina con codice 1 quando ha copiato dei file: è un successo, non un
-errore. Deve copiare 26 file (verificato con una prova a vuoto il 23/09).
-Dopo il comando nella radice ci sono `AGENTS.md`, `CLAUDE.md`, `STATUS.md`, `TEAM.md` e
-`CHECKLIST.md` accanto a tutto il resto.
+`robocopy` exits with code 1 when it copies files: that means success, not an
+error. It should copy 26 files (verified with a dry run on 23/09).
+After the command in the root there are `AGENTS.md`, `CLAUDE.md`, `STATUS.md`, `TEAM.md` and
+`CHECKLIST.md` next to everything else.
 
-**Traccia B — si porta solo la conoscenza:** copia soltanto i tre documenti e i file
-del kit. Poi ricostruisci nell'ordine della sezione 1.5.
+**Track B — bring only research:** copy the three documents and the kit files.
+Then rebuild in the order given in §1.5.
 
-### 1.2 Git e `.gitignore`
+### 1.2 Git and `.gitignore`
 ```powershell
 cd C:\hack\swiss-grounding-mcp
 git init
@@ -60,48 +63,48 @@ __pycache__/
 "@ | Out-File -Encoding utf8 .gitignore
 ```
 
-### 1.3 Verifica che funziona (traccia A)
+### 1.3 Check it works (track A)
 ```powershell
 npm install
 npm test
 ```
-Atteso, quattro righe `self-check ok`, fra cui:
-`71 voci, 70 validate, 0 errori` e `server MCP su stdio, 31 casi`.
+Expected, four lines `self-check ok`, including:
+`71 voci, 70 validate, 0 errori` and `server MCP su stdio, 31 casi`.
 
-Una volta sola, per provare che i dati si ricostruiscono dagli script (serve la rete,
-circa 35 MB):
+Just once, to prove that the data is reconstructed from the scripts (the network is needed,
+about 35 MB):
 ```powershell
 npm run build:data
 npm test
 ```
 
-### 1.4 Collegamento a OpenCode Desktop
-- [ ] Apri la cartella in OpenCode Desktop: `opencode.json` è già nella radice.
-- [ ] Chiedi: *"Qual è il tasso ipotecario di riferimento attuale?"*
-- [ ] Verifica nel registro che la chiamata sia arrivata al server:
+### 1.4 Link to OpenCode Desktop
+- [ ] Open the folder in OpenCode Desktop: `opencode.json` is already in the root.
+- [ ] Ask: *"Qual è il tasso ipotecario di riferimento attuale?"*
+- [ ] Check in the log that the call arrived at the server:
   ```powershell
   Get-Content -Encoding UTF8 .\logs\calls.jsonl -Tail 1
   ```
-- [ ] **Dopo ogni modifica al server**: chiudi OpenCode, termina il processo `opencode-cli`,
-      poi riapri. Chiudere la finestra non basta.
+- [ ] **After every change to the server**: close OpenCode, end the process `opencode-cli`,
+      then reopen. Closing the window is not enough.
   ```powershell
   Get-Process opencode-cli, node -ErrorAction SilentlyContinue | Stop-Process
   ```
 
-### 1.5 Traccia B — ordine di ricostruzione
-Ogni passo si appoggia al precedente. Le specifiche sono nei documenti.
+### 1.5 Track B — rebuild order
+Each step builds on the previous one. The specifications are in the documents.
 
-| # | Cosa | Specifica | Fatto quando |
+| # | What | Specify | Done when |
 |---|---|---|---|
-| 1 | Manifest `coverage/*.toml` + `manifest.py` | CONTRACT §6, SOURCES §8–9 | il validatore passa |
-| 2 | `scripts/build_places.py` → `data/places.json` | SOURCES §3.1b, §7 | controlli di coerenza verdi |
-| 3 | `scripts/build_premiums.py` → `data/premiums_2026.json` | SOURCES §3.2 | 1596 combinazioni |
-| 4 | `data/reference_rate.json` | SOURCES §3.2f | letto dalla pagina BWO |
-| 5 | `src/place.ts` + test | SOURCES §3.1b | 20 casi verdi |
-| 6 | `src/tools.ts` | CONTRACT §3 (testi delle descrizioni) | test di routing verde |
-| 7 | `src/server.ts` + `test/mcp-client-test.ts` | CONTRACT §5, §9 | casi end-to-end verdi |
+| 1 | Manifest `coverage/*.toml` + `manifest.py` | CONTRACT §6, SOURCES §8–9 | the validator passes |
+| 2 | `scripts/build_places.py` → `data/places.json` | SOURCES §3.1b, §7 | green consistency checks |
+| 3 | `scripts/build_premiums.py` → `data/premiums_2026.json` | SOURCES §3.2 | 1596 combinations |
+| 4 | `data/reference_rate.json` | SOURCES §3.2f | read from the BWO | page
+| 5 | `src/place.ts` + test | SOURCES §3.1b | 20 green cases |
+| 6 | `src/tools.ts` | CONTRACT §3 (description texts) | green routing test |
+| 7 | `src/server.ts` + `test/mcp-client-test.ts` | CONTRACT §5, §9 | green end-to-end cases |
 
-- [ ] **Primo commit.** Poi crea il repo su GitHub, privato per ora, e invita il team.
+- [ ] **First commit.** Then create the repo on GitHub, private for now, and invite the team.
   ```powershell
   git add -A; git commit -m "Initial import"
   gh repo create swiss-grounding-mcp --private --source . --push
@@ -109,17 +112,17 @@ Ogni passo si appoggia al precedente. Le specifiche sono nei documenti.
 
 ---
 
-## 2. Giovedì 09:30 — Riunione di avvio con il team (30 minuti)
+## 2. Thursday 09:30 — Kickoff meeting with the team (30 minutes)
 
-- [ ] Ognuno legge `TEAM.md`, circa 10 minuti.
-- [ ] Spiega le tre idee chiave:
-  1. si valuta l'onestà prima dell'ampiezza;
-  2. server grasso, modello magro;
-  3. cinque stati di risposta.
-- [ ] Chiedi a ognuno cosa sa fare e con quali strumenti lavora (Claude Code, Codex,
-      Cursor…). Il file `AGENTS.md` vale per tutti gli agenti.
-- [ ] **Decidi il formato dei dati delle vacanze prima che qualcuno inizi a estrarre.**
-      Bozza da confermare:
+- [ ] Everyone reads `TEAM.md`, about 10 minutes.
+- [ ] Explain the three key ideas:
+  1. honesty is valued before breadth;
+  2. fat server, skinny model;
+  3. five response states.
+- [ ] Ask everyone what they can do and what tools they work with (Claude Code, Codex,
+      Cursor…). The `AGENTS.md` file applies to all agents.
+- [ ] **Decide the format of your holiday data before anyone starts mining.**
+      Draft to be confirmed:
   ```json
   {
     "canton": "GR",
@@ -129,114 +132,114 @@ Ogni passo si appoggia al precedente. Le specifiche sono nei documenti.
     "periods": [
       { "jurisdiction": "GR", "place": "Scuol", "holiday_type": "autumn",
         "start": "2026-10-10", "end": "2026-10-25",
-        "passage": "testo copiato parola per parola dalla fonte" }
+        "passage": "text copied word for word from the source" }
     ]
   }
   ```
-      Un file per cantone (`data/holidays/GR.json`): due persone non modificano mai lo
-      stesso file.
-- [ ] Assegna i ruoli (sezione 3).
-- [ ] Prenota uno **slot con gli esperti Swisscom** (15 minuti, giovedì pomeriggio). Da
-      chiedere: i client di test hanno web e shell attivi? Dopo un `out_of_scope` cosa
-      si aspettano che faccia il modello?
+      One file per canton (`data/holidays/GR.json`): two people never modify it
+      same file.
+- [ ] Assign roles (3 section).
+- [ ] Book a **slot with Swisscom experts** (15 minutes, Thursday afternoon). From
+      ask: do the test clients have web and shell active? After a `out_of_scope` thing
+      do they expect me to be a model?
 
 ---
 
-## 3. Ruoli
+## 3. Roles
 
-In ordine di priorità: con meno persone si tagliano gli ultimi, oppure si accorpano.
+In order of priority: with fewer people, the last ones are cut, or they merge.
 
-| # | Ruolo | Cosa fa | Se siamo in 3 |
+| # | Role | What it does | If we are in 3 |
 |---|---|---|---|
-| 1 | **Lead e integrazione** (tu) | decisioni, codice del server, merge, `STATUS.md`, script di verifica delle date | resta |
-| 2 | **Date vacanze A** | circa metà delle 28 fonti | resta, prende tutte le fonti |
-| 3 | **Date vacanze B** | l'altra metà | accorpato al 2 |
-| 4 | **Patente + README** | procedure cantonali; README con scope, setup e impostazione robots.txt | resta, prende anche il 5 |
-| 5 | **Misure + pitch** | prove in OpenCode e in un secondo client, test di routing, slide | accorpato al 4 |
+| 1 | **Leads and Integration** (you) | decisions, server code, merge, `STATUS.md`, date verification script | stay |
+| 2 | **Holiday dates A** | about half of 28 sources | stays, takes all sources |
+| 3 | **Holiday dates B** | the other half | merged with 2 |
+| 4 | **License + README** | cantonal procedures; README with scope, setup and setting robots.txt | remains, also takes the 5 |
+| 5 | **Measurements + pitch** | tests in OpenCode and in a second client, routing tests, slide | merged with 4 |
 
-**Come si divide l'estrazione delle date:**
-- dai i PDF semplici a chi è meno esperto;
-- tieni per chi ha più esperienza i casi difficili: FR (Kerzers, Morat/Murten), VS, BE (due calendari più Biel), SZ e AG, dove l'estate o le vacanze di sport dipendono dal comune.
+**How the date extraction is divided:**
+- give simple PDFs to those who are less experienced;
+- keep the difficult cases for those with more experience: FR (Kerzers, Morat/Murten), VS, BE (two calendars plus Biel), SZ and AG, where the summer or sports holidays depend on the municipality.
 
-La lista delle fonti è in `coverage/school_holidays.toml`, campo `source_url`.
+The list of sources is in `coverage/school_holidays.toml`, field `source_url`.
 
 ---
 
-## 4. Giovedì 09:30–18:00 — Lavoro in parallelo
+## 4. Thursday 09:30–18:00 — Work in parallel
 
-### 4.1 Procedura di estrazione (ruoli 2 e 3)
-Per ogni cantone:
-1. Apri la riga nel manifest e la fonte (`source_url`). Leggi la sezione del cantone in
-   `SOURCES.md`: lì ci sono le trappole già note.
-2. Per ciascuno dei cinque tipi di vacanza (autunno, Natale, sport, primavera, estate),
-   copia le date **e il passaggio parola per parola**.
-3. Eccezioni (comuni o regioni con date diverse): un periodo separato con il campo
-   `place` o una `jurisdiction` dedicata, per esempio `FR/Kerzers`.
-4. Lancia lo script di verifica. Se il passaggio non si trova nel testo della fonte, la
-   riga non è valida.
-5. Una branch per cantone o gruppo di cantoni, `npm test` verde, poi la pull request.
+### 4.1 Extraction procedure (roles 2 and 3)
+For each canton:
+1. Open the line in the manifest and the source (`source_url`). Read the canton section in
+   `SOURCES.md`: there are the already known traps.
+2. For each of the five types of holidays (autumn, Christmas, sports, spring, summer),
+   copy the dates **and the passage word for word**.
+3. Exceptions (municipalities or regions with different dates): a separate period with the field
+   `place` or a dedicated `jurisdiction`, for example `FR/Kerzers`.
+4. Run the verification script. If the passage is not found in the source text, the
+   row is invalid.
+5. One branch per canton or group of cantons, green `npm test`, then the pull request.
 
-⚠️ La tabella dell'autunno in SOURCES §8ter.2 è un **punto di partenza, non un dato
-verificato**: SG è sbagliato di un giorno, e la frase su Ginevra e Vaud è falsa.
+⚠️ The autumn table in SOURCES §8ter.2 is a **starting point, not a given
+verified**: SG is wrong by one day, and the sentence about Geneva and Vaud is false.
 
-### 4.2 Lead (ruolo 1), in ordine
-- [ ] **Entro le 10:30**: script di verifica delle date. Controlla che il passaggio sia
-      nel testo della fonte, che le date siano valide, che l'inizio venga prima della
-      fine, e che l'anno scolastico coincida. Senza lo script, i dati non entrano.
-- [ ] Integrazione nel server: `holidays()` usa i dati se ci sono, altrimenti resta
-      `source_unavailable` / `not_ingested` come oggi.
-- [ ] Un caso end-to-end per ogni cantone integrato, a partire da Scuol (domanda Q4):
-      atteso `answered`, 10–25.10.2026.
-- [ ] Applica le correzioni alle descrizioni scelte dopo la risposta di Codex. Poi
-      rimisura (CONTRACT §8, confronto A/B appaiato).
+### 4.2 Lead (role 1), on order
+- [ ] **By 10:30**: date verification script. Check that the passage is
+      in the source text, that the dates are valid, that the beginning comes before the
+      end, and that the school year coincides. Without the script, the data doesn't come in.
+- [ ] Integration into the server: `holidays()` uses the data if it exists, otherwise it remains
+      `source_unavailable` / `not_ingested` like today.
+- [ ] An end-to-end case for each integrated canton, starting from Scuol (question Q4):
+      expected `answered`, 10–25.10.2026.
+- [ ] Apply corrections to descriptions chosen after Codex's response. Then
+      remeasure (CONTRACT §8, paired A/B comparison).
 
-### 4.3 Ruolo 4
-- [ ] Procedure della patente: prima VD (domanda Q2), poi i cantoni delle grandi città.
-- [ ] README. Contenuti obbligatori (CHALLENGE §4):
-  - scope, con il blocco generato da `python manifest.py --readme`;
+### 4.3 Role 4
+- [ ] Driving license procedures: first VD (question Q2), then the cantons of large cities.
+- [ ] README. Mandatory contents (CHALLENGE §4):
+  - scope, with the block generated by `python manifest.py --readme`;
   - setup;
-  - configurazione del client;
-  - impostazione robots.txt con il suo default;
-  - nessuna credenziale necessaria;
-  - come si ricostruiscono i dati.
+  - client configuration;
+  - setting robots.txt with its default;
+  - no credentials needed;
+  - how the data is reconstructed.
 
-### 4.4 Ruolo 5
-- [ ] La stessa passata in OpenCode **con web e shell disattivati** (difetto 2 in
-      `STATUS.md`), leggendo gli stati dal registro.
-- [ ] Un secondo client MCP. Il regolamento chiede più di un client (checklist punto 7).
-- [ ] Bozza del pitch. La struttura è in `TEAM.md` §2–§4.
-
----
-
-## 5. Giovedì 18:00 — Punto di controllo
-
-- [ ] `npm test` verde sul branch principale.
-- [ ] Quanti cantoni hanno le date integrate, e quanti mancano.
-- [ ] Le otto domande campione (CHALLENGE §8) passate in OpenCode: stato dal registro,
-      risposta del modello annotata.
-- [ ] Aggiorna `STATUS.md`. Decidi cosa si taglia se non si finisce. Un cantone senza
-      date resta onesto (`not_ingested`); un cantone con date sbagliate costa punti.
+### 4.4 Role 5
+- [ ] The same as passed in OpenCode **with web and shell disabled** (defect 2 in
+      `STATUS.md`), reading the states from the registry.
+- [ ] A second MCP client. The regulation asks for more than one client (checklist point 7).
+- [ ] Draft pitch. The structure is in `TEAM.md` §2–§4.
 
 ---
 
-## 6. Venerdì — Chiusura
+## 5. Thursday 18:00 — Checkpoint
 
-| Ora | Cosa |
+- [ ] `npm test` green on the main branch.
+- [ ] How many cantons have integrated dates, and how many are missing.
+- [ ] The eight sample questions (CHALLENGE §8) passed in OpenCode: status from the register,
+      model response noted.
+- [ ] Update `STATUS.md`. Decide what gets cut if you don't finish. A canton without
+      date stay honest (`not_ingested`); a canton with incorrect dates costs points.
+
+---
+
+## 6. Friday — Closed
+
+| Now | What |
 |---|---|
-| 08:00–10:00 | Ultime correzioni. Slot esperti se serve. README definitivo |
-| **10:00** | **Stop alle funzionalità.** Dopo quest'ora solo correzioni di bug |
-| 10:30 | **Prova da clone pulito**: `git clone` in una cartella nuova, `npm install`, `npm test`, collegamento a OpenCode, domande campione. È ciò che farà Swisscom |
-| 11:00 | Accesso al repo per i valutatori Swisscom, se il repo resta privato. Nessun segreto nella history |
-| **11:30** | **Invio del modulo del Round 1**, con mezz'ora di margine |
-| 12:00–14:00 | Prova del pitch: 4 minuti (1 di pitch più 3 di domande) |
+| 08:00–10:00 | Latest fixes. Expert slots if needed. Definitive README |
+| **10:00** | **Stop features.** After this time only bug fixes |
+| 10:30 | **Test from clean clone**: `git clone` in a new folder, `npm install`, `npm test`, link to OpenCode, sample questions. That's what Swisscom will do |
+| 11:00 | Access to the repo for Swisscom evaluators, if the repo remains private. No secrets in history |
+| **11:30** | **Submission of the Round form 1**, with half an hour's margin |
+| 12:00–14:00 | Pitch test: 4 minutes (1 of pitch plus 3 of questions) |
 
 ---
 
-## 7. Regole da ricordare durante tutto l'evento
+## 7. Rules to remember throughout the event
 
-- Un dato senza passaggio verificato non entra.
-- Si modificano le descrizioni solo misurando prima e dopo.
-- Dopo ogni modifica al server: `npm test`, poi terminare `opencode-cli`.
-- Non eseguire mai `sample_runner.py`.
-- `logs/` non va nel repository.
-- Ogni decisione nuova va in CONTRACT §9.
+- A data without verified passage does not enter.
+- The descriptions are changed only by measuring before and after.
+- After any server changes: `npm test`, then terminate `opencode-cli`.
+- Never run `sample_runner.py`.
+- `logs/` does not go into the repository.
+- Every new decision goes to CONTRACT §9.
