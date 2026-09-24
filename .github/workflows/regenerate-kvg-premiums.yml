@@ -1,0 +1,56 @@
+name: Regenerate KVG premiums
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: Premium year to generate (for example, 2027)
+        required: true
+        type: string
+        default: '2027'
+      site_url:
+        description: Optional map site URL; defaults to https://kvgmapperYY.github.io
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate the selected year's data
+        env:
+          YEAR: ${{ inputs.year }}
+          SITE_URL: ${{ inputs.site_url }}
+        run: |
+          if [ -n "$SITE_URL" ]; then
+            python scripts/build_kvg_premiums.py --year "$YEAR" --site-url "$SITE_URL"
+          else
+            python scripts/build_kvg_premiums.py --year "$YEAR"
+          fi
+      - name: Validate the exporter and 2026 baseline
+        run: |
+          python -m pip install 'pytest>=8,<10'
+          python -m pytest --noconftest tests/test_kvg_export.py -q
+      - name: Open a pull request with the regenerated data
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: |
+            data/kvg_minimum_premiums_${{ inputs.year }}.csv
+            data/kvg_minimum_premiums_${{ inputs.year }}.md
+          branch: automation/kvg-premiums-${{ inputs.year }}
+          delete-branch: true
+          commit-message: 'Update KVG premiums for ${{ inputs.year }}'
+          title: 'Update KVG premiums for ${{ inputs.year }}'
+          body: |
+            Generated from all KVG mapper scenarios for the selected premium year.
+            Each record links to its source map; the Markdown also links to Priminfo.

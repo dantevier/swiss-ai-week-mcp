@@ -24,6 +24,7 @@ dependencies = [
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
     "psutil>=5.9.0",
+    "pypdf>=6.0.0",
 ]
 
 [project.optional-dependencies]
@@ -50,6 +51,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mcp_boilerplate"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/mcp_boilerplate/knowledge_seed.sqlite3" = "mcp_boilerplate/knowledge_seed.sqlite3"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
