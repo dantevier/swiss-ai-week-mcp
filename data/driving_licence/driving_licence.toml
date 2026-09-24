@@ -1,20 +1,19 @@
-# Cambio patente estera — federale + 26 cantoni.
+# Foreign driving licence exchange: federal rules plus 26 cantonal procedures.
 #
-# Tema a DUE LIVELLI, ed è la sua caratteristica distintiva: la sostanza
-# (termine di 12 mesi, corsa di controllo per paese) è diritto federale e vale
-# identica per tutti i 26 cantoni; procedura, modulo, tassa e sede sono
-# cantonali. Una risposta completa cita ENTRAMBI i livelli, ciascuno
-# dall autorità competente per la sua parte (SOURCES §9.1, §9.3).
+# Two levels. The substance (12-month deadline, control drive and country
+# exemptions) is federal law and is identical in every canton. Procedure,
+# form, fee and office are cantonal. A complete answer cites both levels,
+# each from the authority responsible for it; do not cite a cantonal page as
+# the source of the federal 12-month rule (BaseKnowledge/SOURCES.md §9.1, §9.3).
 #
-# Citare la pagina cantonale come fonte del termine di 12 mesi attribuisce una
-# norma federale all autorità sbagliata -> review checklist punto 3.
+# on_missing_place = "answer": without a canton, answer the federal level and
+# state that the procedure depends on the canton; asking when an answer is
+# already possible is penalised (BaseKnowledge/CHALLENGE.md §5.4).
 #
-# on_missing_place = "ask" non serve mai qui: senza cantone si risponde
-# comunque il livello federale e si dichiara che la procedura dipende dal
-# cantone. Chiedere quando si può già rispondere è penalizzato (CHALLENGE §5.4).
+# Research notes are kept in English in driving_licence.en.toml.
 
 # --------------------------------------------------------------------------
-# Livello federale — una riga per 26 cantoni
+# Federal level: one entry for all cantons
 # --------------------------------------------------------------------------
 
 [[entry]]
@@ -30,10 +29,9 @@ landing_url = "https://www.fedlex.admin.ch/eli/cc/1976/2423_2423_2423/de"
 source_status = "binding"
 validated_at = "2026-09-23"
 legal_basis = "VZV/OAC, SR 741.51, art. 29, 42-44, 150"
-notes = "CHIUSO 2026-09-23 sul testo consolidato 01.01.2026 del filestore Fedlex (680 KB, non lo shell SPA). TERMINE, art. 42 cpv. 3bis lett. a: serve la patente svizzera a chi ABITA in Svizzera da dodici mesi e in quel periodo non e stato all estero per piu di tre mesi di fila. CORREZIONE: la nota diceva 12 mesi dall entrata in Svizzera; il testo dice residenza, con la condizione dei tre mesi. ESAMI, art. 44: la regola generale e la CORSA DI CONTROLLO per tutti (cpv. 1), non ripetibile (cpv. 1bis), assenza ingiustificata = non superata (1ter), bocciatura = aberkannt il permesso estero (1quater); per l uso professionale anche una prova di teoria (cpv. 2). ESENZIONI PER PAESE: NON stanno nella VZV. L art. 150 cpv. 5 lett. e autorizza ASTRA a rinunciare a corsa e teoria per Stati con requisiti equivalenti; la lista sta nell ANHANG 2 della Weisung ASTRA Fuehrerausweise von Personen mit Wohnsitz im Ausland (01.10.2013, Stand 15.07.2021), https://www.astra.admin.ch/dam/de/sd-web/IMv9s3nPw9yY/fuehrerausw-wohnsizt-ausland.pdf - la stessa che SVSA Bern linka. Gruppo A, esenti da corsa E da teoria professionale: UE/AELS piu Grossbritannien (31 paesi). Gruppo B, esenti SOLO dalla corsa: Andorra, Australien, Israel, Japan, Kanada, Korea (Republik), Marokko, Monaco, Neuseeland, San Marino, Singapur, Taiwan (SOLO categorie A1 e B), Tunesien, USA. Il blog ASTRA del 27.10.2023 riporta le stesse liste senza la restrizione su Taiwan: citare la Weisung. I cantoni RIPETONO queste regole, non le stabiliscono. SOURCES §9.1, §9.8"
 
 # --------------------------------------------------------------------------
-# Procedura cantonale (26) — modello omogeneo, varia solo il contenuto
+# Cantonal procedure (26 entries, same structure)
 # --------------------------------------------------------------------------
 
 [[entry]]
@@ -48,7 +46,6 @@ source_url = "https://www.svsa.sid.be.ch/de/start/fuehrerausweise/rund-um-fuehre
 landing_url = "https://www.svsa.sid.be.ch/de/start.html"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Scadenza: oltre 12 mesi di soggiorno, Einreisedatum gemaess gueltiger Aufenthaltsbewilligung; si consiglia di depositare prima. Passi: Gesuchsformular firmato con foto a colori; Sehtest da medico o optometrista in Svizzera, valido 24 mesi; al primo Gesuch i documenti si portano PERSONALMENTE, anche all Einwohnerkontrolle del comune; poi online o per posta. TASSE STAMPATE: Umtausch des auslaendischen Fuehrerausweises CHF 120.-; riemissione di un ex permesso svizzero CHF 40.-. PERMESSO IN PROVA: se all ingresso il permesso estero ha meno di un anno, si riceve un Fuehrerausweis auf Probe, con la formazione obbligatoria (Weisung ASTRA del 26.01.2009). Per la Kontrollfahrt la pagina rimanda all Anhang 2 della Weisung ASTRA, la stessa citata nella riga CH. Permessi UE/AELS gruppo 2 (professionali) usabili 12 mesi dall ingresso. Sede Schermenweg 5, 3001 Bern. ATTENZIONE: il vecchio dominio svsa.pom.be.ch e MORTO (HTTP 000) ma la ricerca web lo restituisce ancora. SOURCES §9.4"
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -62,7 +59,6 @@ source_url = "https://www.gr.ch/DE/institutionen/verwaltung/djsg/stva/Documents/
 landing_url = "https://www.gr.ch/DE/institutionen/verwaltung/djsg/stva/Seiten/Start.aspx"
 source_status = "binding"
 validated_at = "2026-09-24"
-notes = "RICONTROLLATO 2026-09-24 sul modulo Gesuch um Umtausch eines auslaendischen Fuehrerausweises (3 pagine), linkato dalla pagina Formulare und Merkblaetter. Sehtest da ottico o medico autorizzato; chi non ha ancora un permesso svizzero deve presentarsi PERSONALMENTE alla Gemeindekanzlei/Einwohnerkontrolle con documento, che inoltra il modulo; foto da incollare o online; questionario medico, con certificato se una risposta e si. Il modulo di scambio riporta Ringstrasse 2, 7000 Chur e Cho d Punt 53, 7503 Samedan. Rohanstrasse 5 e indicata dal sito come sede delle Administrativmassnahmen, non come sportello per questo scambio. La pagina generale sui Fuehrerausweise NON tratta la conversione: la fonte e il modulo. stva.gr.ch ha una catena SSL incompleta; gr.ch/DE/institutionen/.../stva/ risponde pulito (SOURCES §9.7). Pubblica anche Antrag_und_Umtausch_Fuehrerausweis_RM.pdf in ROMANCIO. SOURCES §9.5"
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -76,7 +72,6 @@ source_url = "https://www4.ti.ch/di/sc/home/conversione-licenza-estera"
 landing_url = "https://www4.ti.ch/di/sc/home"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Dal 17.11.2025 la richiesta si fa ESCLUSIVAMENTE ONLINE con procedura guidata; tutti gli allegati scansionati e caricati. Unica eccezione: la licenza estera originale, spedita per posta o consegnata allo sportello di Camorino. Termine: 12 mesi dalla data di entrata in Svizzera. TASSE STAMPATE: Fr. 150.- senza categorie professionali, Fr. 200.- con; esami e visite fatturati a parte. Attesa 1-2 settimane dalla ricezione dell originale; si sconsiglia di guidare all estero nel frattempo. Foto a colori su carta fotografica, sfondo chiaro uniforme. Per alcuni paesi la licenza estera va rispedita allo Stato di provenienza. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -90,7 +85,6 @@ source_url = "https://www.vd.ch/prestation/echanger-un-permis-de-conduire-etrang
 landing_url = "https://www.vd.ch/mobilite/automobile-et-navigation"
 source_status = "binding"
 validated_at = "2026-09-24"
-notes = "RICONTROLLATO 2026-09-24. Riprende il testo federale: residenza da piu di dodici mesi senza piu di tre mesi di fila all estero. Si compila il FORMULAIRE 220, si riuniscono i documenti elencati sul modulo secondo la categoria, si invia o si va al guichet. Sedi SAN: Aigle, Lausanne, Nyon, Yverdon-les-Bains; il permesso arriva per posta in 2-3 giorni lavorativi. Tasse: pagina 6 del formulario e Reglement RE-SAN, non stampate sulla pagina. La pagina pone come condizione la patente ottenuta PRIMA dell ingresso in Svizzera; se e stata ottenuta dopo, contattare il SAN per sapere se lo scambio e possibile. Oltre 5 ANNI di residenza: corsa di controllo se non si e guidato regolarmente, evitabile con l attestation de conduite reguliere (vedi nota LU). E la DOMANDA CAMPIONE #2: il come e qui, il quanto tempo e federale. SOURCES §9.3"
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -104,10 +98,6 @@ source_url = "https://www.zh.ch/de/mobilitaet/fuehrerausweis-fahren-lernen/ausla
 landing_url = "https://www.zh.ch/de/sicherheitsdirektion/strassenverkehrsamt.html"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Termine: 12 mesi dall ingresso. Gesuch stampato, Sehtest in un negozio di ottica o studio medico SVIZZERO, valido 2 anni. Alla prima domanda identita confermata PERSONALMENTE all Einwohnerkontrolle del comune o allo StVA. Foto: incollata se si deposita al comune (su carta fotografica, niente scansioni o stampe proprie); allo StVA si puo scattare col telefono e caricare via link SMS allo sportello. Modulo: ZFO104AUSL. La pagina vera sta sotto zh.ch/de/mobilitaet/...; strassenverkehrsamt.zh.ch NON risolve. Tasse non lette sulla pagina. Landing dal registro asa, verificata 2026-09-22."
-
-# --- Da compilare: 21 cantoni. Modello omogeneo, ~8-10 min ciascuno,
-#     varianza bassa (SOURCES 9.6). Lavoro meccanico a basso rischio.
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -121,7 +111,6 @@ source_url = "https://www.ag.ch/media/kanton-aargau/dvi/dokumente/stva/fuehrerau
 landing_url = "https://www.ag.ch/de/themen/mobilitaet-verkehr/strassenverkehr"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23 su Merkblatt e pagina SmartServicePortal (ag.ch/de/smartserviceportal/dienstleistungen?dl=umtausch-eines-auslaendischen-fuehrerausweises-...). Gesuch inkl. Sehtest; Passfoto a colori 35x45; traduzione se il permesso non e in DE/FR/IT/EN, da consolato/ambasciata in Svizzera o traduttore ammesso dallo StVA; Kontrollfahrt con manovre e frenata d emergenza, termine dato dopo il deposito completo. Invio: Strassenverkehrsamt Aargau, Fuehrerzulassung, Postfach, 5001 Aarau. Tasse: il Merkblatt rimanda al sito, NON le stampa. Frase del Merkblatt: nach Ablauf eines Jahres seit Einreise - formulazione cantonale, la norma federale dice residenza (vedi riga CH). L URL del registro asa redirige su /de/themen/mobilitaet-verkehr/strassenverkehr. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -135,7 +124,6 @@ source_url = "https://www.ai.ch/themen/mobilitaet-und-verkehr/strassenverkehr/fu
 landing_url = "https://www.ai.ch/verwaltung/justiz-polizei-und-militaerdepartement/strassenverkehrsamt"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Pagina Umschrieb auslaendischer Fuehrerausweise: il permesso svizzero serve dopo piu di un anno di residenza; il Gesuch si puo depositare in qualsiasi momento, anche prima dei 12 mesi. Regole per autisti professionali: con permesso UE/AELS 12 mesi di tempo; con permesso frontaliero o da 60/90/120 giorni non serve convertire; tutti gli altri prima del primo viaggio professionale. Copre anche il caso dei residenti svizzeri che prendono la patente all estero: riconosciuta solo con almeno 12 mesi consecutivi di soggiorno nello Stato emittente, da provare (biglietti aerei, conferme). Tasse non stampate sulla pagina. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -149,7 +137,6 @@ source_url = "https://ar.ch/verwaltung/departement-inneres-und-sicherheit/strass
 landing_url = "https://ar.ch/verwaltung/departement-inneres-und-sicherheit/strassenverkehrsamt/"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Il Gesuch si deposita PERSONALMENTE all Einwohneramt del comune di residenza (per i frontalieri: del comune di lavoro) con documento d identita con foto; l Einwohneramt lo inoltra allo StVA. Foto secondo i criteri passaporto/ID, anche digitale. Per C, C1, D1, D o BPT: visita medica di livello 2, certificato allegato al Gesuch. Pagina dedicata alla Kontrollfahrt sotto Fuehrerpruefung. Sede: Landsgemeindeplatz 5, 9043 Trogen. Tasse non stampate sulla pagina. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -163,7 +150,6 @@ source_url = "https://www.baselland.ch/politik-und-behorden/direktionen/sicherhe
 landing_url = "https://www.baselland.ch/politik-und-behorden/direktionen/sicherheitsdirektion/motorfahrzeugkontrolle"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23, letto nel BROWSER: baselland.ch risponde 403 a curl anche con User-Agent di browser (WAF), la fonte va raccolta in build-time. Cinque passi: 1) scaricare il Gesuch um Umschrieb eines auslaendischen Fuehrerausweises; 2) Sehtest da ottico o oculista, con documento d identita, ricette per occhiali NON valgono; 3) conferma dei dati PERSONALMENTE allo sportello dell Einwohnerkontrolle del comune, che invia direttamente il Gesuch alla MFK; 4) allegati: Gesuch, foto a colori su carta fotografica 35x45, Sehtest non piu vecchio di 2 anni, permesso estero originale, copia del permesso di dimora; 5) tasse secondo la lista delle tasse della Fuehrerzulassung, NON stampate sulla pagina. Anche alla conversione possono applicarsi le regole del permesso in prova (Zweiphasenausbildung). Sede MFK: Ergolzstrasse 1, 4414 Fuellinsdorf."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -177,7 +163,6 @@ source_url = "https://www.bs.ch/themen/mobilitaet/fuehrerausweise/umtausch-schwe
 landing_url = "https://www.bs.ch/jsd/polizei/fuer-ihre-sicherheit/im-verkehr/im-strassenverkehr/motorfahrzeugkontrolle"
 source_status = "binding"
 validated_at = "2026-09-24"
-notes = "RICONTROLLATO 2026-09-24. Il Gesuch si consegna PERSONALMENTE allo sportello MFK, Clarastrasse 38, 2. piano. Allegati: modulo compilato elettronicamente, stampato e firmato, non piu vecchio di 3 MESI, con Sehtest (valido 24 mesi, a spese proprie, ricette non valgono); passaporto/ID; permesso estero valido, con traduzione ufficiale autenticata se non in DE/EN/FR/IT; foto 35x45. SCADENZA INTERNA: il Gesuch va depositato ALMENO UN MESE PRIMA della fine dei 12 mesi. Per C, C1, D, D1, BPT visita medica di livello 2, modulo allo sportello. TASSE STAMPATE SULLA PAGINA: CHF 65 apertura Gesuch e CHF 75 prima emissione FAK; importi soggetti a modifica. L URL del registro asa (polizei.bs.ch) redirige su bs.ch/jsd/polizei/..."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -191,7 +176,6 @@ source_url = "https://www.ocn.ch/sites/default/files/2025-05/Informations_%20ech
 landing_url = "https://www.ocn.ch/fr"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23 su pagina OCN (ocn.ch/fr/changements-de/pays-arrivee-en-suisse) e documento informativo del 19.05.2025. Scambio entro 12 mesi (data d ingresso secondo il permesso di soggiorno), permesso e targhe. Allegati: formulaire d echange, permesso originale (caratteri non latini: traduzione da traduttore riconosciuto), foto a colori 35x45 SU CARTA FOTOGRAFICA - foto via e-mail non accettate. Per C/C1/D/D1 il certificat de capacite originale. TASSE STAMPATE, forfait: senza corsa di controllo Fr. 80.-; con corsa cat. B Fr. 260.-; con corsa C, C1, D1, BPT Fr. 345.-; con corsa D Fr. 400.-; certificat de capacite Fr. 35.-. Dominio proprio ocn.ch, NON fr.ch; bilingue /fr e /de. Sede Route de Tavel 10, 1700 Fribourg."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -205,7 +189,6 @@ source_url = "https://www.ge.ch/echanger-son-permis-conduire-etranger"
 landing_url = "https://www.ge.ch/organisation/office-cantonal-vehicules-ocv"
 source_status = "binding"
 validated_at = "2026-09-24"
-notes = "RICONTROLLATO 2026-09-24. Entro 12 mesi. Presentarsi PERSONALMENTE, senza appuntamento, agli sportelli del service des permis de conduire; appuntamento prenotabile online. Allegati: formulaire d echange, passaporto/ID o permesso di soggiorno secondo il caso, attestazione di Sehtest da ottico autorizzato non piu vecchia di 24 mesi, 1 foto a colori formato passaporto e PATENTE ESTERA ORIGINALE VALIDA; secondo il paese traduzione ufficiale o attestazione di titolarita della patente. Secondo il paese corsa di controllo e/o esame teorico. TASSE STAMPATE: CHF 150.- (tranne C, C1, D), CHF 200.- per C, C1, D. Sportelli lu 9-16, ma-ve 7.30-16. OCV, Route de Veyrier 86, 1227 Carouge. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -219,7 +202,6 @@ source_url = "https://www.gl.ch/verwaltung/sicherheit-und-justiz/justiz/strassen
 landing_url = "https://www.gl.ch/verwaltung/sicherheit-und-justiz/justiz/strassenverkehrsamt.html/466"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Gesuch inkl. Sehtest, con foto a colori, permesso estero originale, copia del permesso di dimora. C, C1, D, D1, BPT: visita medica livello 2. Uso professionale: teoria aggiuntiva su ARV e tachigrafo oltre alla corsa. La pagina riporta le due liste di paesi esenti con la stessa formulazione della Weisung ASTRA Anhang 2. Corsa unica, non ripetibile; bocciatura o assenza ingiustificata = aberkannt. Categorie rinunciate alla corsa si riacquistano solo per la via ordinaria. Tasse non stampate sulla pagina. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -233,7 +215,6 @@ source_url = "https://www.jura.ch/fr/Autorites/Administration/DEC/OVJ/Conducteur
 landing_url = "https://www.jura.ch/ovj"
 source_status = "binding"
 validated_at = "2026-09-24"
-notes = "RICONTROLLATO 2026-09-24, sezione Permis de conduire etranger della pagina conducenti OVJ. Riprende il testo federale: residenza da piu di dodici mesi senza piu di tre mesi consecutivi all estero. Da inviare: il permesso estero originale (caratteri non latini: traduzione da consolato o ambasciata, altrimenti traduttore riconosciuto), una rinuncia scritta alle categorie che non si vogliono convertire, copia del PERMESSO DI SOGGIORNO, domanda firmata e foto passaporto di meno di un anno. Per una patente francese serve anche attestation de droits a conduire securisee (RII). Per le categorie professionali e per i paesi fuori dal tableau A sono richiesti ulteriori documenti / un certificat d authenticite. La pagina non specifica la modalita di consegna della domanda di scambio; le istruzioni via e-mail riguardano un altro servizio. Tasse: pagina Taxe et emoluments, non letta. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -247,7 +228,6 @@ source_url = "https://strassenverkehrsamt.lu.ch/Strassenverkehr/fuehrer_und_lern
 landing_url = "https://strassenverkehrsamt.lu.ch/"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Moduli numerati: Nr. 12a Gesuch um Umtausch, Nr. 13 Verzicht Kategorien. Foto a colori; traduzione autenticata se il permesso non e in scrittura latina, e lo StVA puo esigerla se non e in DE o EN. Corse di controllo a Kriens. REGOLA DEI CINQUE ANNI: chi converte un permesso di uno Stato esente PIU DI CINQUE ANNI dopo l ingresso deve fare comunque la corsa di controllo. La stessa regola compare a TG, VD e ZG (a VD e ZG evitabile con un attestato di guida regolare), quindi NON e prassi isolata; ma NON sta nella Weisung ASTRA Anhang 2 (cercato, nessuna occorrenza) e la sua fonte federale non e stata trovata. Permessi UE/AELS gruppo 2 usabili 12 mesi dall ingresso. Sede Arsenalstrasse 45, 6010 Kriens. Tasse non stampate sulla pagina. Landing dal registro asa, verificata 2026-09-22. SOURCES §9.8"
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -261,7 +241,6 @@ source_url = "https://www.scan-ne.ch/conducteur/permis/obtenir-un-permis/permis-
 landing_url = "https://www.scan-ne.ch/"
 source_status = "binding"
 validated_at = "2026-09-24"
-notes = "RICONTROLLATO 2026-09-24. Pagina SCAN per auto e moto; esiste una pagina separata per le categorie professionali. Permesso estero usabile per viaggi PRIVATI al massimo 12 mesi dall arrivo. Passi: compilare e STAMPARE la domanda di scambio, test della vista da un ottico AGREE dal SCAN, foto e firma trasmesse digitalmente, poi presentazione agli sportelli SENZA appuntamento con identificazione obbligatoria; portare patente estera originale valida e permesso di soggiorno. Traduzione ufficiale (ambasciata, consolato o traduttore agree) se il permesso non e in una lingua nazionale o in inglese. TASSE STAMPATE: Fr. 105.- per la prestazione; con corsa di controllo Fr. 120.- per l esame pratico piu Fr. 105.- per il permesso. Dominio proprio scan-ne.ch, NON ne.ch. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -275,7 +254,6 @@ source_url = "https://www.vsz.ch/strassenverkehr/fuehrerausweis/privatpersonen/a
 landing_url = "https://www.vsz.ch/"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. UFFICIO INTERCANTONALE Verkehrssicherheitszentrum OW/NW, stessa pagina e stesso Merkblatt per i due cantoni (vsz.ch/40_formulare-und-merkblaetter/Merkblatt_Umtausch_ausl_FA.pdf). Foto e firma via E-Service Photo Collect, o credenziali allo sportello. Traduzione autenticata se non in scrittura latina. Il Merkblatt riprende il testo federale (residenza da piu di dodici mesi, non piu di tre mesi di fila all estero) e la Laenderliste Art. 150 Abs. 5 Bst. e VZV. REGOLA PROPRIA: la corsa di controllo va fatta ENTRO TRE MESI dal deposito del Gesuch; termine fissato dall ufficio. Svizzeri con esame all estero: prova di 12 mesi consecutivi nel paese. Tasse non stampate sulla pagina. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -289,7 +267,6 @@ source_url = "https://www.vsz.ch/strassenverkehr/fuehrerausweis/privatpersonen/a
 landing_url = "https://www.vsz.ch/"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Identico a NW: un solo ufficio, il Verkehrssicherheitszentrum OW/NW, stessa pagina e stesso Merkblatt. Corsa di controllo entro tre mesi dal deposito. Il registro asa NON ha una voce Obwalden (SOURCES §9.7). Vedi la riga NW per il dettaglio."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -303,7 +280,6 @@ source_url = "https://www.sg.ch/verkehr/strassenverkehr/fuehrerausweise/umschrei
 landing_url = "https://www.sg.ch/verkehr/strassenverkehr.html"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Il Gesuch va confermato e firmato dall Einwohneramt del comune di residenza, che lo inoltra; in alternativa persoenliche Vorsprache allo sportello di St. Gallen. Foto a colori 35x45, Sehtest confermato sul modulo. Pagina con Laenderliste Kontrollfahrt. Corsa non ripetibile e fatturata in ogni caso; assenza ingiustificata = aberkannt a tempo indeterminato. La pagina cita per la non ripetibilita l Art. 29 Abs. 4 VZV; il testo in vigore la prevede per i permessi esteri all Art. 44 Abs. 1bis: citazione cantonale da non riprendere. Permesso in prova: tre anni meno il tempo trascorso dall emissione estera. TASSE STAMPATE: Fr. 80.- bis Fr. 100.- per il cambio, corsa fatturata a parte. Sede Frongartenstrasse 5, St. Gallen. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -317,7 +293,6 @@ source_url = "https://services.sh.ch/de/services/gesuch-umtausch-auslandischer-f
 landing_url = "https://sh.ch/CMS/Webseite/Kanton-Schaffhausen/Beh-rde/Verwaltung/Baudepartement/Strassenverkehrs--und-Schifffahrtsamt-3612-DE.html"
 source_status = "binding"
 validated_at = "2026-09-24"
-notes = "RICONTROLLATO 2026-09-24 sulla pagina servizio dedicata: il Gesuch si scarica, compila, stampa e presenta PERSONALMENTE allo Strassenverkehrs- und Schifffahrtsamt. Servono foto a colori 35x45, patente estera originale valida e documento di identita; permesso di soggiorno originale se pertinente. Il modulo dell ufficio richiede Sehtest valido 24 mesi da ottico o medico in Svizzera e identificazione allo StVA o alla Gemeindeverwaltung. Per la guida professionale valgono anche le regole federali. Sede Ernst Mueller-Strasse 2, 8207 Schaffhausen. La pagina servizio rimanda a un regolamento separato per le tasse. La precedente pagina generale era una FAQ renderizzata via JS."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -331,7 +306,6 @@ source_url = "https://so.ch/verwaltung/bau-und-justizdepartement/motorfahrzeugko
 landing_url = "https://so.ch/verwaltung/bau-und-justizdepartement/motorfahrzeugkontrolle/"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23, letto nel BROWSER: curl riceve la pagina ma il contenuto sta nel main renderizzato. Procedura come la prima domanda di Lernfahrausweis, piu: permesso estero ORIGINALE; svizzeri: prova della durata del soggiorno all estero; stranieri: copia fronte-retro del permesso di dimora. Modulo Gesuch um Umtausch (PDF 375 KB) e Merkblatt Wohnsitznahme im Kanton Solothurn sulla pagina. Sedi: Gurzelenstrasse 3, 4512 Bellach (sede principale), Pruefstellen Laufen e Wangen bei Olten. Tasse non stampate sulla pagina."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -345,7 +319,6 @@ source_url = "https://www.sz.ch/verkehrsamt/strassenverkehr/fahrzeuglenker/fuehr
 landing_url = "https://www.sz.ch/behoerden/verwaltung/baudepartement/verkehrsamt.html/8756-8758-8802-9276-9293"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Quattro passi: Gesuchsformular (anche all Einwohneramt), Sehtest da oculista o ottico scritto sul modulo, foto 35x45 caricata online o allegata (NON incollata), conferma dell Einwohneramt sul modulo. Il Gesuch va consegnato PERSONALMENTE al Verkehrsamt. Traduzione autenticata in originale se non in scrittura latina. Esenzioni secondo la lista ASTRA; il termine per corsa o teoria arriva per posta. Sedi Fuehrerzulassung: Schlagstrasse 82, 6431 Schwyz; Gwattstrasse 3, 8808 Pfaeffikon. Tasse non stampate. URL con catena di id numerici: fragile. Landing dal registro asa, verificata 2026-09-22."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -359,7 +332,6 @@ source_url = "https://strassenverkehrsamt.tg.ch/fuehrerzulassung/fuehrerausweis/
 landing_url = "https://strassenverkehrsamt.tg.ch/"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Modulo interattivo da stampare col pulsante che controlla i campi; Sehtest sul modulo; foto; traduzione autenticata da consolato o ambasciata in Svizzera se non in scrittura latina. Identificazione all Einwohnerkontrolle del comune (che inoltra) o allo StVA, originali PERSONALMENTE. Informazioni sulla corsa entro 10-14 giorni lavorativi. Corsa nella categoria piu alta del permesso estero; chi fa la corsa fa POI anche una teoria aggiuntiva. Oltre 5 ANNI dall ingresso puo essere ordinata una corsa (vedi nota LU). C1, C, D1, D, BPT: visita medica livello 2. Il www.stva.tg.ch del registro asa e morto (SOURCES §9.7). Tasse non stampate."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -373,7 +345,6 @@ source_url = "https://www.ur.ch/dienstleistungen/3229"
 landing_url = "https://www.ur.ch/verkehr/4372"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23 sulla pagina servizio Lernfahr- oder Fuehrerausweis / Umtausch eines auslaendischen Fuehrerausweises, con modulo online. Alla prima domanda si va PERSONALMENTE all Amt fuer Strassen- und Schiffsverkehr, Gotthardstrasse 77a, 6460 Altdorf; la foto si fa sul posto. Il Merkblatt fuer Umtausch indicizzato dai motori (_docn/78095) da 404: deep link marcito. Tasse non stampate sulla pagina."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -387,7 +358,6 @@ source_url = "https://www.vs.ch/web/scn/permis-de-conduire-etranger"
 landing_url = "https://www.vs.ch/web/scn"
 source_status = "binding"
 validated_at = "2026-09-23"
-notes = "CHIUSO 2026-09-23. Permesso estero valido 12 mesi dall arrivo (data d ingresso sul permesso di soggiorno). Documenti (domanda firmata, foto a colori, originale del permesso, copia del permesso di soggiorno; per le categorie professionali certificato medico e estratto del casellario) da consegnare al CONTROLLO ABITANTI del comune in Vallese. TASSE STAMPATE: CHF 70.- trattamento, CHF 53.50 emissione del permesso svizzero, CHF 20.- carta di autorizzazione (solo con corsa), CHF 90.- a 180.- corsa di controllo (90 per la B), CHF 60.- esame teorico complementare (C, CE, C1, D, D1, TPP). Alla corsa ci si presenta col proprio veicolo e accompagnati da una persona con permesso valido. Il registro asa punta a vs.ch/de/autos, che redirige su vs.ch/web/scn."
 
 [[entry]]
 theme = "driving_licence_exchange"
@@ -401,5 +371,4 @@ source_url = "https://cdn.zg.ch/dam/jcr:10f78ed7-4098-4f7e-828c-7e071e7d275f/ZU_
 landing_url = "https://zg.ch/de/sicherheitsdirektion/strassenverkehrsamt"
 source_status = "binding"
 validated_at = "2026-09-24"
-notes = "RICONTROLLATO 2026-09-24 sul Merkblatt Umschreibung auslaendischer Fuehrerausweis. Presentarsi PERSONALMENTE allo StVA Zug, senza appuntamento, con: moduli Gesuch um Umtausch e Zusatzangaben zum Umtausch compilati, 1 foto a colori, PATENTE ESTERA ORIGINALE VALIDA, originale del permesso di dimora o passaporto/ID svizzero, traduzione autenticata se non in scrittura latina. Oltre 5 ANNI dall ingresso: corsa di controllo, salvo pratica di guida dimostrata (vedi nota LU). Per la corsa l ufficio NON fornisce il veicolo d esame. TASSE STAMPATE: Umtausch Fr. 75.-, FAK Fr. 30.-, corsa cat. B o A Fr. 90.-, spostamento termine Fr. 50.-, Aberkennung Fr. 250.-, teoria aggiuntiva Fr. 30.-, Faehigkeitsausweis Fr. 35.-. Per Taiwan vale la restrizione dell Anhang 2 ASTRA alle categorie svizzere A1 e B; il Merkblatt cantonale riporta un elenco piu ampio senza tale precisazione. Landing dal registro asa, verificata 2026-09-22."
 

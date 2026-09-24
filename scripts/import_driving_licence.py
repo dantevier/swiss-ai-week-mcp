@@ -38,7 +38,8 @@ COLUMNS = (
     "legal_basis",
     "notes",
 )
-REQUIRED_COLUMNS = set(COLUMNS) - {"landing_url", "validated_at", "legal_basis"}
+# notes come only from the English translations file.
+REQUIRED_COLUMNS = set(COLUMNS) - {"landing_url", "validated_at", "legal_basis", "notes"}
 FACT_COLUMNS = (
     "fact_key", "fact_type", "description_en", "source_url", "validated_at",
     "amount_min_rappen", "amount_max_rappen", "fee_code", "fee_model",
