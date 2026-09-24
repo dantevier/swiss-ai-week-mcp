@@ -1,5 +1,8 @@
 # Team briefing — Swiss Grounding MCP
 
+> Historical team briefing for the Node/TypeScript rehearsal. The current repository
+> uses Python/FastMCP; [STATUS.md](STATUS.md) records what actually works here.
+
 Ten minutes to read. Details live in `AGENTS.md` (how we work), `STATUS.md` (where we
 are) and `CHALLENGE.md` (what Swisscom asks).
 

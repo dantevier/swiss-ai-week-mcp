@@ -1,148 +1,148 @@
 # Swiss Grounding MCP — Knowledge Base
 
-> **Scopo**: unica fonte di verità interna su cosa Swisscom chiede, come valuta e cosa
-> consegniamo. Da consultare durante l'hackathon per qualsiasi dubbio sui requisiti.
+> **Purpose**: Single source of internal truth on what Swisscom is asking for, how it values and what
+> we deliver. Please consult during the hackathon if you have any questions regarding the requirements.
 >
-> **Compilato**: 2026-09-21 · **Evento**: 24–25 settembre 2026, Kraftwerk, Selnaustrasse 25, Zurigo
+> **Compiled**: 2026-09-21 · **Event**: 24–25 September 2026, Kraftwerk, Selnaustrasse 25, Zurich
 >
-> **Legenda affidabilità** — ogni affermazione è marcata:
-> - ✅ **verificato** su fonte primaria (repo ufficiale, briefing deck, sito ai-weeks.ch)
-> - ⚠️ **non verificabile pubblicamente** (proviene dall'Hacker's Handbook, riservato)
-> - 🔍 **inferenza** ad alta confidenza, non dichiarata esplicitamente dalla fonte
+> **Reliability legend** — each statement is marked:
+> - ✅ **verified** on primary source (official repo, briefing deck, ai-weeks.ch website)
+> - ⚠️ **not publicly verifiable** (comes from the Hacker's Handbook, confidential)
+> - 🔍 High confidence **inference**, not explicitly stated by the source
 
 ---
 
-## 0. Indice rapido
+## 0. Quick index
 
-| Domanda | Sezione |
+| Question | Section |
 |---|---|
-| Quando devo consegnare davvero? | [§2 Timeline](#2-timeline-operativa) |
-| Cosa devo consegnare esattamente? | [§3 Deliverables](#3-deliverables) |
-| Quali requisiti sono binari e non negoziabili? | [§4 Requisiti hard](#4-requisiti-hard-checklist) |
-| Come assegnano il punteggio? | [§5 Valutazione](#5-come-valutano) |
-| Quando è giusto chiedere info all'utente? | [§5.4 Regola ask-back](#54-le-tre-viste-e-la-regola-dellask-back) |
-| Cosa conta come fonte autorevole? | [§6 Autorevolezza](#6-cosa-conta-come-fonte-autorevole) |
-| Quali domande useranno? | [§8 Domande campione](#8-domande-campione-8-note) · [§9 Practice case](#9-practice-case-e-checklist-dal-self-check-pack) |
-| Posso usare indici pre-costruiti / API key? | [§10 Runtime](#10-hosting-indici-chiavi-costi) |
-| Cosa NON sappiamo? | [§11 Zone d'ombra](#11-zone-dombra) |
-| Trappole pratiche | [§13 Avvertenze](#13-avvertenze-operative) |
+| When do I actually have to deliver? | [§2 Timeline](#2-operational-timeline) |
+| What exactly do I have to deliver? | [§3 Deliverables](#3-deliverables) |
+| Which requirements are binary and non-negotiable? | [§4 Hard Requirements](#4-hard-requirements-checklist) |
+| How do they assign the score? | [§5 Rating](#5-how-they-rate) |
+| When is it right to ask the user for information? | [§5.4 Ask-back rule](#ask-back-rule) |
+| What counts as an authoritative source? | [§6 Authority](#6-what-counts-as-an-authoritative-source) |
+| What questions will they use? | [§8 Sample questions](#8-sample-questions-8-notes) · [§9 Practice case](#9-practice-case-and-checklist-from-the-self-check-pack) |
+| Can I use pre-built indexes / API keys? | [§10 Runtime](#10-hosting-indexes-keys-costs) |
+| What DON'T we know? | [§11 Gray areas](#11-shadow-areas) |
+| Practical traps | [§13 Warnings](#13-operational-warnings) |
 
 ---
 
-## 1. Fonti e come rigenerarle
+## 1. Sources and how to regenerate them
 
-| Fonte | URL / percorso | Stato |
+| Source | URL/path | Status |
 |---|---|---|
-| Repo ufficiale challenge | `https://github.com/Swiss-ai-Weeks/swisscom-2026` | ✅ clonato e letto |
+| Official challenge repo | `https://github.com/Swiss-ai-Weeks/swisscom-2026` | ✅ cloned and read |
 | README challenge | `swiss-grounding-mcp/README.md` | ✅ |
-| Briefing deck (12 slide) | `swiss-grounding-mcp/briefing-swiss-grounding-mcp.pdf` | ✅ testo estratto |
-| Self-check pack | `swiss-grounding-mcp/evaluation/` — **solo in git history** | ✅ recuperato |
-| Pagina challenge | `https://ai-weeks.ch/2026/challenges?location=zurich-hackathon` | ✅ |
-| FAQ evento | `https://ai-weeks.ch/2026/hack-zurich` | ✅ |
-| Hacker's Handbook | non pubblico | ⚠️ non reperibile |
+| Briefing deck (12 slide) | `swiss-grounding-mcp/briefing-swiss-grounding-mcp.pdf` | ✅ excerpt text |
+| Self-check pack | `swiss-grounding-mcp/evaluation/` — **only in git history** | ✅ recovered |
+| Challenge page | `https://ai-weeks.ch/2026/challenges?location=zurich-hackathon` | ✅ |
+| Event FAQ | `https://ai-weeks.ch/2026/hack-zurich` | ✅ |
+| Hacker's Handbook | not public | ⚠️ not available |
 
-### Recupero del self-check pack
+### Retrieving the self-check pack
 
-Il pack **non è nel working tree**: vive come snapshot in git history. Dalla root del repo clonato:
+The pack **is not in the working tree**: it lives as a snapshot in git history. From the root of the cloned repo:
 
 ```sh
 material_commit=$(git log -1 --diff-filter=A --format=%H -- swiss-grounding-mcp/evaluation/sample-questions.b64)
 git restore --source="$material_commit" --worktree -- swiss-grounding-mcp/evaluation
 ```
 
-Il commit al 2026-09-21 è `74232a1e9c8b14a9d86bf2cd2a3f8916597a68c1`.
-Il contenuto è in `sample-questions.b64`. Per decodificarlo **senza eseguire codice del repo**:
+The commit at 2026-09-21 is `74232a1e9c8b14a9d86bf2cd2a3f8916597a68c1`.
+The content is in `sample-questions.b64`. To decode it **without running repo code**:
 
 ```sh
 tr -d '\r' < swiss-grounding-mcp/evaluation/sample-questions.b64 | base64 -d > decoded.json
 ```
 
-> Uno shallow clone non ha la history necessaria: serve `git fetch --unshallow` prima.
+> A shallow clone does not have the necessary history: you need `git fetch --unshallow` first.
 
 ---
 
-## 2. Timeline operativa
+## 2. Operational timeline
 
-### Evento ✅ (FAQ ai-weeks.ch)
-- **Gio 24/09, 08:00 CET** — kickoff
-- **Ven 25/09, 21:00 CET** — chiusura evento
-- Ingresso solo con **QR ticket + documento d'identità valido**
+### Event ✅ (FAQ ai-weeks.ch)
+- **Thu 24/09, 08:00 CET** — kickoff
+- **Fri 25/09, 21:00 CET** — event closes
+- Entry only with **QR ticket + valid identity document**
 
-### Giuria ⚠️ (dall'Handbook, non verificabile pubblicamente ma coerente con la FAQ)
-| Ora (Ven 25/09) | Evento |
+### Jury ⚠️ (from the Handbook, not publicly verifiable but consistent with the FAQ)
+| Now (Fri 25/09) | Event |
 |---|---|
-| **12:00** | **⏰ SUBMISSION ROUND 1 — deadline reale** |
-| 14:00–16:00 | Expert Jury, stanza chiusa, 3 panel paralleli — **4 min** (1 pitch + 3 Q&A) |
-| 17:00 | Annuncio shortlist |
-| 17:30 | Submission finale Round 2 |
+| **12:00** | **⏰ SUBMISSION ROUND 1 — real deadline** |
+| 14:00–16:00 | Expert Jury, closed room, 3 parallel panels — **4 min** (1 pitch + 3 Q&A) |
+| 17:00 | Shortlist announcement |
+| 17:30 | Final Submission Round 2 |
 | 18:00–18:45 | Main Jury, main stage — **3 min** (2 pitch + 1 Q&A) |
 | 19:30 | Award Ceremony |
 
-**Implicazione**: il tempo di sviluppo utile è **~28 ore**, non 36. Il server deve essere
-runnable e testabile da Swisscom prima di venerdì 12:00.
+**Implication**: Useful development time is **~28 hours**, not 36. The server must be
+runnable and testable by Swisscom before Friday 12:00.
 
-✅ La FAQ conferma che **10 team** passano al main stage.
-✅ Submission Round 1 via form, Round 2 via email (link/dettagli pubblicati sul posto).
+✅ The FAQ confirms that **10 team** are moving to the main stage.
+✅ Submission Round 1 via form, Round 2 via email (links/details published on site).
 
-### Supporto Swisscom ✅
-Slot prenotabili da **15 minuti** con gli esperti myAI on-site al Kraftwerk:
-**giovedì pomeriggio** e **venerdì mattina**.
-Referenti: Matthias Appius, Alexander Stark (Swisscom myAI).
+### Swisscom Support ✅
+Slots bookable from **15 minutes** with myAI experts on-site at Kraftwerk:
+**Thursday afternoon** and **Friday morning**.
+Contacts: Matthias Appius, Alexander Stark (Swisscom myAI).
 
 ---
 
 ## 3. Deliverables
 
-✅ Testuale dal README e dalla slide 5:
+✅ Text from the README and slide 5:
 
-1. **Repository GitHub**, pubblico o privato, con **accesso per i valutatori Swisscom**
-2. **MCP server funzionante** con istruzioni di setup chiare, così che Swisscom possa avviarlo
-3. **Coverage e limitazioni documentate**: quali topic, quale geografia
-4. **Accesso di test sicuro** dove serve, e **nessun secret nel repo**
-5. Nessuna integrazione myAI richiesta durante l'evento
+1. **GitHub repository**, public or private, with **access for Swisscom evaluators**
+2. **Working MCP server** with clear setup instructions so Swisscom can start it
+3. **Documented coverage and limitations**: which topics, which geography
+4. **Secure test access** where you need it, and **no secrets in the repo**
+5. No myAI integration required during the event
 
 ---
 
-## 4. Requisiti hard (checklist)
+## 4. Hard requirements (checklist)
 
-Requisiti binari e verificabili. Sono i punti su cui si perde in modo evitabile.
+Binary and verifiable requirements. These are the points on which you lose in an avoidable way.
 
-- [ ] **Scope dichiarato nel README**: topic + geografia, esplicitamente.
-      *La qualità viene misurata contro questa dichiarazione.* ✅
-- [ ] **robots.txt e terms of use rispettati di default, MA come impostazione di
-      configurazione** — non comportamento hardcoded. Swisscom deve poterlo
-      attivare/disattivare per i test. **Setting e default documentati nel README.** ✅
-      > *"Whether it does so must be a configuration setting, not hardcoded behaviour,
+- [ ] **Scope declared in README**: topic + geography, explicitly.
+      *Quality is measured against this statement.* ✅
+- [ ] **robots.txt and terms of use respected by default, BUT as the setting of
+      configuration** — not hardcoded behavior. Swisscom must be able to
+      enable/disable for testing. **Settings and defaults documented in the README.** ✅
+      > *"Whether it does so must be a configuration setting, not hardcoded behavior,
       > so that Swisscom can switch it on or off when running your server for testing."*
-- [ ] **Il codice nel repo gira in locale** con il setup documentato, anche se hostiamo
-      un endpoint. Serve a confermare che il sorgente pubblicato è il server testato. ✅
-- [ ] Se hostiamo: **endpoint up fino a fine valutazione**. ✅
-- [ ] **Zero secret nel repository.** Credenziali di test consegnate via canale sicuro
-      degli organizzatori **prima del deadline**. ✅
-- [ ] **Ogni credenziale richiesta elencata nel README.** ✅
-- [ ] Se usiamo un indice pre-costruito: **il setup lo scarica/usa senza passi manuali**
-      E **il repo contiene lo script che l'ha generato**. Swisscom **non ricostruisce**
-      l'indice. ✅
-- [ ] **Costruito contro lo standard MCP**, non contro un client specifico. ✅
+- [ ] **The code in the repo runs locally** with the documented setup, even if we host
+      an endpoint. It serves to confirm that the published source is the tested server. ✅
+- [ ] If we host: **endpoint up until end of evaluation**. ✅
+- [ ] **Zero secrets in the repository.** Test credentials delivered via secure channel
+      of the organizers **before the deadline**. ✅
+- [ ] **Each required credential listed in the README.** ✅
+- [ ] If we use a pre-built index: **the setup downloads/uses it without manual steps**
+      And **the repo contains the script that generated it**. Swisscom **does not rebuild**
+      the index. ✅
+- [ ] **Built against the MCP standard**, not a specific client. ✅
 
 ---
 
-## 5. Come valutano
+## 5. How they rate
 
-### 5.1 Le cinque dimensioni ✅
+### 5.1 The five dimensions ✅
 
-1. **Grounding quality** — correttezza, fonti autorevoli, giurisdizione, freshness,
-   supporto alla citazione, gestione onesta delle domande non supportate
-2. **Useful Swiss coverage** — ampiezza e valore pratico dell'informazione pubblica
-   svizzera resa accessibile, incluso lo scope dichiarato
-3. **Agent efficiency** — qualità della tool selection, numero di chiamate, dimensione
-   delle risposte, token, latenza, evitare richieste live non necessarie
-4. **Operability** — setup riproducibile, design di refresh e caching, resilienza,
-   monitoring, source etiquette, manutenibilità
-5. **Integration readiness** — contratto MCP coerente, documentazione chiara,
-   estensibilità, uso immediato da client MCP standard e dal test harness Swisscom
+1. **Grounding quality** — correctness, authoritative sources, jurisdiction, freshness,
+   citation support, honest handling of unsupported queries
+2. **Useful Swiss coverage** — breadth and practical value of public information
+   Switzerland made accessible, including the declared scope
+3. **Agent efficiency** — quality of tool selection, number of calls, size
+   of responses, tokens, latency, avoid unnecessary live requests
+4. **Operability** — reproducible setup, refresh and caching design, resilience,
+   monitoring, source etiquette, maintainability
+5. **Integration readiness** — consistent MCP contract, clear documentation,
+   extensibility, immediate use from standard MCP clients and the Swisscom test harness
 
-### 5.2 Gerarchia esplicita ✅ (slide 8)
+### 5.2 Explicit hierarchy ✅ (slide 8)
 
 ```
 1. Correct and honest answers      ← domina
@@ -153,325 +153,325 @@ Requisiti binari e verificabili. Sono i punti su cui si perde in modo evitabile.
 > *"High quality with narrow coverage beats broad coverage with low quality.
 > Having both is best and wins."*
 
-**Nessuna formula pubblicata.** Check automatici + confronto LLM-assisted contro risposte
-verificate informano il **review group myAI**, che decide **a mano**. ✅
+**No published formula.** Automatic checks + LLM-assisted comparison against answers
+verified, they inform the **review group myAI**, which decides **by hand**. ✅
 
-### 5.3 Setup di test ✅
+### 5.3 Test Setup ✅
 
-- **2 client MCP compatibili × 2 LLM ciascuno = 4 combinazioni**, identiche per ogni team
-- **Quali client e quali modelli: non divulgati**
-- Il server è collegato **esattamente come descritto nelle nostre setup instructions**
-- Domande in **tedesco, francese, italiano e romancio**
-- Il set completo di domande e la sua dimensione restano nascosti
+- **2 compatible MCP clients × 2 LLM each = 4 combinations**, identical for each team
+- **Which clients and which models: not disclosed**
+- The server is connected **exactly as described in our setup instructions**
+- Questions in **German, French, Italian and Romansh**
+- The complete question set and its size remain hidden
 
-### 5.4 Le tre viste e la regola dell'ask-back ✅
+### 5.4 The three views and the ask-back rule <a id="ask-back-rule"></a> ✅
 
-Tre viste su ogni server:
-1. **Qualità dentro lo scope dichiarato** — corretto, da fonte autorevole svizzera,
-   giurisdizione giusta, aggiornato, citato
-2. **Breadth** — quanta informazione pubblica svizzera utile rendiamo accessibile
-3. **Onestà fuori scope** — dire chiaramente che non è coperto, **non indovinare**
+Three views on each server:
+1. **Quality within the declared scope** — correct, from an authoritative Swiss source,
+   right jurisdiction, updated, cited
+2. **Breadth** — how much useful Swiss public information we make accessible
+3. **Honesty out of scope** — clearly say it's not covered, **don't guess**
 
-**Regola dell'ask-back** (citazione integrale):
+**Ask-back rule** (full quote):
 
 > *"Asking back can be the right answer. When the answer depends on information that is
 > missing, such as the municipality, a precise request for exactly that information counts
 > as correct. When the question can be answered as asked, asking back counts as wrong,
 > and so does asking for context you do not need."*
 
-Tre penalità distinte, quindi:
-- rispondere quando manca un dato essenziale → **sbagliato**
-- chiedere quando la domanda è già rispondibile → **sbagliato**
-- chiedere contesto che non serve → **sbagliato**
+Three distinct penalties, therefore:
+- respond when an essential piece of data is missing → **wrong**
+- ask when the question can already be answered → **wrong**
+- ask for unnecessary context → **wrong**
 
 ---
 
-## 6. Cosa conta come fonte autorevole
+## 6. What counts as an authoritative source
 
-✅ Swisscom **non fornisce una lista di fonti**. Trovare e raggiungere le fonti giuste
-è parte della challenge. La valutazione **non controlla quali siti abbiamo usato**:
-controlla se il server raggiunge informazione autorevole svizzera e restituisce risposte
-grounded con riferimenti verificabili.
+✅ Swisscom **does not provide a list of sources**. Find and reach the right sources
+it's part of the challenge. The rating **does not check which sites we used**:
+checks whether the server reaches Swiss authoritative information and returns responses
+grounded with verifiable references.
 
-Definizione: *"the body that is actually responsible for the matter"* — l'ufficio federale,
-il cantone, il comune, o un'organizzazione con mandato di legge.
+Definition: *"the body that is actually responsible for the matter"* — the federal office,
+the canton, the municipality, or an organization mandated by law.
 
-Regole pratiche ✅:
-- Uffici federali pubblicano sotto **admin.ch**; **ch.ch** è il portale multilingue della
-  Confederazione e una buona mappa di chi è responsabile di cosa
-- I cantoni pubblicano su domini propri, di solito il codice a due lettere:
+Practical rules ✅:
+- Federal offices publish under **admin.ch**; **ch.ch** is the multilingual portal of
+  Confederation and a good map of who is responsible for what
+- The cantons publish on their own domains, usually the two-letter code:
   `be.ch`, `vd.ch`, `ti.ch`, `gr.ch`
-- I comuni pubblicano sui propri siti — **molte risposte locali esistono solo lì**
-- Alcuni enti semi-ufficiali sono autorevoli perché la legge dà loro il compito
-  (es. centro informazioni AHV/IV, piattaforma open data del trasporto pubblico)
-- Quattro lingue nazionali: una fonte può esistere solo in una o due, e la risposta
-  corretta può dipendere dalla regione linguistica
+- Municipalities publish on their websites — **many local answers only exist there**
+- Some semi-official bodies are authoritative because the law gives them the task
+  (e.g. AHV/IV information centre, public transport open data platform)
+- Four national languages: a source can only exist in one or two, and the answer
+  correct may depend on the linguistic region
 
-⚠️ **Dalla review checklist**: *"Check that the publisher is responsible for the matter,
-not merely an official Swiss domain."* Un link generico ad `admin.ch` non basta.
+⚠️ **From the review checklist**: *"Check that the publisher is responsible for the matter,
+not merely an official Swiss domain."* A generic link to `admin.ch` is not enough.
 
-Approcci ammessi: registry curato, discovery dinamica, open data e API, o combinazioni. ✅
+Accepted approaches: curated registry, dynamic discovery, open data and API, or combinations. ✅
 
 ---
 
-## 7. Topic areas di esempio (16) ✅
+## 7. Example topic areas (16) ✅
 
-Esempi, **non lista obbligatoria e non il set di valutazione**.
+Examples, **not mandatory list and not the evaluation set**.
 
-| # | Topic area | Fonte esempio | Livello |
+| # | Topic area | Example source | Level |
 |---|---|---|---|
-| 1 | Premi cassa malati e assicurazione di base | priminfo.admin.ch | Federale (BAG) |
-| 2 | Imposte e tasse | amministrazione fiscale TI, ti.ch | Cantonale |
-| 3 | Diritto e regolamenti | fedlex.admin.ch | Federale |
-| 4 | Raccolta rifiuti e riciclaggio | calendario rifiuti Losanna, lausanne.ch | Comunale |
-| 5 | Trasloco, notifica di domicilio, stato civile | controllo abitanti Berna, bern.ch | Comunale |
-| 6 | Permessi di soggiorno e migrazione | sem.admin.ch | Federale |
-| 7 | Assicurazioni sociali e pensioni | ahv-iv.ch | Semi-ufficiale |
-| 8 | Lavoro e disoccupazione | arbeit.swiss | Federale (SECO) |
-| 9 | Scuole e istruzione | dip. istruzione Ginevra, ge.ch | Cantonale |
-| 10 | Trasporto pubblico e mobilità | opentransportdata.swiss | Semi-uff. (mandato UFT) |
-| 11 | Circolazione stradale, veicoli, patenti | ufficio circolazione GR, gr.ch | Cantonale |
-| 12 | Abitazione e locazione | bwo.admin.ch | Federale |
-| 13 | Votazioni, elezioni, diritti politici | bk.admin.ch | Federale |
-| 14 | Imprese, registro di commercio, IVA | zefix.ch | Federale |
-| 15 | Dogane e acquisti dall'estero | bazg.admin.ch | Federale |
-| 16 | Statistica, open data, geodati, meteo | bfs.admin.ch, opendata.swiss, map.geo.admin.ch, meteoswiss.admin.ch | Federale |
+| 1 | Health insurance premiums and basic insurance | priminfo.admin.ch | Federal (BAG) |
+| 2 | Taxes and duties | tax administration TI, ti.ch | Cantonal |
+| 3 | Law and regulations | fedlex.admin.ch | Federal |
+| 4 | Waste collection and recycling | waste calendar Lausanne, lausanne.ch | Municipal |
+| 5 | Moving, domicile notification, civil status | Bern residents' office, bern.ch | Municipal |
+| 6 | Residence permits and migration | sem.admin.ch | Federal |
+| 7 | Social insurance and pensions | ahv-iv.ch | Semi-official |
+| 8 | Work and unemployment | arbeit.swiss | Federal (SECO) |
+| 9 | Schools and education | dep. education Geneva, ge.ch | Cantonal |
+| 10 | Public transport and mobility | opentransportdata.swiss | Semi-official (FOT mandate) |
+| 11 | Road traffic, vehicles, licenses | GR circulation office, gr.ch | Cantonal |
+| 12 | Housing and rental | bwo.admin.ch | Federal |
+| 13 | Voting, elections, political rights | bk.admin.ch | Federal |
+| 14 | Companies, commercial register, VAT | zefix.ch | Federal |
+| 15 | Customs and purchases from abroad | bazg.admin.ch | Federal |
+| 16 | Statistics, open data, geodata, weather | bfs.admin.ch, opendata.swiss, map.geo.admin.ch, meteoswiss.admin.ch | Federal |
 
 ---
 
-## 8. Domande campione (8 note)
+## 8. Sample questions (8 notes)
 
-### Le 5 pubblicate ✅
-Il README dichiara: una richiede di chiedere il comune, una **non è una domanda sulla
-Svizzera** e la risposta giusta è dirlo. Non dicono quali.
+### The five published questions ✅
+The README states: one requires asking the municipality, one **is not a question about
+Switzerland** and the right answer is to say so. They don't say which ones.
 
 1. 🇩🇪 *Wann wird bei uns das nächste Mal Karton abgeholt?*
 2. 🇫🇷 *Comment puis-je échanger mon permis de conduire étranger contre un permis suisse
-   dans le canton de Vaud, et combien de temps ai-je pour le faire?*
+   in the canton of Vaud, and what are the times to do?*
 3. 🇮🇹 *Qual è il premio mensile più basso dell'assicurazione di base per un adulto di
-   30 anni domiciliato a Lugano con franchigia di 2500 franchi?*
+   30 years domiciled in Lugano with deductible of 2500 francs?*
 4. 🇨🇭 (rm) *Cura èn las vacanzas d'atun 2026 per la scola da Scuol?*
 5. 🇩🇪 *Wie hoch ist der Rundfunkbeitrag, den ich nach meinem Umzug nach Konstanz
    zahlen muss?*
 
-🔍 **Inferenza ad alta confidenza**: incrociando con i practice case `missing_location` e
-`cross_border`, la #1 è quella che richiede il comune e la #5 è quella fuori Svizzera
-(Konstanz è in Germania).
+🔍 **High confidence inference**: crossing with the practice cases `missing_location` and
+`cross_border`, the #1 is the one required by the municipality and the #5 is the one outside Switzerland
+(Konstanz is in Germany).
 
-### Le 3 aggiuntive nel fixture del self-check pack ✅
+### Three additional questions in the self-check pack fixture ✅
 6. 🇩🇪 *Wann sind die Herbstferien 2026 in der Stadt Bern?*
 7. 🇫🇷 *Où dois-je annoncer mon arrivée dans la ville de Lausanne?*
 8. 🇮🇹 *Quale autorità pubblica il tasso ipotecario di riferimento per gli affitti in Svizzera?*
 
 ---
 
-## 9. Practice case e checklist (dal self-check pack)
+## 9. Practice case and checklist (from the self-check pack)
 
-✅ Otto casi con i check espliciti. È il materiale più vicino al set nascosto che avremo.
+✅ Eight cases with explicit checks. It's the closest material to the hidden set we'll get.
 
 ### 9.1 `missing_location` — de
 **Q**: *Wann wird bei uns Karton abgeholt?*
-- Chiedere il **comune** prima di selezionare un calendario locale
-- Se il calendario è specifico per via, chiedere **solo** l'informazione di località
-  aggiuntiva che serve
-- **Non inventare una data di raccolta**
+- Ask for **town** before selecting a local calendar
+- If the calendar is street specific, ask **only** for location information
+  addition that is needed
+- **Do not invent a collection date**
 
 ### 9.2 `enough_context` — fr
-**Q**: *Où trouver le calendrier officiel des vacances scolaires 2026 de la ville de Genève?*
-- Usare l'autorità scolastica responsabile e il suo calendario 2026
-- **Non chiedere un comune già fornito**
-- Citare il calendario reale o la sua pagina di pubblicazione ufficiale
+**Q**: *Where will you find the official school holiday calendar 2026 from the city of Genève?*
+- Use the responsible school authority and its calendar 2026
+- **Do not ask for a municipality already provided**
+- Cite the actual calendar or its official publication page
 
 ### 9.3 `cross_border` — de
 **Q**: *Wie hoch ist der Rundfunkbeitrag in Konstanz?*
-- Riconoscere che Konstanz è in **Germania**
-- Per un server Swiss-only: dichiarare che è **fuori copertura**
-- **Non sostituire** con il canone svizzero
+- Recognize that Konstanz is in **Germany**
+- For a Swiss-only server: declare that it is **out of coverage**
+- **Do not replace** with the Swiss fee
 
 ### 9.4 `romansh_locality` — rm
-**Q**: *Cura èn las vacanzas d'atun 2026 per la scola da Scuol?*
-- Identificare Scuol e il calendario scolastico applicabile
-- Verificare **anno richiesto** e **applicabilità locale**
-- Non dedurre date da un altro cantone o da un riassunto tradotto senza data
+**Q**: *Do you care about today's holidays 2026 for school at Scuol?*
+- Identify School and applicable school calendar
+- Check **required year** and **local applicability**
+- Do not deduce dates from another canton or from an undated translated summary
 
 ### 9.5 `rate_freshness` — it
-**Q**: *Qual è il tasso ipotecario di riferimento attualmente in vigore per gli affitti
-in Svizzera?*
-- Trovare la **pubblicazione corrente** dell'autorità federale competente per l'abitazione
-- Indicare la **data di efficacia** insieme al tasso
-- **Una pubblicazione ufficiale più vecchia resta una risposta obsoleta**
+**Q**: *What is the reference mortgage rate currently in force for rentals
+in Switzerland?*
+- Find the **current publication** of the competent federal housing authority
+- Indicate the **effective date** together with the rate
+- **An older official post remains an outdated answer**
 
 ### 9.6 `paired_jurisdiction` — fr
-**Q**: *Comment annoncer mon arrivée à Lausanne? Et à Berne?*
-- Risolvere **ogni procedura comunale in modo indipendente**
-- Non riusare scadenze, tasse o moduli di un comune per l'altro
-- Attribuire ogni procedura alla sua autorità responsabile
+**Q**: *Comment will announce you have arrived in Lausanne? Et à Berne?*
+- Solve **each municipal procedure independently**
+- Do not reuse deadlines, fees or forms from one municipality for another
+- Attribute each procedure to its responsible authority
 
 ### 9.7 `citation_support` — de
-**Q**: *Welche Quelle belegt genau die von dir genannte Frist?*
-- Restituire **il passaggio** che sostiene quella scadenza specifica
-- **Una homepage ufficiale da sola non basta**
-- Se nessun passaggio di supporto è stato trovato: qualificare o **ritrattare** la claim
+**Q**: *Welcome to those who want to say Frist?*
+- Return **the step** that supports that specific deadline
+- **An official homepage alone is not enough**
+- If no supporting passage was found: qualify or **retract** the claim
 
 ### 9.8 `source_failure` — en
-**Q**: ripetere una domanda in-scope con la fonte autorevole non disponibile.
-- Distinguere **retrieval failure** da **assenza del fatto**
-- Dichiarare se la risposta si basa su **evidenza in cache** e identificarne la **data**
-- Non inventare una citazione né sostituire silenziosamente la giurisdizione
+**Q**: Repeat an in-scope question with the authoritative source unavailable.
+- Distinguish **retrieval failure** from **absence of the fact**
+- State whether the response is based on **cached evidence** and identify the **date**
+- Do not invent a subpoena or silently substitute jurisdiction
 
-### 9.9 Review checklist (8 punti) ✅
+### 9.9 Review checklist (8 points) ✅
 
-1. Documentare topic e coverage geografica **prima** di confrontare i risultati
-2. Per ogni claim chiave, conservare **URL della fonte + passaggio di supporto o record dati**
-3. Verificare che l'editore sia **responsabile della materia**, non solo un dominio
-   svizzero ufficiale
-4. Verificare comune, cantone, gruppo di popolazione, **anno di riferimento** e
-   **data di efficacia** dove rilevante
-5. Chiedere **solo** l'informazione mancante che cambia la risposta
-6. Distinguere: **fuori scope** / **contesto insufficiente** / **fonte non disponibile** /
-   **nessun risultato corrispondente** — sono quattro stati diversi
-7. Esercitare lo stesso contratto MCP con **più di un client compatibile**
-8. Setup riproducibile, credenziali fuori da Git, passi di rebuild dell'indice documentati
+1. Document topic and geographic coverage **before** comparing results
+2. For each key claim, keep **Source URL + supporting passage or data record**
+3. Verify that the publisher is **responsible for the subject matter**, not just a domain
+   official Swiss
+4. Check the municipality, canton, population group, **reference year**, and
+   **effective date** where relevant
+5. Ask **only** the missing information that changes the answer
+6. Distinguish: **out of scope** / **insufficient context** / **source not available** /
+   **no matching results** — that's four different states
+7. Exercise the same MCP contract with **more than one compatible client**
+8. Reproducible setup, credentials outside of Git, documented index rebuild steps
 
 ---
 
-## 10. Hosting, indici, chiavi, costi
+## 10. Hosting, indexes, keys, costs
 
-✅ Tutto dalla slide 12 + README §3.
+✅ Everything from the slide 12 + README §3.
 
-**Locale o hosted — scelta nostra.** Swisscom testa un endpoint hosted oppure avvia il
-server dal repo. In entrambi i casi il codice nel repo deve girare in locale con il setup
-documentato, per confermare che il sorgente pubblicato è il server testato.
+**Local or hosted — our choice.** Swisscom tests a hosted endpoint or launches the
+server from the repo. In both cases the code in the repo must run locally with the setup
+documented, to confirm that the published source is the tested server.
 
-**Indici pre-costruiti: ammessi.** Non serve fare embedding o crawling allo start.
-Possiamo spedire un vector store/indice nel repo o farlo scaricare dal setup.
-Due condizioni: (1) il setup lo scarica e lo usa **senza passi manuali**; (2) il repo
-contiene **lo script che l'ha costruito**, così che chiunque possa ricostruirlo con dati
-più freschi. **Swisscom non ricostruisce l'indice durante la valutazione.**
+**Pre-built indexes: allowed.** No need to do embedding or crawling at start.
+We can ship a vector store/index to the repo or have it downloaded from setup.
+Two conditions: (1) the setup downloads it and uses it **without manual steps**; (2) the repo
+contains **the script that built it**, so anyone can reconstruct it with data
+fresher. **Swisscom does not reconstruct the index during the evaluation.**
 
-**Chiavi.** API key a runtime sono accettabili (es. embedding a query time, o una chiamata
-LLM interna al server). Elencare ogni credenziale nel README e consegnare credenziali di
-test funzionanti via canale sicuro degli organizzatori prima del deadline.
+**Keys.** API keys at runtime are acceptable (e.g. embedding at query time, or a call
+LLM internal to the server). List each credential in the README and hand in credentials
+tests running via the organizers' secure channel before the deadline.
 > *"A server that runs without any external keys is easier for us to run and easier for you
 > to keep running, and that shows in the operability assessment."*
 
-**Costi.** Swisscom **non rimborsa** costi di API, embedding o hosting. Per eventuali
-API credit rivolgersi agli organizzatori Swiss AI Weeks.
+**Costs.** Swisscom **does not reimburse** API, embedding or hosting costs. For any
+API credit contact the Swiss AI Weeks organizers.
 > *"Embedding budget does not decide the ranking: quality inside your declared scope comes
 > first, and a small, well built index or a live API approach with no embeddings at all is
 > just as valid as a large vector store."*
 
 ---
 
-## 11. Zone d'ombra
+## 11. Shadow areas
 
-Cose che **non sappiamo e non sapremo**:
+Things we **don't know and won't know**:
 
-- Quali **client MCP** e quali **LLM** usano per i test
-- **Dimensione** del set di domande nascosto
-- Qualsiasi **formula di punteggio** — non esiste, decide a mano il review group myAI
-- Il **premio specifico** di questa challenge (la FAQ generale parla di premi non
-  acquistabili + denaro; nessuna cifra pubblicata)
-- Se ci sono **API credit** dagli organizzatori (Swisscom rimanda esplicitamente a loro)
+- Which **MCP** clients and which **LLM** clients use for testing
+- **Size** of the hidden question set
+- Any **scoring formula** — it doesn't exist, the myAI review group decides by hand
+- The **specific prize** of this challenge (the general FAQ talks about non-
+  purchasable + money; no figures published)
+- If there are **API credits** from the organizers (Swisscom explicitly refers to them)
 
-⚠️ Il blocco "Jury Process & Evaluation Criteria" (§2) proviene dall'Hacker's Handbook e
-**non è stato verificabile su fonte pubblica**. È coerente con la FAQ ma va riconfermato
-sul posto.
-
----
-
-## 12. Contesto evento (FAQ ai-weeks.ch) ✅
-
-- **IP e code ownership**: la proprietà intellettuale creata resta **ai team / ai singoli
-  partecipanti**, indipendentemente dal fatto che si lavori su una challenge di un partner
-- Lingua dell'evento: **inglese**
-- Piattaforme fornite: **GitHub** e **Hugging Face**; tool/API aggiuntivi documentati
-  nell'Handbook
-- Comunicazione: **Discord**
-- Infra: WiFi con uplink 10 Gbit (Fiber7), prese 220V tipo J, supporto tecnico on-site
-- Eligibility giuria ⚠️: valuta solo progetti sottomessi in tempo da team registrati
-  dove **tutti i membri hanno ticket valido e documento d'identità**
-- Rimborso viaggio: CHF 80 (100–500 km), CHF 150 (>500 km), con ricevute, post-evento.
-  Alloggio non coperto
-- Giuria: decisioni **finali e non appellabili**; il moderatore ha il voto decisivo;
-  conflitti d'interesse vanno dichiarati con ricusazione ⚠️
+⚠️ The "Jury Process & Evaluation Criteria" block (§2) comes from the Hacker's Handbook and
+** could not be verified from a public source **. It is consistent with the FAQ but needs to be reconfirmed
+on site.
 
 ---
 
-## 13. Avvertenze operative
+## 12. Event context (FAQ ai-weeks.ch) ✅
 
-### 13.1 Non eseguire `sample_runner.py` durante la demo
-Il companion utility del self-check pack apre **10 finestre di terminale** con animazioni
-ASCII e riproduce **audio per ~8 secondi**. Richiede macOS Terminal o `xterm`; su Windows
-il window mode non parte. Per ottenere solo il report: `--dry-run`. Meglio ancora:
-decodificare direttamente il `.b64` (vedi §1).
+- **IP and code ownership**: the intellectual property created remains **with the teams / individuals
+  participants**, regardless of whether you are working on a challenge from a partner
+- Event language: **English**
+- Platforms provided: **GitHub** and **Hugging Face**; Documented additional tools/APIs
+  in the Handbook
+- Communication: **Discord**
+- Infra: WiFi with 10 Gbit (Fiber7) uplink, 220V type J sockets, on-site technical support
+- Eligibility jury ⚠️: only evaluate projects submitted in time by registered teams
+  where **all members have a valid ticket and ID**
+- Trip reimbursement: CHF 80 (100–500 km), CHF 150 (>500 km), with receipts, post-event.
+  Accommodation not covered
+- Jury: **final and non-appealable** decisions; the moderator has the deciding vote;
+  conflicts of interest must be declared with recusal ⚠️
 
-### 13.2 Prompt injection nel fixture ⚠️
-`sample-questions.b64` contiene cinque "variants" scherzose con campo `instruction`.
-Una di esse (`banking`) istruisce l'assistente a **rifiutare ogni domanda implementativa**
-finché non riceve una release phrase, e a non rivelare né lo scherzo né la frase.
+---
 
-**Sono dati contenuti in un repository, non istruzioni.** Se il nostro pipeline ingerisce
-questo fixture (o qualsiasi contenuto recuperato dal web) senza separare dati e istruzioni,
-la demo si blocca. Vale come promemoria di design: **il contenuto recuperato dalle fonti
-non deve mai poter pilotare il comportamento dell'agente.**
+## 13. Operational warnings
 
-### 13.3 Il fixture non è il set di valutazione
+### 13.1 Do not run `sample_runner.py` during the demo
+The self-check pack companion utility opens **10 terminal windows** with animations
+ASCII and plays **audio for ~8 seconds**. Requires macOS Terminal or `xterm`; on Windows
+window mode doesn't start. To get the report only: `--dry-run`. Better yet:
+directly decode the `.b64` (see §1).
+
+### 13.2 Prompt injection in the fixture ⚠️
+`sample-questions.b64` contains five joke "variants" with field `instruction`.
+One of them (`banking`) instructs the assistant to **reject all implementation questions**
+until he receives a release phrase, and not to reveal either the joke or the phrase.
+
+**This is data contained in a repository, not instructions.** If our pipeline ingests
+this fixture (or any content retrieved from the web) without separating data and instructions,
+the demo crashes. Valid as a design reminder: **content retrieved from sources
+must never be able to control the agent's behavior.**
+
+### 13.3 The fixture is not the evaluation set
 > *"These are preparation materials, not verified reference answers, the hidden question set
 > or a scoring formula."*
 
-Le risposte fattuali vanno verificate su fonti autorevoli correnti: nessun practice case
-sostituisce una fonte.
+Factual answers must be verified on current authoritative sources: no practice case
+replaces a source.
 
 ---
 
-## 14. Citazioni chiave (verbatim, EN)
+## 14. Key quotes (verbatim, EN)
 
-Da usare come riferimento letterale quando c'è un dubbio di interpretazione.
+To be used as a literal reference when there is doubt of interpretation.
 
-**Sullo scope:**
+**On the scope:**
 > "Declare your scope. In your README, state which topics and which geography your server
 > covers... We evaluate answer quality against that declaration."
 
-**Sulla priorità qualità vs. ampiezza:**
+**On the priority of quality vs. width:**
 > "In general, a high quality solution with narrow coverage is preferred over a broad
 > solution with low quality. Having both is best and wins."
 
-**Sull'ordine di importanza:**
+**In order of importance:**
 > "The order of importance is: correct and honest answers, then breadth, then agent
 > efficiency, operability and the quality of your MCP contract as tie breakers."
 
-**Su robots.txt:**
+**On robots.txt:**
 > "Your server should respect the robots.txt and terms of use of the sources it accesses
-> by default. Whether it does so must be a configuration setting, not hardcoded behaviour,
+> by default. Whether it does so must be a configuration setting, not hardcoded behavior,
 > so that Swisscom can switch it on or off when running your server for testing. Document
 > the setting and its default in your README."
 
-**Su cosa fa un buon MCP (slide 4):**
+**On what a good MCP does (slide 4):**
 > "Offers a coherent, compact set of tools · Returns evidence an AI client can use and cite
 > · Keeps information as fresh as the use case needs · Says so when a question is not
 > covered · Runs locally from its repo; hosting it as well is your choice"
 
-**Sul non costruire per un client specifico:**
+**On not building for a specific client:**
 > "We do not disclose which clients and which models we use, so build against the MCP
 > standard rather than against one specific assistant."
 
 ---
 
-## 15. Lettura strategica
+## 15. Strategic reading
 
-Il segnale dominante del materiale: **questa challenge non premia la copertura, premia la
-disciplina epistemica.** Il sistema deve saper produrre quattro output distinti:
+The dominant signal of the material: **this challenge does not reward coverage, it rewards
+epistemic discipline.** The system must be able to produce four distinct outputs:
 
-1. risposta + passaggio esatto che la prova + data di efficacia
-2. richiesta precisa del singolo dato mancante
-3. "fuori dalla mia copertura dichiarata"
-4. "la fonte non è raggiungibile" (≠ "il fatto non esiste")
+1. answer + exact supporting passage + effective date
+2. precise request for the single missing data
+3. "outside my declared coverage"
+4. "the source is unavailable" (not "the fact does not exist")
 
-Il comportamento da eliminare è il quinto: rispondere in modo plausibile. È il default di
-un LLM, ed è esattamente ciò che fa perdere punti. Gran parte del lavoro tecnico consiste
-nel **togliere al modello la possibilità di improvvisare**, non nell'aggiungere fonti.
+The behavior to eliminate is the fifth: responding in a plausible manner. It is the default of
+an LLM, and that's exactly what loses points. Much of the technical work consists
+in **taking away the possibility of improvising from the model**, not in adding sources.
 
-Corollario dal caso `citation_support` + checklist punto 3: una risposta con link generico
-a un dominio ufficiale vale zero. Serve il **passaggio testuale** che sostiene la claim
-specifica, con l'autorità realmente competente per quella materia.
+Corollary from the `citation_support` case + checklist point 3: an answer with generic link
+an official domain is worth zero. You need the **textual passage** that supports the claim
+specific, with the authority truly competent for that matter.

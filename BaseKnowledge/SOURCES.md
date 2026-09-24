@@ -1,171 +1,176 @@
-# Fonti svizzere — analisi tecnica di accessibilità
+# Swiss sources — technical accessibility analysis
 
-> **Scopo**: cosa è realmente interrogabile in ~28 ore, con che sforzo, con che freschezza.
-> Complementa [CHALLENGE.md](CHALLENGE.md), che copre i requisiti Swisscom.
+> Research from a separate Node/TypeScript rehearsal. Source findings remain useful,
+> but the referenced datasets, scripts, and server are not present in the current Python
+> repository; see [STATUS.md](STATUS.md). Quoted source passages stay in their original
+> language so they can be checked against the source.
+
+> **Purpose**: what can actually be queried in ~28 hours, with what effort, with what freshness.
+> Complements [CHALLENGE.md](CHALLENGE.md), which covers Swisscom requirements.
 >
-> **Data verifica**: 2026-09-21 · **Metodo**: chiamate HTTP reali, non ricerca web
+> **Verified date**: 2026-09-21 · **Method**: Real HTTP calls, not web search
 >
-> **Legenda**: 🟢 verificato hands-on · 🟡 documentato ma non testato da noi · 🔴 verificato come bloccante
+> **Legend**: 🟢 verified hands-on · 🟡 documented but not tested by us · 🔴 verified as a blocker
 
 ---
 
-## 1. La legge fondamentale di questo dominio
+## 1. The fundamental law of this domain
 
-**Dove esiste open data strutturato, non ci sono le domande campione.
-Dove ci sono le domande campione, non esiste open data.**
+**Where structured open data exists, there are no sample questions.
+Where there are sample questions, there is no open data.**
 
-Numeri verificati su `opendata.swiss` (16'040 dataset totali):
+Numbers verified on `opendata.swiss` (16'040 total datasets):
 
-| Query | Dataset trovati | Comuni/cantoni in CH |
+| Queries | Datasets found | Municipalities/cantons in CH |
 |---|---|---|
-| `entsorgungskalender` | **9** | ~2'100 comuni |
-| `abfall` | 122 | ~2'100 comuni |
-| `schulferien` | **5** | 26 cantoni |
+| `entsorgungskalender` | **9** | ~2'100 municipalities |
+| `abfall` | 122 | ~2'100 municipalities |
+| `schulferien` | **5** | 26 cantons |
 
-Swisscom ha scelto come domande campione proprio raccolta rifiuti e vacanze scolastiche
-comunali. **Non sono coperte dall'open data federale.** Vivono su siti comunali e cantonali
-come HTML e PDF.
+Swisscom chose municipal waste collection and school holidays as sample topics.
+**Federal open data does not cover them.** The answers live on municipal and cantonal
+websites, often in HTML or PDFs.
 
-Questo è esattamente il punto della slide 3 del briefing:
+This is exactly the point of slide 3 in the briefing:
 > *"Invisible data: the answer sits in an API, a dataset table or a PDF annex that search
 > does not surface."*
 
-**Conseguenza di design**: una strategia "wrapper su opendata.swiss" fallisce le domande
-campione. Una strategia che gestisce HTML/PDF comunali le prende. La seconda è più difficile
-ma è quella che il set nascosto premia.
+**Design consequence**: a wrapper around `opendata.swiss` misses these sample questions.
+A server that reads municipal HTML and PDFs can answer them. That takes more work,
+but addresses the harder cases in the hidden set.
 
 ---
 
-## 2. Tabella maestra: 16 topic area × accessibilità reale
+## 2. Master table: 16 topic area × real accessibility
 
-Effort = stima nostra per una copertura credibile, non per la perfezione.
+Effort is our estimate for credible coverage, not perfection.
 
-| # | Topic | Accesso | Formato | Auth | Freschezza | Effort |
+| # | Topic | Access | Format | Auth | Freshness | Effort |
 |---|---|---|---|---|---|---|
-| 1 | **Premi cassa malati** | 🟢 CSV ufficiale BAG | CSV/XLSX | no | agg. 2026-09-11 | **Basso** |
-| 2 | Imposte cantonali | 🔴 26 sistemi diversi | HTML/PDF/calcolatori | no | annuale | Molto alto |
-| 3 | **Diritto federale** | 🟢 SPARQL Fedlex | RDF/HTML | no | continua | **Medio** |
-| 4 | **Raccolta rifiuti** | 🔴 frammentato | HTML/PDF/ICS | varia | settimanale | Alto per comune |
-| 5 | Notifica domicilio | 🟡 solo siti comunali | HTML | no | rara | Medio per comune |
-| 6 | Permessi soggiorno | 🟡 sem.admin.ch | HTML/PDF | no | rara | Medio |
-| 7 | AHV/IV pensioni | 🟡 ahv-iv.ch memento | HTML/PDF | no | annuale | Medio |
-| 8 | Lavoro/disoccupazione | 🟡 arbeit.swiss | HTML | no | rara | Medio |
-| 9 | **Vacanze scolastiche** | 🔴 26 cantoni, PDF | PDF/ICS parziale | no | annuale | Alto |
-| 10 | **Trasporto pubblico** | 🟡 OJP 2.0 / GTFS-RT | XML/protobuf | **API key** | realtime | Medio |
-| 11 | Patenti/veicoli | 🟡 26 uffici cantonali | HTML | no | rara | Alto |
-| 12 | **Tasso riferimento** | 🟡 pagina BWO | HTML | no | trimestrale | **Bassissimo** |
-| 13 | **Votazioni** | 🟡 VoteInfo JSON | JSON | no | per votazione | Basso |
-| 14 | **Registro imprese** | 🔴 Zefix = HTTP 401 | JSON | **account** | continua | Basso + credenziale |
-| 15 | Dogane | 🟡 bazg/Tares | HTML | no | rara | Medio |
-| 16 | **Statistica** | 🟡 PxWeb BFS | JSON/PX | no | varia | Basso |
-| — | **Geo/comuni** | 🟢 geo.admin.ch | JSON | no | continua | **Bassissimo** |
-| — | **Catalogo open data** | 🟢 CKAN | JSON | no | continua | **Bassissimo** |
+| 1 | **Health insurance premiums** | 🟢 Official CSV BAG | CSV/XLSX | no | updated 2026-09-11 | **Low** |
+| 2 | Cantonal taxes | 🔴 26 different systems | HTML/PDF/calculators | no | annual | Very high |
+| 3 | **Federal law** | 🟢 SPARQL Fedlex | RDF/HTML | no | continuous | **Medium** |
+| 4 | **Waste collection** | 🔴 fragmented | HTML/PDF/ICS | varies | weekly | High for municipality |
+| 5 | Domicile notification | 🟡 municipal sites only | HTML | no | rare | Medium per municipality |
+| 6 | Residence permits | 🟡 sem.admin.ch | HTML/PDF | no | rare | Medium |
+| 7 | AHV/IV pensions | 🟡 ahv-iv.ch memento | HTML/PDF | no | annual | Medium |
+| 8 | Work/unemployment | 🟡 arbeit.swiss | HTML | no | rare | Medium |
+| 9 | **School holidays** | 🔴 26 cantons, PDF | Partial PDF/ICS | no | annual | High |
+| 10 | **Public transport** | 🟡 OJP 2.0 / GTFS-RT | XML/protobuf | **API key** | realtime | Medium |
+| 11 | Licenses/vehicles | 🟡 26 cantonal offices | HTML | no | rare | High |
+| 12 | **Reference rate** | 🟡 BWO page | HTML | no | quarterly | **Very low** |
+| 13 | **Voting** | 🟡 VoteInfo JSON | JSON | no | by vote | Low |
+| 14 | **Business register** | 🔴 Zefix = HTTP 401 | JSON | **account** | continue | Low + credential |
+| 15 | Customs | 🟡 bazg/Tares | HTML | no | rare | Medium |
+| 16 | **Statistics** | 🟡 PxWeb BFS | JSON/PX | no | varies | Low |
+| — | **Geo/municipalities** | 🟢 geo.admin.ch | JSON | no | continuous | **Very low** |
+| — | **Open data catalog** | 🟢 CKAN | JSON | no | continuous | **Very low** |
 
 ---
 
-## 3. Fonti verificate hands-on
+## 3. Hands-on verified sources
 
-### 3.1 🟢 swisstopo SearchServer — il risolutore di giurisdizione
+### 3.1 🟢 swisstopo SearchServer — the jurisdiction resolver
 
-**Questa è la fondazione.** Risolve nome comune → numero BFS + cantone, senza auth.
+**This is the foundation.** Resolves municipality name → BFS number + canton, without auth.
 
 ```sh
 curl "https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=Scuol&type=locations&origins=gg25&limit=3"
 ```
 
-Risposta verificata:
+Verified Answer:
 - `Scuol (GR)` → `featureId: 3762`, lat/lon, bounding box
 - `Lugano (TI)` → `featureId: 5192`
 
-`featureId` = **numero UFS del comune**. `origins=gg25` limita ai confini comunali ufficiali.
-Supporta anche NPA, indirizzi, distretti, particelle.
+`featureId` = **UFS number of the municipality**. `origins=gg25` limits to official municipal boundaries.
+It also supports postcodes, addresses, districts, parcels.
 
-**Perché conta**: il 90% delle domande locali richiede prima di stabilire *quale* comune e
-*quale* cantone. Senza questo passo, ogni risposta municipale è una scommessa. Con questo,
-diventa un lookup deterministico — e permette di distinguere "comune ambiguo →
-chiedi" da "comune risolto → procedi", che è la regola ask-back di §5.4 di CHALLENGE.md.
+**Why it matters**: 90% of local questions ask first to establish *which* municipality and
+*which* canton. Without this step, every municipal response is a gamble. With this,
+becomes a deterministic lookup — and allows you to distinguish "ambiguous municipality →
+ask" da "municipality solved → proceed", which is the ask-back rule of §5.4 of CHALLENGE.md.
 
-### 3.1b 🔴 swisstopo fuzzy risolve il comune sbagliato; il risolutore è offline
+### 3.1b 🔴 swisstopo fuzzy solves the wrong municipality; the resolver is offline
 
-Verificato il 2026-09-23. `SearchServer?searchText=Wengen&origins=gg25` risponde
-**`Wengi (BE)`** con `"fuzzy":"true"`. Wengen non è un comune: è una località di
-**Lauterbrunnen**. La ricerca fuzzy restituisce in silenzio un comune reale e sbagliato,
-e con `origins=zipcode` Wengen non dà risultati. Da qui la decisione (utente,
-2026-09-23): **risolutore solo offline**, costruito in build-time da
-`scripts/build_places.py` in `data/places.json`, senza fuzzy.
+Verified the 2026-09-23. `SearchServer?searchText=Wengen&origins=gg25` replies
+**`Wengi (BE)`** with `"fuzzy":"true"`. Wengen is not a municipality: it is a locality of
+**Lauterbrunnen**. Fuzzy search silently returns a real and wrong municipality,
+and with `origins=zipcode` Wengen gives no results. Hence the decision (user,
+2026-09-23): **offline-only solver**, built in build-time by
+`scripts/build_places.py` to `data/places.json`, without fuzzy.
 
-Fonti, tutte senza credenziali:
-- **registro BFS** al 01.01.2026 (`agvchapp.bfs.admin.ch/api/communes/levels` e `/snapshot`):
-  2110 comuni, cantone, regione linguistica;
-- **mutazioni BFS** dal 2000 (`/mutations`): i nomi storici. Plagne → Sauge si ottiene
-  seguendo la catena dei codici storici, perché le mutazioni includono anche i semplici
-  cambi di distretto (stesso nome, codice storico nuovo);
-- **elenco ufficiale delle località** swisstopo (`ortschaftenverzeichnis_plz`, 5718
-  righe): località e NPA → comune, **con la quota di indirizzi**. Wengen → Lauterbrunnen
-  100 %; Engelberg → 93 % Engelberg, il resto NW e UR;
-- **SR 832.106 Anhang 1**: regione di premio per comune.
+Sources, all without credentials:
+- **BFS register** at 01.01.2026 (`agvchapp.bfs.admin.ch/api/communes/levels` and `/snapshot`):
+  2110 municipalities, canton, linguistic region;
+- **BFS mutations** from 2000 (`/mutations`): the historical names. Plagne → Sauge is obtained
+  following the chain of historical codes, because the mutations also include the simple ones
+  district changes (same name, new historical code);
+- **official location list** swisstopo (`ortschaftenverzeichnis_plz`, 5718
+  rows): locality and postcode → municipality, **with the share of addresses**. Wengen → Lauterbrunnen
+  100 %; Engelberg → 93 % Engelberg, the rest NW and UR;
+- **SR 832.106 Anhang 1**: premium region by municipality.
 
-Tre trappole trovate costruendolo:
-- **La tabella Fedlex va letta come tabella.** Un parser a righe di testo perdeva 43
-  comuni, i nomi lunghi con `<br>` ("Neuhausen am Rheinfall"). Il primo "Anhang 1" del
-  documento sta nel testo dell'art. 1, non nell'intestazione dell'allegato.
-- **Ordinanza e registro divergono dove l'art. 3 lo prevede.** Fétigny-Ménières (nata il
-  01.01.2026) non ha regione nell'Anhang; i suoi ex comuni sì, entrambi regione 2.
-  Gurmels ha assorbito il 2278, stessa regione. Il build applica l'art. 3 e lo annota;
-  se gli ex comuni avessero regioni diverse, la regione dipenderebbe dall'indirizzo.
-- **Il controllo di coerenza del build ha bloccato due volte la scrittura dei dati**, ed
-  entrambe le volte per un difetto reale (il parser, poi l'art. 3). Non va rimosso.
+Three traps found while building it:
+- **The Fedlex table should be read as a table.** A text line parser was missing 43
+  municipalities, long names with `<br>` ("Neuhausen am Rheinfall"). The first "Anhang 1" of
+  document is in the text of the art. 1, not in the attachment header.
+- **Ordinance and register diverge where the art. 3 predicts it.** Fétigny-Ménières (born on
+  01.01.2026) has no region in Anhang; its former municipalities yes, both 2 region.
+  Gurmels absorbed the 2278, same region. The build applies the art. 3 and notes it;
+  if the former municipalities had different regions, the region would depend on the address.
+- **Build consistency check blocked data writing twice**, ed
+  both times for a real defect (the parser, then the item 3). It should not be removed.
 
-Non si risolvono, e lo si dichiara: i quartieri che non sono località ufficiali
-(Oerlikon), i nomi di città in un'altra lingua (Genf come città; come cantone sì).
-Fuori Svizzera (Konstanz): `not_found`, che è ciò che serve per dire "non è in
-Svizzera". Self-check in `test/place-test.ts`.
+They are not resolved, and it is declared: the neighborhoods that are not official locations
+(Oerlikon), city names in another language (Genf as city; as canton yes).
+Outside Switzerland (Konstanz): `not_found`, which is what it takes to say "it is not in
+Switzerland". Self-check in `test/place-test.ts`.
 
-### 3.2 🟢 Premi cassa malati BAG — la vittoria facile
+### 3.2 🟢 BAG health insurance premiums — the easy victory
 
-La domanda campione #3 (Lugano, 30 anni, franchigia 2500) è **completamente risolvibile da
-un CSV ufficiale**.
+The sample question #3 (Lugano, 30 years, deductible 2500) is **completely resolvable by
+an official CSV**.
 
-Dataset: `health-insurance-premiums` su opendata.swiss, publisher **Bundesamt für
-Gesundheit BAG**, base legale citata (`fedlex.admin.ch/eli/cc/2015/840 art. 71`).
-**Modificato 2026-09-11** — freschissimo.
+Dataset: `health-insurance-premiums` on opendata.swiss, publisher **Bundesamt für
+Gesundheit BAG**, legal basis cited (`fedlex.admin.ch/eli/cc/2015/840 art. 71`).
+**Edited 2026-09-11** — very fresh.
 
-File verificati dietro `opendata.bagnet.ch`:
+Verified files behind `opendata.bagnet.ch`:
 ```
-/Praemien/Prämien_CH.csv          ← i premi
-/Praemien/Einzugsgebiete.csv      ← aree operative assicuratori (NON le regioni di premio)
-/Praemien/Tarife.csv              ← catalogo modelli assicurativi
+/Praemien/Prämien_CH.csv          ← premiums
+/Praemien/Einzugsgebiete.csv      ← insurer operating areas (NOT premium regions)
+/Praemien/Tarife.csv              ← insurance model catalogue
 /Praemien/Archiv_Praemien_2026.zip
 /Praemien/Erläuterungen zu den Prämiendaten.xlsx
 ```
 
-Header reale di `Prämien_CH.csv` (verificato):
+Real header of `Prämien_CH.csv` (verified):
 ```
 Versicherer, Kanton, Hoheitsgebiet, Geschäftsjahr, Erhebungsjahr, Region,
 Altersklasse, Unfalleinschluss, Tarif, Tariftyp, Altersuntergruppe,
 Franchisestufe, Franchise, Prämie, isBaseP, isBaseF, Tarifbezeichnung
 ```
 
-Tutte le dimensioni della domanda sono colonne: cantone, regione, classe d'età, franchigia,
-premio.
+All question dimensions are columns: canton, region, age class, deductible,
+premium.
 
-> ⚠️ `Tarife.csv` **non** contiene i premi: è il catalogo dei prodotti. Il file giusto è
+> ⚠️ `Tarife.csv` **does not** contain the premiums: it is the product catalogue. The right file is
 > `Prämien_CH.csv`.
 
-#### 🔴 Correzione: quelli sopra sono path logici, non URL
+#### 🔴 Correction: the above are logical paths, not URLs
 
-Verificato il 2026-09-22 costruendo il manifest di copertura.
-`https://opendata.bagnet.ch/Praemien/Archiv_Praemien_2026.zip` restituisce **404**, e così
-ogni altra variante di caso. I file non sono serviti per path: stanno dietro un endpoint
-di download che prende il path **in base64**.
+Verified the 2026-09-22 by building the coverage manifest.
+`https://opendata.bagnet.ch/Praemien/Archiv_Praemien_2026.zip` returns **404**, and so
+any other case variant. The files are not used for path: they are behind an endpoint
+of download which takes the path **in base64**.
 
 ```
-https://opendata.bagnet.ch/?r=/download&path=<base64 del path>
+https://opendata.bagnet.ch/?r=/download&path=<base64 of the path>
 L1ByYWVtaWVuL0FyY2hpdl9QcmFlbWllbl8yMDI2LnppcA%3D%3D  =  /Praemien/Archiv_Praemien_2026.zip
 L1ByYWVtaWVuL1Byw6RtaWVuX0NILmNzdg%3D%3D              =  /Praemien/Prämien_CH.csv
 ```
 
-Gli URL veri si ricavano dal CKAN di opendata.swiss, che li elenca tutti:
+The real URLs are obtained from the CKAN of opendata.swiss, which lists them all:
 
 ```sh
 curl -sH 'User-Agent: <UA descrittivo>' \
@@ -173,186 +178,186 @@ curl -sH 'User-Agent: <UA descrittivo>' \
   | grep -o 'https[^"]*bagnet[^"]*'
 ```
 
-Verificato sull'archivio 2026: **31'923'906 byte**, `Content-Type: application/zip`,
+Verified on archive 2026: **31'923'906 byte**, `Content-Type: application/zip`,
 magic `PK\x03\x04`.
 
-> **Il path che un dataset documenta non è l'indirizzo da cui si scarica.** Un elenco di
-> file in una scheda dataset descrive la struttura interna del deposito, non l'API di
-> accesso. Vale come regola generale per i cataloghi open data svizzeri.
+> **The path that a dataset documents is not the address from which it is downloaded.** A list of
+> file in a dataset tab describes the internal structure of the repository, not the API of
+> access. This applies as a general rule for Swiss open data catalogues.
 
-### 3.2b ⚠️ I file "live" sono stub vuoti — i dati stanno nello ZIP
+### 3.2b ⚠️ "live" files are empty stubs — the data is in the ZIP
 
-**Correzione a quanto sopra.** Scaricando integralmente i file pubblicati:
+**Correction to the above.** By downloading the published files in full:
 
-| File pubblicato | Dimensione reale |
+| Published file | Actual size |
 |---|---|
-| `Prämien_CH.csv` | **201 byte — solo intestazione** |
-| `Einzugsgebiete.csv` | **116 byte — solo intestazione** |
+| `Prämien_CH.csv` | **201 byte — header only** |
+| `Einzugsgebiete.csv` | **116 byte — header only** |
 | `Prämien_CH.xlsx` | 9'426 byte — stub |
-| **`Archiv_Praemien_2026.zip`** | **31'923'906 byte ← i dati veri** |
+| **`Archiv_Praemien_2026.zip`** | **31'923'906 bytes ← the real data** |
 
-Contenuto dello ZIP (15 file, 58 MB non compressi):
+Contents of the ZIP (15 file, 58 uncompressed MB):
 
 ```
-Prämien_CH.csv                     22'545'492   ← 217'473 righe di premi
+Prämien_CH.csv                     22'545'492   ← 217'473 premium rows
 Einzugsgebiete.csv                    209'347
 Tarife.csv                             20'552
-Erläuterungen zu den Prämiendaten.xlsx 21'629   ← documentazione dei campi
+Erläuterungen zu den Prämiendaten.xlsx 21'629   ← field documentation
 ```
 
-**Chi si limita agli URL pubblicati su opendata.swiss ottiene intestazioni senza dati.**
-Il metadato CKAN dice "modificato 2026-09-11" ed è vero, ma si riferisce al record, non al
-contenuto dei file.
+**Those who limit themselves to the URLs published on opendata.swiss get headers without data.**
+The CKAN metadata says "modificato 2026-09-11" and that's true, but it refers to the record, not the
+contents of the files.
 
-> ⚠️ **Separatori incoerenti dentro lo stesso archivio**: `Prämien_CH.csv` usa la virgola,
-> `Einzugsgebiete.csv` usa il punto e virgola. Entrambi hanno un BOM UTF-8.
+> ⚠️ **Inconsistent separators within the same archive**: `Prämien_CH.csv` uses comma,
+> `Einzugsgebiete.csv` uses semicolons. Both have a BOM UTF-8.
 
-### 3.2c `Einzugsgebiete.csv` non è ciò che sembra
+### 3.2c `Einzugsgebiete.csv` is not what it seems
 
-Header reale: `Versicherer;Kanton;Hoheitsgebiet;Geschäftsjahr;Erhebungsjahr;Region;Tarif;
+Real header: `Versicherer;Kanton;Hoheitsgebiet;Geschäftsjahr;Erhebungsjahr;Region;Tarif;
 Tariftyp;HMO-ID;Eingeschränkt;Gemeinden-BFS`
 
-Non mappa comune → regione di premio. Registra **in quali regioni e con quali tariffe
-ciascun assicuratore opera**, e se l'offerta è ristretta a comuni specifici.
+This is not a municipality → premium region map. Register **in which regions and with which rates
+each insurer operates**, and if the offer is restricted to specific municipalities.
 
-Nell'anno 2026: **0 righe con `Eingeschränkt=J`**, quindi la colonna `Gemeinden-BFS` è
-vuota ovunque. Il meccanismo esiste ma non è usato quest'anno. Serve comunque per
-verificare che l'assicuratore più economico operi davvero nella regione richiesta.
+In the year 2026: **0 rows with `Eingeschränkt=J`**, so the column `Gemeinden-BFS` is
+empty everywhere. The mechanism exists but is not used this year. However, it is useful for
+check that the cheapest insurer actually operates in the requested region.
 
-### 3.2d La mappatura comune → regione di premio è un'ordinanza
+### 3.2d The municipality mapping → premium region is an ordinance
 
-Sta nel **Verordnung des EDI über die Prämienregionen, SR 832.106**, allegato 1.
-Non è nell'archivio BAG.
+It lies in the **Verordnung des EDI über die Prämienregionen, SR 832.106**, attachment 1.
+It is not in the BAG archive.
 
-Copia servita da BAG (26 pagine, 1.6 MB, PDF):
+Copy served by BAG (26 pages, 1.6 MB, PDF):
 `bag.admin.ch/dam/en/sd-web/x8IbM-bv0Ptd/Verordnung des EDI über die Prämienregionen DE_mit Kopfzeile.pdf`
 
-Formato: `<BFS> <Nome comune> <regione>`. Riga verificata: **`5192 Lugano 1`**.
+Format: `<BFS> <Municipality name> <region>`. Verified row: **`5192 Lugano 1`**.
 
-> 🔴 **Trappola di versione, verificata.** Il PDF servito da BAG dichiara in testa:
+> 🔴 **Version trap, verified.** The PDF served by BAG states at the top:
 > *"Dieser Text ist eine provisorische Fassung. Massgebend ist die definitive Fassung,
 > welche unter www.fedlex.admin.ch veröffentlicht werden wird."*
-> È l'**Änderung vom 28. August 2026**, che *"tritt am 1. Januar 2027 in Kraft"*.
+> This is the **Änderung vom 28. August 2026**, which *"tritt am 1. Januar 2027 in Kraft"*.
 >
-> Quindi: documento giusto, autorità giusta, **anno di riferimento sbagliato** se lo si
-> usa con i premi 2026. E il documento stesso dichiara che l'autorevole è Fedlex, non
-> questa copia. Le regioni di premio **cambiano**: esiste un'ordinanza di modifica.
+> So: right document, right authority, **wrong reference year** if so
+> use with 2026 premiums. And the document itself states that the authoritative one is Fedlex, not
+> this copy. The premium regions **change**: there is a modification ordinance.
 
-### 3.2d-bis 🟢 Fedlex è indirizzabile per data — risolve il problema delle versioni
+### 3.2d-bis 🟢 Fedlex is addressable by date — solves versioning problem
 
-SR 832.106 ha ELI `cc/2022/184`. Il **filestore** di Fedlex serve il testo consolidato
-**in vigore a una data qualsiasi**, come HTML statico, senza SPA e senza auth:
+SR 832.106 has ELI `cc/2022/184`. The Fedlex **filestore** serves the consolidated text
+**effective as of any date**, as static HTML, without SPA and without auth:
 
 ```
 https://www.fedlex.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/2022/184/<YYYYMMDD>/de/html/fedlex-data-admin-ch-eli-cc-2022-184-<YYYYMMDD>-de-html.html
 ```
 
-Verificato su tre date:
+Verified on three dates:
 
-| Versione in vigore il | Byte | Lugano |
+| Version in force on | Bytes | Lugano |
 |---|---|---|
-| 01.01.2023 | 123'898 | **regione 1** |
-| 01.01.2025 | 268'353 | **regione 1** |
-| 01.01.2026 | 480'590 | **regione 1** |
+| 01.01.2023 | 123'898 | **region 1** |
+| 01.01.2025 | 268'353 | **region 1** |
+| 01.01.2026 | 480'590 | **region 1** |
 
-**Questo è il pezzo più importante trovato finora sul piano operativo.** Vale per
-qualsiasi atto del diritto federale, non solo per questa ordinanza: trasforma "quale
-versione era in vigore nell'anno di riferimento" da problema difficile a **parametro
-nell'URL**. È la risposta strutturale al criterio freschezza per tutto il livello
-federale, e rende superflua la copia provvisoria servita da BAG.
+**This is the most important piece operationally found so far.** Applies to
+any act of federal law, not only for this ordinance: transform "which
+version was in effect in the reporting year" from hard problem to **parameter
+in the URL**. It is the structural response to the freshness criterion for the entire level
+federal, and makes the provisional copy served by BAG superfluous.
 
-> ⚠️ La pagina `fedlex.admin.ch/eli/...` normale è una SPA: il `<title>` è sempre
-> "Fedlex" e il contenuto non si estrae con una GET. **Usare il filestore, non la SPA.**
+> ⚠️ The normal `fedlex.admin.ch/eli/...` page is a SPA: the `<title>` is always
+> "Fedlex" and the content is not extracted with a GET. **Use the filestore, not the SPA.**
 
-Conferma sostanziale: Lugano è in regione di premio 1 in tutte le versioni verificate,
-quindi la risposta di §3.2e non cambia. Ma la verifica va fatta, non assunta.
+Substantial confirmation: Lugano is in the 1 premium region in all verified versions,
+so the response of §3.2e does not change. But the verification must be done, not assumed.
 
-#### 🔴 Correzione: la data deve essere una data di consolidamento reale
+#### 🔴 Fix: The date must be a real consolidation date
 
-Verificato su un secondo atto, **VMWG SR 221.213.11**, ELI `cc/1990/835_835_835`:
+Verified on a second act, **VMWG SR 221.213.11**, ELI `cc/1990/835_835_835`:
 
-| Data richiesta | Risposta | Contenuto |
+| Requested date | Answer | Contents |
 |---|---|---|
-| `20251001` | HTTP 200, **45'554 byte** | testo consolidato reale, art. 12a leggibile |
-| `20260101` | HTTP 200, **77'151 byte** | **shell della SPA**, con `no-script-warning` |
+| `20251001` | HTTP 200, **45'554 byte** | real consolidated text, art. 12a readable |
+| `20260101` | HTTP 200, **77'151 byte** | **SPA shell**, with `no-script-warning` |
 
-**Una data che non corrisponde a un consolidamento effettivo restituisce HTTP 200 con lo
-scheletro JavaScript, non un errore.** Fallimento silenzioso: lo status dice OK, la
-pipeline estrae zero e riporta "dato non trovato" invece di "versione inesistente".
+**A date that does not correspond to an actual consolidation returns HTTP 200 with the
+JavaScript skeleton, not an error.** Silent failure: status says OK, the
+pipeline extracts no rows and reports "data not found" instead of "version does not exist".
 
-Due difese:
-1. **77'151 byte è la firma dello shell** (identica su VZV 741.51 e su questo tentativo).
-   Rilevare il marcatore `no-script-warning` prima di fidarsi della risposta.
-   Riconfermata il 2026-09-22 su un terzo atto, **VZV SR 741.51** (`cc/1976/2423_2423_2423`):
-   `20260101` restituisce il consolidato reale, `20250101` e `20240101` restituiscono
-   **77'151 byte esatti**. Anche `SR 832.106` a `20260101` è reale. Le date valide
-   **differiscono da atto ad atto**: non esiste una data che funzioni per tutti.
-2. Le date di consolidamento valide si ottengono dall'endpoint **SPARQL** di Fedlex; il
-   filestore non le elenca.
+Two defenses:
+1. **77'151 byte is the shell signature** (identical on VZV 741.51 and on this attempt).
+   Detect the `no-script-warning` marker before trusting the response.
+   2026-09-22 reconfirmed on a third act, **VZV SR 741.51** (`cc/1976/2423_2423_2423`):
+   `20260101` returns the real consolidated, `20250101` and `20240101` return
+   **77'151 exact bytes**. `SR 832.106` to `20260101` is also real. Valid dates
+   **differ from act to act**: there is no one date that works for everyone.
+2. Valid consolidation dates are obtained from the Fedlex **SPARQL** endpoint; the
+   filestore doesn't list them.
 
-Il filestore resta lo strumento giusto, ma **non è interrogabile con una data
-arbitraria**: va prima risolta la versione, poi scaricata.
+The filestore remains the right tool, but **it cannot be queried with a date
+arbitrary**: the version must be resolved first, then downloaded.
 
-### 3.2e Domanda campione #3, risolta end-to-end
+### 3.2e Sample question #3, resolved end-to-end
 
-*"Qual è il premio mensile più basso dell'assicurazione di base per un adulto di 30 anni
-domiciliato a Lugano con franchigia di 2500 franchi?"*
+*"What is the lowest monthly basic insurance premium for an adult aged 30
+domiciled in Lugano with an excess of 2500 francs?"*
 
-Catena: Lugano → BFS 5192 → regione di premio TI 1 → filtro su `Prämien_CH.csv`
+Chain: Lugano → BFS 5192 → TI premium region 1 → filter on `Prämien_CH.csv`
 (`Kanton=TI`, `Region=PR-REG CH1`, `Altersklasse=AKL-ERW`, `Franchise=FRA-2500`).
 
-Risultato per l'anno **2026**:
+Result for the year **2026**:
 
-| Interpretazione | Senza infortuni | Con infortuni |
+| Interpretation | Injury-free | With injuries |
 |---|---|---|
-| Qualsiasi modello (il più economico è `TAR-DIV`, AGRIsmart, assicuratore 1560) | **CHF 449.90** | CHF 473.60 |
-| Solo modello standard (`TAR-BASE`, "Grundversicherung") | CHF 523.20 | CHF 550.70 |
+| Any model (the cheapest is `TAR-DIV`, AGRIsmart, insurer 1560) | **CHF 449.90** | CHF 473.60 |
+| Standard model only (`TAR-BASE`, "Grundversicherung") | CHF 523.20 | CHF 550.70 |
 
-Verificato che l'assicuratore 1560 opera in TI regione 1 con `Eingeschränkt=N`, quindi
-l'offerta è disponibile a Lugano.
+Verified that the insurer 1560 operates in TI region 1 with `Eingeschränkt=N`, therefore
+the offer is available in Lugano.
 
-**Tre ambiguità che la domanda non risolve** e che cambiano la risposta:
+**Three ambiguities that the question does not resolve** and which change the answer:
 
-1. **Copertura infortuni**: differenza di CHF 23.70/mese. Chi è dipendente è già coperto
-   dal datore di lavoro e sceglie `OHN-UNF`.
-2. **"Assicurazione di base"**: se significa l'obbligatoria (che include i modelli
-   alternativi) → 449.90; se significa il modello standard → 523.20. **CHF 73/mese di
-   differenza.** In italiano la prima lettura è quella corrente.
-3. **Anno**: i dati disponibili al 2026-09-21 arrivano al 2026. L'archivio 2027 **non
-   esiste ancora**. Il BAG pubblica i premi dell'anno successivo verso fine settembre —
-   cioè **potenzialmente durante l'hackathon del 24–25 settembre 2026**.
+1. **Accident cover**: difference of CHF 23.70/month. Anyone who is dependent is already covered
+   by the employer and chooses `OHN-UNF`.
+2. **"Assicurazione di base"**: if it means compulsory (which includes models
+   alternatives) → 449.90; if it means the standard model → 523.20. **CHF 73/month of
+   difference.** In Italian the first reading is the current one.
+3. **Year**: Data available at 2026-09-21 arrives at 2026. The archive 2027 **not
+   still exists**. The BAG publishes the following year's premiums towards the end of September —
+   i.e. **potentially during the 24–25 September 2026 hackathon**.
 
-La risposta corretta esplicita l'anno di riferimento e almeno l'assunzione sugli
-infortuni. È il caso `rate_freshness` applicato a un altro tema.
+The correct answer specifies the reference year and at least the assumption on
+injuries. This is the case `rate_freshness` applied to another theme.
 
-### 3.2f 🟢 Tasso di riferimento ipotecario — verificato end-to-end
+### 3.2f 🟢 Mortgage Reference Rate — verified end-to-end
 
-Secondo tema federale del nostro scope. Verificato il 2026-09-21.
+Second federal theme of our scope. Verified the 2026-09-21.
 
-**Fonte**: `referenzzinssatz.admin.ch` → redirect a `bwo.admin.ch/de/referenzzinssatz`.
-Versioni DE/FR/IT. Nessun open data: `referenzzinssatz` su CKAN = **0 risultati**.
+**Source**: `referenzzinssatz.admin.ch` → redirect to `bwo.admin.ch/de/referenzzinssatz`.
+DE/FR/IT versions. No open data: `referenzzinssatz` on CKAN = **0 results**.
 
-**Valore corrente**: **1,25 %**
+**Current value**: **1,25 %**
 
-**Base legale**, recuperata da Fedlex: **VMWG art. 12a**, *Verordnung vom 9. Mai 1990
+**Legal basis**, retrieved from Fedlex: **VMWG art. 12a**, *Verordnung vom 9. Never 1990
 über die Miete und Pacht von Wohn- und Geschäftsräumen*, **SR 221.213.11**,
-ELI `cc/1990/835_835_835`. Testo:
+ELI `cc/1990/835_835_835`. Text:
 
 > *"Für Mietzinsanpassungen aufgrund von Änderungen des Hypothekarzinssatzes gilt ein
 > Referenzzinssatz. Dieser stützt sich auf den vierteljährlich erhobenen,
 > volumengewichteten Durchschnittszinssatz für inländische Hypothekarforderungen und wird
 > durch kaufmännische Rundung ermittelt."*
 
-Norma complementare: *Verordnung des WBF vom 22. Januar 2008 über die Erhebung des für
-die Mietzinse massgebenden hypothekarischen Durchschnittszinssatzes*. Per l'adeguamento
-del canone: VMWG art. 13 cpv. 1 lett. c; CO art. 269d, 266c, 270b.
+Complementary standard: *Verordnung des WBF vom 22. Januar 2008 beyond the Erhebung des für
+die Mietzinse massgebenden hypothekarischen Durchschnittszinssatzes*. For adaptation
+of the fee: VMWG art. 13 para. 1 read. c; CO art. 269d, 266c, 270b.
 
-#### 🔴 Il tranello: quattro date per un numero
+#### 🔴 The catch: four dates for one number
 
-La tabella storica ha quattro colonne — tasso, *gültig ab*, tasso medio sottostante,
-*Stichtag der Erhebung*. Le ultime righe:
+The historical table has four columns — rate, *gültig ab*, average underlying rate,
+*Stichtag der Erhebung*. The last lines:
 
-| Tasso | Gültig ab | Durchschnittszinssatz | Stichtag |
+| Rate | Gültig ab | Durchschnittszinssatz | Stichtag |
 |---|---|---|---|
 | 1,25 % | **02.09.2026** | 1,31 % | 30.06.2026 |
 | 1,25 % | 02.06.2026 | 1,31 % | 31.03.2026 |
@@ -361,233 +366,233 @@ La tabella storica ha quattro colonne — tasso, *gültig ab*, tasso medio sotto
 | 1,25 % | **02.09.2025** | 1,37 % | 30.06.2025 |
 | 1,5 % | 03.06.2025 | 1,44 % | 31.03.2025 |
 
-L'ultima riga dice *"gültig ab 02.09.2026"*. Copiarla e rispondere **"1,25 % valido dal
-2 settembre 2026"** è **sostanzialmente sbagliato**: quella è la data dell'ultima
-pubblicazione trimestrale, che ha *confermato* il tasso. Il tasso è passato da 1,5 % a
-1,25 % il **02.09.2025** ed è invariato da allora. È la data rilevante per un adeguamento
-del canone.
+The last line says *"gültig ab 02.09.2026"*. Copy it and reply **"1,25 % valid from
+2 September 2026"** is **substantially wrong**: that is the date of the last
+quarterly publication, which *confirmed* the rate. The rate went from 1,5 % to
+1,25 % on **02.09.2025** and has been unchanged since then. This is the relevant date for an adjustment
+of the fee.
 
-La pagina lo dice correttamente: *"gültig seit 02.09.2025, unverändert ab 02.09.2026"*.
-**Chi legge la tabella invece della frase sbaglia, pur citando la fonte giusta.**
+The page says it correctly: *"gültig seit 02.09.2025, unverändert ab 02.09.2026"*.
+**Whoever reads the table instead of the sentence is wrong, even though he cites the right source.**
 
-Terza data: *"Veröffentlicht am 1. September 2026"*, la pubblicazione. Quarta: lo
-*Stichtag* del rilevamento, 30.06.2026.
+Third date: *"Veröffentlicht am 1. September 2026"*, the publication date. Fourth: the
+Detection *Stichtag*, 30.06.2026.
 
-Nota metodologica da conservare per domande storiche: *"ab Dezember 2011 gemäss
-kaufmännischer Rundung des Durchschnittszinssatzes"* — il metodo di arrotondamento è
-cambiato nel dicembre 2011.
+Methodological note to keep for historical questions: *"ab Dezember 2011 gemäss
+kaufmännischer Rundung des Durchschnittszinssatzes"* — the rounding method is
+changed in December 2011.
 
-#### Freschezza
+#### Freshness
 
-Serie completa dal 10.09.2008 (3,5 %) a oggi. Prossime pubblicazioni: **01.12.2026**,
-poi 01.03/01.06/01.09/01.12.2027.
+Complete series from 10.09.2008 (3,5 %) to today. Upcoming publications: **01.12.2026**,
+then 01.03/01.06/01.09/01.12.2027.
 
-**Nessun rischio di freschezza durante l'hackathon**: la prossima variazione possibile è
-a dicembre. Al contrario dei premi cassa malati, che potrebbero uscire durante l'evento.
+**No risk of freshness during the hackathon**: The next possible variation is
+in December. Unlike health insurance premiums, which could be released during the event.
 
-#### ⚠️ La pagina è una SPA Nuxt
+#### ⚠️ The page is a Nuxt SPA
 
-`curl` restituisce il payload JavaScript, non la tabella. Serve rendering.
+`curl` returns the JavaScript payload, not the table. Rendering needed.
 
-Ma è **un solo numero che cambia al massimo 4 volte l'anno**: curarlo al build con URL,
-valore, data di entrata in vigore e data di pubblicazione è del tutto adeguato e non
-richiede un browser nel server.
+But it is **only one number that changes at most 4 times a year**: take care of it at the build with URL,
+value, effective date and publication date is entirely appropriate and not
+requires a browser on the server.
 
-### 3.3 🟢 opendata.swiss CKAN — il catalogo, non i dati
+### 3.3 🟢 opendata.swiss CKAN — the catalog, not the data
 
 ```sh
 curl -A "<nostro-user-agent>" "https://ckan.opendata.swiss/api/3/action/package_search?q=<query>&rows=0"
 ```
 
-16'040 dataset. Utile come **indice di discovery**, non come fonte di risposte:
-la maggior parte dei record punta a file da scaricare, non a endpoint interrogabili.
+16'040 dataset. Useful as a **discovery index**, not as a source of answers:
+most records point to files to download, not queryable endpoints.
 
-🔴 **Trappola verificata**: senza `User-Agent` esplicito restituisce **HTTP 403** (nginx).
-Con uno User-Agent descrittivo funziona. Vale come requisito di *source etiquette*:
-identificarsi sempre.
+🔴 **Checked Trap**: Without explicit `User-Agent` returns **HTTP 403** (nginx).
+With a descriptive User-Agent it works. Valid as a *source etiquette* requirement:
+always identify yourself.
 
-### 3.4 🔴 Zefix — richiede credenziale
+### 3.4 🔴 Zefix — requires credential
 
 ```sh
 curl -X POST "https://www.zefix.admin.ch/ZefixPublicREST/api/v1/company/search" ...
 → HTTP 401
 ```
 
-API REST pubblica ma con Basic auth su account gratuito. Swagger:
+Public REST API but with Basic auth on free account. Swagger:
 `https://www.zefix.admin.ch/ZefixPublicREST/swagger-ui/index.html`
 
-**Trade-off**: copre il topic 14 con poco codice, ma introduce una credenziale da consegnare
-a Swisscom via canale sicuro e penalizza l'operability (§10 CHALLENGE.md: *"a server that
+**Trade-off**: covers the 14 topic with little code, but introduces a credential to deliver
+to Swisscom via secure channel and penalizes operability (§10 CHALLENGE.md: *"a server that
 runs without any external keys... shows in the operability assessment"*).
 
-### 3.5 🟡 Fedlex — SPARQL, nessuna auth
+### 3.5 🟡 Fedlex — SPARQL, no auth
 
-- Endpoint: `https://fedlex.data.admin.ch/sparqlendpoint` (GET e POST)
-- Modello dati JOLux, documentazione: `https://swiss.github.io/fedlex-jolux/`
-- Riuso libero, anche commerciale
+- Endpoint: `https://fedlex.data.admin.ch/sparqlendpoint` (GET and POST)
+- JOLux data model, documentation: `https://swiss.github.io/fedlex-jolux/`
+- Free reuse, including commercial
 
-Copre il topic 3 con **citazioni ELI stabili** — esattamente il tipo di riferimento che il
-practice case `citation_support` richiede. Costo: curva di apprendimento SPARQL/JOLux.
+Covers topic 3 with **stable ELI citations** — exactly the kind of reference that the
+practice case `citation_support` requires. Cost: SPARQL/JOLux learning curve.
 
-### 3.6 🟡 Altre confermate per documentazione
+### 3.6 🟡 More confirmed for documentation
 
-| Fonte | Endpoint | Note |
+| Source | Endpoints | Notes |
 |---|---|---|
-| BFS PxWeb | `https://www.pxweb.bfs.admin.ch/` | ~682 dataset, 21 temi, no auth, multilingue DE/FR/IT/EN |
-| VoteInfo | via CKAN `echtzeitdaten-am-abstimmungstag-...` | JSON, storico su bfs.admin.ch, imminenti su S3 |
-| OJP 2.0 / GTFS-RT | `api-manager.opentransportdata.swiss` | **richiede API key**, orario 2026 disponibile |
-| Tasso riferimento | `referenzzinssatz.admin.ch` → `bwo.admin.ch/de/referenzzinssatz` | 🟢 redirect verificato. Solo HTML, nessuna API. Un singolo valore trimestrale |
+| BFS PxWeb | `https://www.pxweb.bfs.admin.ch/` | ~682 dataset, 21 themes, no auth, multilingual DE/FR/IT/EN |
+| VoteInfo | via CKAN `echtzeitdaten-am-abstimmungstag-...` | JSON, historical on bfs.admin.ch, upcoming on S3 |
+| OJP 2.0 / GTFS-RT | `api-manager.opentransportdata.swiss` | **requires API key**, time 2026 available |
+| Reference rate | `referenzzinssatz.admin.ch` → `bwo.admin.ch/de/referenzzinssatz` | 🟢 redirect verified. HTML only, no API. A single quarterly value |
 
 ---
 
-## 4. Trappole verificate sul campo
+## 4. Traps verified in the field
 
-### 4.1 🔴 Il dominio ovvio è quello sbagliato
+### 4.1 🔴 The obvious domain is the wrong one
 
 ```
-scuol.ch   → HTTP 200 → redirect a engadin.com  (sito turistico)
-scuol.net  → HTTP 200 → sito ufficiale del comune
+scuol.ch   → HTTP 200 → redirect to engadin.com (tourism site)
+scuol.net  → HTTP 200 → official municipal site
 ```
 
-Un'euristica "nome comune + .ch" porta a un sito turistico commerciale presentato come
-autorevole. È letteralmente il fallimento descritto nel briefing. **Serve un registry
-comune → dominio ufficiale verificato**, non una regola di costruzione URL.
+A "municipality name + .ch" heuristic leads to a commercial tourism site presented as
+authoritative. It is literally the failure described in the briefing. **A registry is required
+municipality → verified official domain**, not a URL construction rule.
 
-### 4.2 🔴 La fonte autorevole è un PDF
+### 4.2 🔴 The authoritative source is a PDF
 
-Vacanze scolastiche di Scuol 2026, fonte ufficiale verificata:
+Scuol school holidays 2026, verified official source:
 ```
 https://www.gr.ch/DE/institutionen/verwaltung/ekud/avs/Volksschule/SB_Ferienplaene_2026_2027_de.pdf
 → HTTP 200, application/pdf, 77'418 byte
 ```
 
-Il cantone GR pubblica il piano ferie come PDF per comune. Nessuna API, nessun ICS
-cantonale. **Chi non sa leggere PDF non risponde a questa domanda campione.**
+The canton GR publishes the holiday plan as a PDF per municipality. No API, no ICS
+cantonal. **Anyone who can't read PDFs won't answer this sample question.**
 
-Nota: siti aggregatori come `schulferien.org`, `feiertagskalender.ch`, `localcities.ch`
-hanno il dato ma **non sono autorevoli** — sono esattamente ciò che la checklist punto 3
-esclude (*"not merely an official Swiss domain"* — questi non sono nemmeno quello).
+Note: aggregator sites such as `schulferien.org`, `feiertagskalender.ch`, `localcities.ch`
+they have the data but **are not authoritative** — they are exactly what the checklist points out 3
+excludes (*"not merely an official Swiss domain"* — these aren't even that).
 
-### 4.3 🟡 ch.ch non serve un robots.txt reale
+### 4.3 🟡 ch.ch doesn't need a real robots.txt
 
 ```
 GET https://www.ch.ch/robots.txt → HTTP 200, content-type: text/html
 ```
 
-Restituisce lo shell della SPA. Un parser robots.txt ingenuo lo interpreta come regole
-valide o va in errore. Dato che il rispetto di robots.txt è un **requisito configurabile
-obbligatorio** (§4 CHALLENGE.md), il parser deve gestire: assenza, HTML al posto di testo,
+Returns the SPA shell. A naive robots.txt parser interprets this as rules
+valid or it goes into error. Since compliance with robots.txt is a **configurable requirement
+mandatory** (§4 CHALLENGE.md), the parser must handle: absence, HTML instead of text,
 404, timeout.
 
-### 4.4 🔴 Nessun User-Agent = 403
+### 4.4 🔴 No User-Agent = 403
 
-Verificato su `ckan.opendata.swiss`. Vale come regola generale: ogni richiesta uscente
-deve avere uno UA identificabile con riferimento di contatto.
+Verified on `ckan.opendata.swiss`. As a general rule: every outgoing request
+must have an identifiable UA with contact reference.
 
 ---
 
-## 5. Panorama competitivo: MCP server svizzeri già esistenti
+## 5. Competitive landscape: Existing Swiss MCP servers
 
-Rilevante su due fronti: **originalità** (criterio 4 della giuria) e **riuso**.
+Relevant on two fronts: **originality** (jury criterion 4) and **reuse**.
 
-| Repo | Copertura |
+| Repo | Coverage |
 |---|---|
 | `malkreide/swiss-public-data-mcp` | portfolio, simap.ch procurement |
 | `malkreide/swiss-statistics-mcp` | BFS STAT-TAB PxWeb, 682 dataset, no auth |
-| `malkreide/amtsblatt-mcp` | SHAB + fogli ufficiali cantonali |
-| `malkreide/zurich-opendata-mcp` | Open Data Zurigo, 20 tool |
-| `JayTheSkier/fedlex-connector` | legislazione federale Fedlex |
-| `vikramgorla/mcp-swiss` | trasporti, meteo, geodati, imprese, zero API key |
-| `pipeworx-io/mcp-opendata-swiss` | catalogo CKAN opendata.swiss |
+| `malkreide/amtsblatt-mcp` | SHAB + cantonal official sheets |
+| `malkreide/zurich-opendata-mcp` | Open Data Zurich, 20 tool |
+| `JayTheSkier/fedlex-connector` | federal legislation Fedlex |
+| `vikramgorla/mcp-swiss` | transport, weather, geodata, businesses, zero API key |
+| `pipeworx-io/mcp-opendata-swiss` | CKAN catalog opendata.swiss |
 
-**Lettura**: sono in prevalenza **wrapper sottili su API già strutturate**. Nessuno, in base
-alle descrizioni pubbliche, affronta il problema che Swisscom valuta davvero — risoluzione di
-giurisdizione, estrazione del passaggio probante, data di efficacia, ask-back disciplinato,
-onestà fuori scope. Le API facili sono già coperte da altri; il valore differenziante sta nel
-livello di grounding, non nel numero di fonti.
+**Reading**: They are mostly **thin wrappers on already structured APIs**. None, basically
+to public descriptions, addresses the problem that Swisscom really values — resolution of
+jurisdiction, extraction of the evidentiary passage, effective date, regulated ask-back,
+honesty out of scope. Easy APIs are already covered by others; the differentiating value lies in
+level of grounding, not in the number of sources.
 
-Da verificare prima dell'evento: se le licenze permettono il riuso, prendere il layer di
-trasporto da uno di questi invece di riscriverlo è coerente con il tempo disponibile.
+To check before the event: if the licenses allow reuse, take the layer of
+transport from one of these instead of rewriting it is consistent with the available time.
 
 ---
 
-## 6. Opzioni di scope — trade-off espliciti
+## 6. Scope options — explicit trade-offs
 
-Nessuna raccomandazione: la scelta di scope è una decisione di prodotto.
-Riferimento: *"high quality with narrow coverage is preferred over a broad solution with
+No recommendation: Scope choice is a product decision.
+Reference: *"high quality with narrow coverage is preferred over a broad solution with
 low quality"*.
 
-### Opzione A — Verticale profondo su un cantone/città
-*Es.: "tutti i temi comunali per la Città di Zurigo/Losanna"*
-- **Pro**: open data municipale ricco (Zurigo ha Open ERZ API per i rifiuti, dataset
-  vacanze scolastiche fino al 2029/30); qualità dimostrabile; freschezza controllabile
-- **Contro**: breadth minima; molte domande del set nascosto cadranno fuori scope, quindi
-  il punteggio dipende quasi interamente dalla qualità dell'onestà fuori scope
-- **Rischio**: se il set nascosto è distribuito su tutta la CH, si risponde a pochissimo
+### Option A — Deep vertical on a canton/city
+*E.g.: "all municipal topics for the City of Zurich/Lausanne"*
+- **Pro**: rich municipal open data (Zurich has Open ERZ API for waste, dataset
+  school holidays until 2029/30); demonstrable quality; controllable freshness
+- **Cons**: minimum breadth; many questions from the hidden set will fall out of scope, therefore
+  the score depends almost entirely on the quality of the off-scope honesty
+- **Risk**: if the hidden set is distributed throughout the CH, very little is responded to
 
-### Opzione B — Orizzontale su temi federali strutturati
-*Es.: "premi cassa malati, diritto federale, statistica, votazioni, per tutta la CH"*
-- **Pro**: tutto il paese coperto; dati strutturati e freschi; effort basso per tema;
-  citazioni forti (ELI Fedlex, CSV BAG con base legale)
-- **Contro**: **manca tutto il livello comunale**, che è dove Swisscom ha messo 2 domande
-  campione su 5; rischia di sembrare il wrapper che altri hanno già fatto
-- **Rischio**: originalità bassa, e il caso `missing_location` non si esercita mai
+### Option B — Horizontal on structured federal issues
+*E.g.: "health insurance premiums, federal law, statistics, voting, across Switzerland"*
+- **Pro**: the whole country covered; structured and fresh data; low effort per theme;
+  strong quotes (ELI Fedlex, CSV BAG with legal basis)
+- **Cons**: **all municipal level is missing**, which is where Swisscom put 2 questions
+  sample on 5; it risks looking like the wrapper that others have already done
+- **Risk**: Low originality, and the `missing_location` case never gets exercised
 
-### Opzione C — Ibrido: spina dorsale federale + profondità municipale selettiva
-*Es.: "temi federali per tutta la CH + rifiuti/scuola/domicilio per N comuni dichiarati"*
-- **Pro**: copre entrambe le famiglie di domande campione; esercita ask-back, risoluzione
-  di giurisdizione e lettura PDF; breadth reale e qualità dimostrabile
-- **Contro**: il più costoso; richiede sia pipeline strutturata sia estrazione da HTML/PDF
-- **Rischio**: in 28h si rischia di fare male due cose invece che bene una
+### Option C — Hybrid: federal backbone + selective municipal depth
+*E.g.: "federal topics across Switzerland + waste/schools/residence for N declared municipalities"*
+- **Pro**: covers both families of sample questions; exercises ask-back,resolution
+  of jurisdiction and PDF reading; real breadth and demonstrable quality
+- **Cons**: the most expensive; requires both structured pipeline and HTML/PDF extraction
+- **Risk**: in 28h you risk doing two things badly instead of doing one well
 
-### Opzione D — Meta-layer di routing verso l'autorità competente
-*Es.: "per qualsiasi domanda svizzera, identifica l'autorità responsabile e la pagina
-esatta, con estrazione del passaggio dove possibile"*
-- **Pro**: breadth massima dichiarabile; sfrutta ch.ch come mappa di competenza; originale
-- **Contro**: rischia di restituire "vai qui" invece di una risposta; la giuria valuta
-  *risposte corrette*, e un puntatore non è una risposta
-- **Rischio**: il criterio 1 penalizza esattamente questo
+### Option D — Meta-layer routing to the competent authority
+*E.g.: "for any Swiss question, identify the responsible authority and the page
+exact, with extraction of the passage where possible"*
+- **Pro**: maximum breadth that can be declared; use ch.ch as a competence map; original
+- **Cons**: risks returning "vai qui" instead of an answer; the jury evaluates
+  *correct answers*, and a pointer is not an answer
+- **Risk**: the 1 criterion penalizes exactly this
 
-**Dimensione trasversale a ogni opzione**: qualunque scope scegliamo, i quattro
-comportamenti di §15 di CHALLENGE.md (risposta citata / ask-back preciso / fuori scope /
-fonte irraggiungibile) vanno implementati. Sono il vero prodotto.
+**Dimension transversal to each option**: whatever scope we choose, the four
+§15 behaviors of CHALLENGE.md (quoted response / precise ask-back / out of scope /
+unreachable source) must be implemented. They are the real product.
 
 ---
 
-## 7. Dati di riferimento sulle giurisdizioni 🟢
+## 7. Reference data on jurisdictions 🟢
 
-Tutti i numeri di questa sezione vengono dal **registro ufficiale BFS dei comuni**
-(standard eCH-0071), snapshot **01-01-2026**, scaricato e contato da noi.
+All numbers in this section come from the **official BFS register of municipalities**
+(standard eCH-0071), snapshot **01-01-2026**, downloaded and counted by us.
 
-### 7.1 Fonte e comandi riproducibili
+### 7.1 Reproducible source and commands
 
 ```sh
-# registro ufficiale, snapshot datato, CSV, nessuna auth
+# official register, dated snapshot, CSV, no authentication
 curl -A "<nostro-user-agent>" \
   "https://www.agvchapp.bfs.admin.ch/api/communes/levels?date=01-01-2026" -o comuni.csv
 ```
 
-Colonne rilevanti: `BfsCode` (numero UFS), `Name`, `Canton`, `District`,
-`SPRGEB2020` (regione linguistica: `1`=DE, `2`=FR, `3`=IT, `4`=RM).
+Relevant columns: `BfsCode` (UFS number), `Name`, `Canton`, `District`,
+`SPRGEB2020` (language region: `1`=DE, `2`=FR, `3`=IT, `4`=RM).
 
 ```sh
-awk -F',' 'NR>1 {c[$5]++} END {for (k in c) print k, c[k]}' comuni.csv   # per cantone
-awk -F',' 'NR>1 {s[$20]++} END {for (k in s) print k, s[k]}' comuni.csv  # per lingua
+awk -F',' 'NR>1 {c[$5]++} END {for (k in c) print k, c[k]}' comuni.csv   # by canton
+awk -F',' 'NR>1 {s[$20]++} END {for (k in s) print k, s[k]}' comuni.csv  # by language
 ```
 
-> ⚠️ Il campo lingua è la **colonna 20**, non la 21 (la 21 è `AGKSA2020`, agglomerati).
-> Verifica di sanità: Bern→1, Lausanne→2, Lugano→3, Scuol→4.
+> ⚠️ The language field is the **column 20**, not the 21 (the 21 is `AGKSA2020`, agglomerations).
+> Health audit: Bern→1, Lausanne→2, Lugano→3, Scuol→4.
 
-### 7.2 Totale: 2'110 comuni
+### 7.2 Total: 2'110 municipalities
 
-Il numero cala nel tempo per fusioni comunali: qualsiasi conteggio trovato altrove va
-datato. Fonti secondarie citano 2'202 (2020) e 2'172 (2021).
+The number drops over time due to municipal mergers: any count found elsewhere goes
+dated. Secondary sources cite 2'202 (2020) and 2'172 (2021).
 
-### 7.3 Comuni per cantone
+### 7.3 Municipalities by canton
 
-Ordinati per costo di copertura completa. **Somma verificata = 2'110.**
+Sorted by cost of full coverage. **Verified sum = 2'110.**
 
-| Cantone | Comuni | | Cantone | Comuni | | Cantone | Comuni |
+| Canton | Municipalities | | Canton | Municipalities | | Canton | Municipalities |
 |---|---|---|---|---|---|---|---|
 | BS | **3** | | SH | 26 | | BL | 86 |
 | GL | **3** | | SZ | 30 | | GR | 100 |
@@ -600,30 +605,30 @@ Ordinati per costo di copertura completa. **Somma verificata = 2'110.**
 | NE | 24 | | | | | VD | 300 |
 | | | | | | | BE | 334 |
 
-**Cantoni completabili** entro un budget di ricerca realistico (≤26 comuni): BS, GL, AI,
-OW, NW, ZG, UR, AR, NE, SH. I sei più piccoli insieme fanno **40 comuni**, ma sono tutti
-germanofoni tranne NE.
+**Completable cantons** within a realistic research budget (≤26 municipalities): BS, GL, AI,
+OW, NW, ZG, UR, AR, NE, SH. The six smallest together make **40 municipalities**, but they are all
+German speakers except NE.
 
-### 7.4 Comuni per regione linguistica
+### 7.4 Municipalities by linguistic region
 
-| Regione | Comuni | Costo di una rivendicazione "area completa" |
+| Region | Municipalities | Cost of a “full area” claim |
 |---|---|---|
-| Tedesca | 1'374 | fuori portata |
-| Francese | 606 | fuori portata |
-| Italiana | 115 | al limite |
-| **Romancia** | **15** | **alla portata** |
+| German | 1'374 | out of reach |
+| French | 606 | out of reach |
+| Italian | 115 | to the limit |
+| **Romance** | **15** | **within reach** |
 
-**Somma verificata = 2'110.**
+**Verified sum = 2'110.**
 
-### 7.5 I 15 comuni della regione linguistica romancia
+### 7.5 The 15 municipalities of the Romansh linguistic region
 
-Tutti nei Grigioni, concentrati in **3 cluster amministrativi**. Include Scuol, che
-Swisscom ha messo tra le domande campione.
+All in Grisons, concentrated in **3 administrative clusters**. Includes Scuol, which
+Swisscom has included sample questions.
 
-| BFS | Comune | Regione |
+| BFS | Municipality | Region |
 |---|---|---|
 | 3981 | Breil/Brigels | Surselva |
-| 3982 | Disentis/Mustér | Surselva |
+| 3982 | Disentis/Muster | Surselva |
 | 3572 | Falera | Surselva |
 | 3618 | Lumnezia | Surselva |
 | 3983 | Medel (Lucmagn) | Surselva |
@@ -632,86 +637,86 @@ Swisscom ha messo tra le domande campione.
 | 3985 | Sumvitg | Surselva |
 | 3987 | Trun | Surselva |
 | 3986 | Tujetsch | Surselva |
-| **3762** | **Scuol** | Engiadina Bassa / Val Müstair |
-| 3847 | Val Müstair | Engiadina Bassa / Val Müstair |
-| 3764 | Valsot | Engiadina Bassa / Val Müstair |
-| 3746 | Zernez | Engiadina Bassa / Val Müstair |
+| **3762** | **School** | Lower Engiadina / Val Müstair |
+| 3847 | Val Müstair | Lower Engiadina / Val Müstair |
+| 3764 | Valsot | Lower Engiadina / Val Müstair |
+| 3746 | Zernez | Lower Engiadina / Val Müstair |
 | 3788 | S-chanf | Maloja |
 
-Possibile aggregatore regionale da verificare: `regiunebvm.ch` (Regiun Engiadina Bassa
-Val Müstair) potrebbe coprire 4 dei 15 con una fonte sola.
+Possible regional aggregator to check: `regiunebvm.ch` (Regiun Engiadina Bassa
+Val Müstair) could cover 4 of 15 with a single source.
 
-### 7.6 Competenza sui rifiuti: cantonale per legge, comunale nei fatti
+### 7.6 Competence over waste: cantonal by law, municipal in fact
 
-**USG art. 31b** assegna ai cantoni la responsabilità dello smaltimento dei rifiuti urbani,
-ma i cantoni **delegano ai comuni** raccolta e finanziamento. Base legale: USG (SR 814.01)
+**USG art. 31b** assigns responsibility for the disposal of urban waste to the cantons,
+but the cantons **delegate collection and financing to the municipalities. Legal basis: USG (SR 814.01)
 art. 30 ss., VVEA (SR 814.600).
 
-Conseguenza operativa: **il calendario di raccolta è pubblicato dal comune o da un
-consorzio intercomunale. Non esiste un calendario rifiuti cantonale da interrogare.**
-Qualsiasi strategia "rifiuti a livello cantonale" è priva di fonte.
+Operational consequence: **the collection calendar is published by the municipality or by a
+intermunicipal consortium. There is no cantonal waste calendar to query.**
+Any "cantonal waste" strategy is unsourced.
 
-### 7.7 Nessun moltiplicatore per i rifiuti
+### 7.7 No waste multiplier
 
-Cercato un fornitore dominante da integrare una volta per coprirne molti: **non esiste**.
-Il mercato è frammentato tra Trennio, Sammelkalender, A-Region e le soluzioni proprie
-delle città grandi. Il costo per comune resta lineare.
+Searched for a dominant provider to integrate once to cover many: **does not exist**.
+The market is fragmented between Trennio, Sammelkalender, A-Region and its own solutions
+of large cities. The cost per municipality remains linear.
 
-### 7.8 ⚠️ La trappola Localcities
+### 7.8 ⚠️ The Localcities Trap
 
-`Localcities` copre tutti i ~2'200 comuni con calendario rifiuti incluso, ed è di
-**Swisscom Directories**. È la scorciatoia più comoda del dominio ed è **la risposta
-sbagliata**: è un aggregatore, non l'ente responsabile della materia. La review checklist
-punto 3 lo esclude esplicitamente.
+`Localcities` covers all municipalities ~2'200 with waste calendar included, and is
+**Swisscom Directories**. It's the most convenient shortcut in the domain and it's **the answer
+wrong**: it is an aggregator, not the body responsible for the matter. The review checklist
+dot 3 explicitly excludes it.
 
-Vale lo stesso per `schulferien.org`, `feiertagskalender.ch`, `localcities.ch` sulle
-vacanze scolastiche: hanno il dato, non hanno l'autorità.
+The same applies to `schulferien.org`, `feiertagskalender.ch`, `localcities.ch` on
+school holidays: they have the data, they don't have the authority.
 
 ---
 
-## 8. Campionamento cantonale: vacanze scolastiche 🟢
+## 8. Cantonal sampling: school holidays 🟢
 
-Cinque cantoni in tre lingue, verificati scaricando e leggendo le fonti il 2026-09-21.
-**Risultato: cinque cantoni, cinque modelli diversi. Nessuna omogeneità.**
+Five cantons in three languages, verified by downloading and reading the sources on 2026-09-21.
+**Result: five cantons, five different models. No homogeneity.**
 
-### 8.1 I cinque modelli
+### 8.1 The five models
 
-| Cantone | Modello | Granularità | Formato | Vacanze d'autunno 2026 |
+| Canton | Model | Granularity | Format | Autumn holidays 2026 |
 |---|---|---|---|---|
-| **VD** | tabella pluriennale unica 2022→2031 | uniforme sul cantone | PDF 1 pagina | **10–25 ottobre** |
-| **TI** | elenco in prosa, un anno per documento | uniforme sul cantone | PDF 1 pagina | **31 ottobre – 8 novembre** |
-| **GR** | tabella per comune, 164 righe | per comune | PDF 8 pagine, trilingue | Scuol **10–25 ottobre** |
-| **BE** | regola DIN + date risolte + eccezioni | mista | 2 PDF | **19.09 – 11.10.2026** |
-| **ZH** | delega ai comuni scolastici | comune scolastico | pagina HTML | **non determinabile** |
+| **VD** | single multi-year table 2022→2031 | uniform on the canton | PDF 1 page | **10–25 October** |
+| **TI** | list in prose, one year per document | uniform on the canton | PDF 1 page | **31 October – 8 November** |
+| **GR** | table by municipality, 164 rows | by municipality | PDF 8 pages, trilingual | School **10–25 October** |
+| **BE** | DIN rule + resolved dates + exceptions | mixed | 2 PDF | **19.09 – 11.10.2026** |
+| **ZH** | delegation to school municipalities | school municipality | HTML page | **not determinable** |
 
-### 8.2 Fonti verificate
+### 8.2 Sources verified
 
-| Cantone | URL | Stato |
+| Canton | URL | Status |
 |---|---|---|
 | VD | `vd.ch/fileadmin/user_upload/themes/formation/Vacances_scolaires/def_calendrier_vacances_scolaires_2023_2031.pdf` | 200, PDF, 124 KB |
 | TI | `www4.ti.ch/fileadmin/DECS/calendario_scolastico/Calendario_scolastico_2026_2027.pdf` | 200, PDF, 178 KB |
 | GR | `gr.ch/DE/institutionen/verwaltung/ekud/avs/Volksschule/SB_Ferienplaene_2026_2027_de.pdf` | 200, PDF, 77 KB |
-| BE regola | `akvb-gemeinden.bkd.be.ch/.../schulferien-kanton-bern-d.pdf` | 200, PDF, 122 KB |
-| BE eccezioni | `akvb-gemeinden.bkd.be.ch/.../schulferien-kanton-bern-bewilligte-ausnahmen-d.pdf` | 200, PDF, 116 KB |
+| BE rule | `akvb-gemeinden.bkd.be.ch/.../schulferien-kanton-bern-d.pdf` | 200, PDF, 122 KB |
+| BE exceptions | `akvb-gemeinden.bkd.be.ch/.../schulferien-kanton-bern-bewilligte-ausnahmen-d.pdf` | 200, PDF, 116 KB |
 | ZH | `zh.ch/de/bildung/bildungssystem/schulferien.html` | 200, HTML |
 
-> Le pagine HTML di `ti.ch` hanno protezione anti-bot, ma **il PDF si scarica senza
-> ostacoli**. Verificare sempre la risorsa finale, non la pagina che la ospita.
+> `ti.ch` HTML pages have anti-bot protection, but **the PDF can be downloaded without
+> obstacles**. Always check the final resource, not the page that hosts it.
 
-### 8.3 Prova che l'inferenza tra cantoni è letale
+### 8.3 Proof that canton inference is lethal
 
-Stesso anno, stesso paese, stesso tema:
+Same year, same country, same theme:
 
-- Vaud: 10–25 ottobre (2 settimane)
-- Ticino: 31 ottobre – 8 novembre (1 settimana, **3 settimane più tardi**)
-- Berna: 19 settembre – 11 ottobre (3 settimane, **la più lunga e la più precoce**)
+- Vaud: 10–25 October (2 weeks)
+- Ticino: 31 October – 8 November (1 week, **3 weeks later**)
+- Bern: 19 September – 11 October (3 weeks, **the longest and earliest**)
 
-Il practice case `romansh_locality` vieta di dedurre da un altro cantone. Questi sono i
-numeri che mostrano l'entità dell'errore.
+The `romansh_locality` practice case prohibits deductions from another canton. These are the
+numbers showing the magnitude of the error.
 
-### 8.4 Berna: la regola e le sue riserve
+### 8.4 Bern: the rule and its reservations
 
-Il PDF contiene sia la regola sia le date risolte fino al 2031/32:
+The PDF contains both the rule and the resolved dates up to 2031/32:
 
 ```
 Herbstferien     Wochen 39 bis 41
@@ -723,364 +728,364 @@ Sommerferien     Wochen 28 bis 32
 2026/27  Herbstferien  Sa, 19.09.2026 - So, 11.10.2026
 ```
 
-Riserve, tutte verificate nel documento:
+Reserves, all verified in the document:
 
-- vale **solo per la parte germanofona**; la francofona segue BEJUNE, documento separato
-- **le vacanze di febbraio le sceglie ogni comune** (DIN 2–14) → non cantonale
-- i comuni turistici alpini scelgono le vacanze di primavera (DIN 15–21)
-- **Biel + Evilard, Orvin, Plagne, Romont, Vauffelin alternano** sistema tedesco (anni
-  pari) e francese (anni dispari)
-- un secondo PDF elenca ~16 comuni con eccezioni: Boltigen, Gsteig b/Gstaad, Lauenen,
+- applies **only for the German-speaking part**; the francophone follows BEJUNE, separate document
+- **the February holidays are chosen by each municipality** (DIN 2–14) → non-cantonal
+- Alpine tourist municipalities choose spring holidays (DIN 15–21)
+- **Biel + Evilard, Orvin, Plagne, Romont, Vauffelin alternate** German system (years
+  even) and French (odd years)
+- a second PDF lists ~16 municipalities with exceptions: Boltigen, Gsteig b/Gstaad, Lauenen,
   Saanen, St. Stephan, Zweisimmen, Lenk, Adelboden, Erlenbach, Därstetten, Diemtigen,
   Oberwil i/S, Golaten, Gurbrü, Münchenwiler, Wil…
 
-**Nello stesso cantone, per lo stesso tema, la granularità cambia secondo il tipo di
-vacanza**: Herbstferien è cantonale, Februar-Ferien è comunale.
+**In the same canton, for the same theme, the granularity changes according to the type of
+holiday**: Herbstferien is cantonal, Februar-Ferien is municipal.
 
-### 8.4b Berna ha DUE calendari, per regione linguistica
+### 8.4b Bern has TWO calendars, per linguistic region
 
-Fonte francofona verificata (2 pagine, 5'216 caratteri, 200):
+Verified French-speaking source (2 pages, 5'216 characters, 200):
 `akvb-gemeinden.bkd.be.ch/.../fr/.../schulferien-kanton-bern-f.pdf`
 
-Base legale identica, nome diverso: **LEO art. 8 al. 3, RSB 432.210** (in tedesco:
-VSG, BSG 432.210). Le vacanze sono *"harmonisées par région linguistique"*.
+Identical legal basis, different name: **LEO art. 8 al. 3, RSB 432.210** (in German:
+VSG, BSG 432.210). Holidays are *"harmonisées par région linguistique"*.
 
-| | Parte germanofona | Parte francofona |
+| | German-speaking part | Francophone part |
 |---|---|---|
-| Comuni (registro BFS) | **299** | **35**, tutti nell'Arrondissement Jura bernois |
-| Riferimento | calendario perpetuo DIN | **spazio BEJUNE** |
-| **Autunno 2026** | **19.09 – 11.10** (3 sett., sem. 39–41) | **05.10 – 16.10** (2 sett., sem. 41–42) |
-| Inverno 2026/27 | 24.12.2026 – 10.01.2027 | 25.12.2026 – 08.01.2027 |
-| Primavera 2027 | 10.04 – 25.04 | 26.03 – 09.04 |
-| Settimana bianca | libera (DIN 2–14) | libera |
+| Municipalities (BFS register) | **299** | **35**, all in the Arrondissement Jura bernois |
+| Reference | DIN perpetual calendar | **BEJUNE space** |
+| **Autumn 2026** | **19.09 – 11.10** (3 week, week 39–41) | **05.10 – 16.10** (2 week, week 41–42) |
+| Winter 2026/27 | 24.12.2026 – 10.01.2027 | 25.12.2026 – 08.01.2027 |
+| Spring 2027 | 10.04 – 25.04 | 26.03 – 09.04 |
+| White week | free (DIN 2–14) | free |
 
-**Stesso cantone, stesso tema, stesso anno: due risposte diverse, sfasate di due
-settimane e di lunghezza diversa.** La chiave di risoluzione per le vacanze scolastiche
-non è il cantone, e nemmeno il comune: è **(cantone × regione linguistica × parità
-dell'anno scolastico × lista eccezioni)**.
+**Same canton, same theme, same year: two different answers, out of phase by two
+weeks and of different lengths.** The key to solving school holidays
+it is not the canton, nor even the municipality: it is **(canton × linguistic region × parity
+of the school year × list of exceptions)**.
 
-### 8.4c Biel/Bienne: bilingue, ma classificata germanofona
+### 8.4c Biel/Bienne: bilingual, but classified as German-speaking
 
-La regola di alternanza riguarda Biel e cinque comuni vicini. Confronto con il registro
+The alternation rule concerns Biel and five neighboring municipalities. Comparison with the register
 BFS:
 
-| Comune citato | BFS | Regione linguistica BFS |
+| Municipality cited | BFS | BFS linguistic region |
 |---|---|---|
-| Biel/Bienne | 371 | **1 = tedesca** (benché ufficialmente bilingue) |
-| Evilard | 372 | 1 = tedesca |
-| Orvin | 438 | 2 = francese |
-| Romont (BE) | 442 | 2 = francese |
-| Plagne | — | **non esiste più** |
-| Vauffelin | — | **non esiste più** |
+| Biel/Bienne | 371 | **1 = German** (although officially bilingual) |
+| Evilard | 372 | 1 = German |
+| Orvin | 438 | 2 = French |
+| Romont (BE) | 442 | 2 = French |
+| Plagne | — | **no longer exists** |
+| Vauffelin | — | **no longer exists** |
 
-Per l'anno 2026/27 (inizio in anno pari) questi comuni seguono il **piano germanofono**:
-Biel, autunno 2026 = 19.09 – 11.10.2026.
+For the year 2026/27 (starting in an even year) these municipalities follow the **German-speaking plan**:
+Biel, autumn 2026 = 19.09 – 11.10.2026.
 
-Attenzione: la classificazione linguistica BFS di Biel è "tedesca", quindi un routing
-basato solo su quel campo darebbe la risposta giusta per caso, e quella sbagliata negli
-anni dispari. **La regola di alternanza va letta, non dedotta.**
+Attention: Biel's BFS language classification is "tedesca", therefore a routing
+based only on that field it would give the right answer by chance, and the wrong one by chance
+odd years. **The alternation rule must be read, not deduced.**
 
-### 8.4d ⚠️ Il documento cantonale cita comuni che non esistono più
+### 8.4d ⚠️ The cantonal document mentions municipalities that no longer exist
 
-`Plagne` e `Vauffelin` **non sono nel registro BFS al 01-01-2026**: sono confluiti in
-**Sauge** (BFS 449). Il documento bernese è datato 1° giugno / 1° luglio 2026 e li elenca
-ancora.
+`Plagne` and `Vauffelin` **are not in the BFS register at 01-01-2026**: they merged into
+**Sauge** (BFS 449). The Bernese document is dated 1° June / 1° July 2026 and lists them
+again.
 
-Una fonte autorevole e corrente può contenere **nomi di giurisdizione obsoleti**. Un
-lookup per nome fallisce su "Plagne", e chi chiede di "Sauge" non si trova nel documento.
+An authoritative and current source may contain **outdated jurisdiction names**. A
+lookup by name fails on "Plagne", and the person asking for "Sauge" is not found in the document.
 
-Difesa: il **Gemeindeverzeichnis storico** del BFS mappa i comuni sciolti ai successori.
-Endpoint già individuato in §7.1:
+Defense: The **Historical Gemeindeverzeichnis** of the BFS maps dissolved municipalities to successors.
+Endpoint already identified in §7.1:
 `agvchapp.bfs.admin.ch/api/communes/mutations?...`
-Il risolutore di giurisdizione deve gestire entrambe le direzioni — nome storico → comune
-attuale, e comune attuale → nomi storici citati nei documenti.
+The jurisdiction resolver must handle both directions — historical name → municipality
+current, and current municipality → historical names cited in documents.
 
-### 8.4e BEJUNE: un calendario per tre cantoni (da confermare)
+### 8.4e BEJUNE: a calendar for three cantons (to be confirmed)
 
-La parte francofona di BE dichiara di allinearsi allo spazio **BEJUNE** = Berna, Giura,
-Neuchâtel. Riscontro preliminare per l'autunno 2026:
+The French-speaking part of BE declares alignment with the space **BEJUNE** = Bern, Jura,
+Neuchatel. Preliminary feedback for autumn 2026:
 
-- BE francofono: 05.10 – 16.10.2026 ✅ *verificato sul PDF cantonale*
-- Neuchâtel: 5–16 ottobre 2026 ⚠️ *solo da aggregatori*
-- Jura: 5–16 ottobre 2026 ⚠️ *solo da aggregatori*
+- French-speaking BE: 05.10 – 16.10.2026 ✅ *verified on the cantonal PDF*
+- Neuchâtel: 5–16 October 2026 ⚠️ *only from aggregators*
+- Jura: 5–16 October 2026 ⚠️ *only from aggregators*
 
-Se confermato su fonti autorevoli, **un solo calendario copre la parte francofona di BE
-più tutto NE e tutto JU**, cioè 35 + 24 + 51 = 110 comuni con una fonte sola.
+If confirmed on authoritative sources, **only one calendar covers the French-speaking part of BE
+plus all NE and all JU**, i.e. 35 + 24 + 51 = 110 municipalities with a single source.
 
-> **Non usare questo allineamento finché non è verificato su `ne.ch` e `jura.ch`.**
-> Le fonti trovate finora (`vacances-scolaires.ch`, `profcalendar.org`,
-> `feiertagskalender.ch`) sono aggregatori, esclusi dalla checklist punto 3. Per il Giura
-> la fonte autorevole è un arrêté del Governo cantonale.
+> **Do not use this alignment until verified on `ne.ch` and `jura.ch`.**
+> The sources found so far (`vacances-scolaires.ch`, `profcalendar.org`,
+> `feiertagskalender.ch`) are aggregators, excluded from the checklist point 3. For the Jura
+> the authoritative source is an arrêté from the cantonal government.
 
-### 8.5 Zurigo: delega totale
+### 8.5 Zurich: total delegation
 
-Testuale dalla pagina cantonale:
+Text from the cantonal page:
 
 > *"Im Kanton Zürich bestimmen die Volksschulen ihre Ferien und schulfreien Tage selbst.
 > Nur der Schulbeginn und die Weihnachtsferien sind verbindlich."*
 
-Nel cantone più popoloso della Svizzera, a livello cantonale sono vincolanti **solo
-l'inizio dell'anno scolastico e le vacanze di Natale**. Tutto il resto lo decidono i 160
-comuni scolastici. L'«ewiger Ferienkalender» esiste ma è dichiarato *Planungshilfe*,
-non norma. Base legale: BiG §7, VSV §32 cpv. 2 (LS 412.101).
+In the most populous canton of Switzerland, **only are binding at cantonal level
+the start of the school year and the Christmas holidays**. 160 decides everything else
+school municipalities. The «ewiger Ferienkalender» exists but is declared *Planungshilfe*,
+not norm. Legal basis: BiG §7, VSV §32 para. 2 (LS 412.101).
 
-**La risposta corretta con scope cantonale non è "non lo so", è l'ask-back citato**:
-"nel canton Zurigo le vacanze le decide il singolo comune scolastico, quale?", con
-riferimento alla pagina che lo afferma. Secondo il rubric è una risposta corretta.
+**For a question scoped only to Zurich canton, the correct response is to ask back, not say "I do not know"**:
+"in the canton of Zurich, each school municipality sets its own holidays; which municipality?", with
+reference the page that states this. According to the rubric it is a correct answer.
 
-### 8.6 Trappole nel PDF grigionese
+### 8.6 Traps in the Grisons PDF
 
-Il caso più ricco di insidie del campione. Tutte verificate.
+The case with the most pitfalls in the sample. All verified.
 
-1. **I codici non sono numeri BFS.** Scuol nel PDF è `330`, il BFS reale è `3762`.
-   Verificato su 7 comuni (Arosa 107/3921, Bonaduz 115/3721, Zernez 335/3746,
-   Valsot 328/3764…). **Il join va fatto per nome, non per ID.**
-2. **Righe duplicate**: 164 righe per 100 comuni, perché il PDF contiene sia la tabella
-   cantonale sia tabelle per distretto. Serve dedup.
-3. **Scuole private con date diverse**: `Privat Scoula Rudolf Steiner Scuol` ha le
-   vacanze sportive 27.02–07.03, la scuola pubblica di Scuol 06.03–14.03. "La scola da
-   Scuol" è ambiguo, e la riga sbagliata dà una data errata **con la fonte giusta**.
-4. **Estrazione rumorosa**: `05.01.2 7`, `16. 08.27` — spazi spuri dentro le date.
-   Normalizzare prima di interpretare.
-5. **Le intestazioni sono trilingui, romancio incluso**: `vacanzas d'atun`,
-   `vacanzas da Nadal`, `vacanzas da sport`, `vacanzas da primavaira`. La formula esatta
-   della domanda campione #4 è **nel testo della fonte**. Per questo tema il problema
-   del retrieval romancio non esiste e Supertext non serve.
+1. **Codes are not BFS numbers.** School in PDF is `330`, real BFS is `3762`.
+   Verified on municipalities 7 (Arosa 107/3921, Bonaduz 115/3721, Zernez 335/3746,
+   Valsot 328/3764…). **The join must be done by name, not by ID.**
+2. **Duplicate rows**: 164 rows for municipalities 100, because the PDF contains both the table
+   cantonal and tables by district. Needs dedup.
+3. **Private schools with different dates**: `Privat Scoula Rudolf Steiner Scuol` has the
+   sports holidays 27.02–07.03, the public school of Scuol 06.03–14.03. "The school from
+   Scuol" is ambiguous, and the wrong line gives the wrong date **with the right source**.
+4. **Noisy extraction**: `05.01.2 7`, `16. 08.27` — spurious spaces inside dates.
+   Normalize before interpreting.
+5. **Headings are trilingual, including Romansh**: `vacanzas d'atun`,
+   `vacanzas da Nadal`, `vacanzas da sport`, `vacanzas da primavaira`. The exact formula
+   of sample question #4 is **in the source text**. For this theme the problem
+   Romansh retrieval does not exist and Supertext is not needed.
 
-### 8.7 Conseguenza architetturale: il campo "livello di risoluzione"
+### 8.7 Architectural consequence: the "livello di risoluzione" field
 
-Non si può sapere a priori se una domanda richiede il comune: dipende dal cantone **e**
-dal tipo di vacanza. Il manifest deve quindi registrare, per ogni coppia
-(cantone × tipo di vacanza), a che livello la risposta è determinata:
+You cannot know in advance whether a question needs a municipality: it depends on the canton **and**
+by the type of holiday. The manifest must then record,for each pair
+(canton × type of holiday), at what level the answer is determined:
 
-| Valore | Comportamento | Esempi verificati |
+| Value | Behavior | Verified Examples |
 |---|---|---|
-| `cantonale_uniforme` | rispondi | VD, TI |
-| `per_comune_in_fonte_cantonale` | risolvi il comune nella tabella, poi rispondi | GR |
-| `regola_con_eccezioni` | rispondi, ma verifica la lista eccezioni | BE, Herbstferien |
-| `delegato` | **chiedi il comune**, citando la norma che delega | ZH; BE, Februar-Ferien |
+| `cantonale_uniforme` | reply | VD, TI |
+| `per_comune_in_fonte_cantonale` | solve the municipality in the table, then answer | GR |
+| `regola_con_eccezioni` | reply, but check the exceptions list | BE, Herbstferien |
+| `delegato` | **ask the municipality**, citing the delegating law | ZH; BE, Februar-Ferien |
 
-L'ask-back diventa la lettura di un campo, decisa dal server: identica su tutte e quattro
-le configurazioni client×LLM. È il principio "server grasso, modello magro" applicato al
-caso che vale più punti.
+The ask-back becomes the reading of a field, decided by the server: identical on all four
+client×LLM configurations. It's the "server grasso, modello magro" principle applied to the
+case worth more points.
 
-### 8.8 Dettagli semantici da citare insieme alla data
+### 8.8 Semantic details to cite along with the date
 
-- Berna: *"Die Daten enthalten den ersten und letzten vollen Ferientag"*
+- Bern: *"Die Daten enthalten den ersten und letzten vollen Ferientag"*
 - Ticino: *"(dal – al compresi)"*
 
-Definizioni diverse di inizio e fine. Cambiano la risposta di un giorno.
+Different definitions of beginning and end. They change the answer one day.
 
-### 8.9 Stima di ricerca rivista
+### 8.9 Revised research estimate
 
-Tempi reali di questo campionamento: VD ~5 min, TI ~5 min, GR ~20 min, BE ~25 min,
-ZH ~15 min. **Media ~14 min** contro i 12 stimati: per 26 cantoni fa **~6 ore**, quindi
-l'ordine di grandezza regge.
+Real times of this sampling: VD ~5 min, TI ~5 min, GR ~20 min, BE ~25 min,
+ZH ~15 min. **Average ~14 min** against the estimated 12: for 26 cantons ago **~6 hours**, therefore
+the order of magnitude holds.
 
-Ma la varianza è alta e **i casi difficili sono i cantoni grandi**. La stima regge solo
-accettando l'ask-back per i cantoni che delegano. Se si volesse *rispondere* anche per
-ZH, servirebbero 160 comuni — fuori scope per decisione presa.
+But the variance is high and **the difficult cases are the large cantons**. The estimate just holds up
+accepting the ask-back for the delegating cantons. If you wanted to *answer* also for
+ZH, municipalities 160 would be needed — out of scope due to decision taken.
 
 ---
 
-## 8bis. Campione esteso: 10 cantoni e la tassonomia dei modelli 🟢
+## 8bis. Extended sample: 10 cantons and model taxonomy 🟢
 
-Verificato il 2026-09-21. Dopo dieci cantoni, **nessun cluster riduce il lavoro: ogni
-cantone va aperto singolarmente.**
+Verified the 2026-09-21. After ten cantons, **no cluster reduces work: every
+canton must be opened individually.**
 
-### 8bis.1 BEJUNE: confermato su fonti autorevoli, ma solo in parte
+### 8bis.1 BEJUNE: confirmed on authoritative sources, but only partially
 
-| Cantone | Fonte autorevole | Vacanze d'autunno 2026 |
+| Canton | Authoritative source | Autumn holidays 2026 |
 |---|---|---|
-| BE francofono | PDF cantonale (§8.4b) | **05.10 – 16.10** |
-| Neuchâtel | `ne.ch/themes/scolarite-et-formation/calendrier-et-vacances-scolaires` (`dateModified` 17.08.2026) | **5 – 16 ottobre** |
-| Jura | `jura.ch/fr/Autorites/Administration/DFNS/SEN/Vacances-scolaires/` | **5 – 16 ottobre** |
+| BE francophone | Cantonal PDF (§8.4b) | **05.10 – 16.10** |
+| Neuchatel | `ne.ch/themes/scolarite-et-formation/calendrier-et-vacances-scolaires` (`dateModified` 17.08.2026) | **5 – 16 October** |
+| Jura | `jura.ch/fr/Autorites/Administration/DFNS/SEN/Vacances-scolaires/` | **5 – 16 October** |
 
-L'autunno coincide. **L'inverno no:**
+Autumn coincides. **Winter not:**
 
-| Cantone | Vacanze d'inverno 2026/27 |
+| Canton | Winter holidays 2026/27 |
 |---|---|
-| Neuchâtel | 21.12.2026 – 01.01.2027 |
+| Neuchatel | 21.12.2026 – 01.01.2027 |
 | Jura | 24.12.2026 – 08.01.2027 |
-| BE francofono | 25.12.2026 – 08.01.2027 |
+| BE francophone | 25.12.2026 – 08.01.2027 |
 
-**Tre cantoni, tre date diverse.** In più Neuchâtel ha le *"Vacances du 1er mars"*, una
-ricorrenza cantonale che gli altri due non hanno.
+**Three cantons, three different dates.** Plus Neuchâtel has the *"Vacances du 1er mars"*, a
+cantonal anniversary that the other two do not have.
 
-> 🔴 **BEJUNE armonizza solo alcune vacanze.** Trattarlo come "una fonte per 110 comuni"
-> produce date invernali sbagliate per due cantoni su tre. L'allineamento va registrato
-> **per tipo di vacanza**, non per cantone.
+> 🔴 **BEJUNE only harmonizes some holidays.** Treat it as "one source for 110 municipalities"
+> produces wrong winter dates for two out of three cantons. The alignment must be recorded
+> **by type of holiday**, not by canton.
 
-### 8bis.2 Due trappole di accesso sulle fonti romande
+### 8bis.2 Two access traps on Romande sources
 
-| Risorsa | Esito | Insidia |
+| Resource | Outcome | Pitfall |
 |---|---|---|
-| `jura.ch/.../220531_Arrete_Vacances_scolaires-2023---2028...pdf` | **HTTP 410**, corpo "Erreur 404" | Deep link da motore di ricerca, documento **sostituito** da un nuovo arrêté 2025–2028 del 13.03.2026, raggiungibile solo dalla pagina di atterraggio |
-| `ne.ch/autorites/DFDS/SEEO/Documents/Plan_Vac_Scol.pdf` | **HTTP 200**, `Content-Type: text/html` | URL con estensione `.pdf` che serve una pagina web. Status OK, estensione PDF, contenuto HTML |
+| `jura.ch/.../220531_Arrete_Vacances_scolaires-2023---2028...pdf` | **HTTP 410**, body "Erreur 404" | Deep link from search engine, document **replaced** by a new arrêté 2025–2028 of 13.03.2026, reachable only from the landing page |
+| `ne.ch/autorites/DFDS/SEEO/Documents/Plan_Vac_Scol.pdf` | **HTTP 200**, `Content-Type: text/html` | URL with extension `.pdf` serving a web page. Status OK, PDF extension, HTML content |
 
-Il secondo è il peggiore: una pipeline ingenua passa HTML a un parser PDF e ottiene
-zero risultati, poi riporta "dato non trovato" invece di "recupero fallito" — cioè
-esattamente la confusione che il practice case `source_failure` vieta.
+The second is the worst: a naive pipeline passes HTML to a PDF parser and gets
+no results, then reports "data not found" instead of "retrieval failed" — that is,
+exactly the confusion that the `source_failure` practice case prohibits.
 
-**Regola derivata: partire sempre dalla pagina di atterraggio dell'autorità, mai dal deep
-link restituito da una ricerca.** I deep link marciscono, le pagine di atterraggio no.
-E validare il `Content-Type` effettivo, non l'estensione.
+**Derived rule: always start from the authority landing page, never from the deep
+link returned from a search.** Deep links rot, landing pages don't.
+And validate the actual `Content-Type`, not the extension.
 
-### 8bis.3 Tassonomia dei modelli, su 10 cantoni
+### 8bis.3 Model taxonomy, on 10 cantons
 
-| Modello | Cantoni | Comportamento richiesto |
+| Model | Cantons | Required behavior |
 |---|---|---|
-| **Uniforme cantonale** | VD, TI, NE, JU | rispondi |
-| **Per comune in documento cantonale** | GR, LU | risolvi il comune nella tabella |
-| **Per regione linguistica** | BE, VS | risolvi la regione linguistica, poi rispondi |
-| **Cantonale con variazione comunale** | SG | rispondi con riserva, o chiedi |
-| **Delegato ai comuni** | ZH, (AG da confermare) | **chiedi il comune**, citando la norma |
+| **Cantonal uniform** | VD, TI, NE, JU | reply |
+| **By municipality in cantonal document** | GR, LU | solve the municipality in the table |
+| **By linguistic region** | BE, VS | solve the language region, then answer |
+| **Cantonal with municipal variation** | SG | reply with reserve, or ask |
+| **Delegate to the municipalities** | ZH, (AG to be confirmed) | **ask the municipality**, citing the law |
 
-### 8bis.4 I cantoni bilingui pubblicano due calendari
+### 8bis.4 Bilingual cantons publish two calendars
 
-Non è una stranezza bernese. Il **Vallese** pubblica due piani separati:
+It's not a Bernese quirk. **Valais** publishes two separate plans:
 
-- `Plan de scolarite valais romand 2026-2027.pdf` (Vallese romando)
+- `Plan de scolarite valais romand 2026-2027.pdf` (Roman Valais)
 - `Schul- und Ferienplan 2026-2027.pdf` (Oberwallis)
 
-Stessa struttura di Berna. La chiave (cantone × regione linguistica) di §8.4b è quindi un
-**pattern**, non un caso isolato.
+Same structure as Bern. The key (canton × linguistic region) of §8.4b is therefore a
+**pattern**, not an isolated case.
 
-Nota: i Grigioni, trilingui, fanno il contrario — **un solo documento** con tutti i
-comuni e le intestazioni in tre lingue (§8.6). Nemmeno il multilinguismo predice il
-modello.
+Note: Grisons, trilingual, do the opposite — **one document** with all
+municipalities areas and headings in three languages (§8.6). Multilingualism does not predict the
+model.
 
-### 8bis.5 Altri riscontri del campione esteso
+### 8bis.5 Other findings from the extended sample
 
-- **Luzern**: due documenti — uno cantonale pluriennale 2026/27→2031/32 e uno
-  **per comune** (`ferienplan_gemeinden_sj26_27.pdf`, 6 pagine). I comuni divergono:
-  Adligenswil e Aesch hanno l'autunno 26.09–18.10, Alberswil chiude l'11.10. Modello
-  "5/3" (5 settimane d'estate, 3 d'autunno).
-- **St. Gallen**: il Bildungsrat fissa il quadro, ma la Città di San Gallo pubblica il
-  proprio piano **e un dataset open data con export ICS**
-  (`daten.stadt.sg.ch/.../schulferien-feiertage-stadt-stgallen/exports/ical`). È l'unico
-  caso di dato scolastico machine-readable incontrato finora.
-- **Aargau**: nessun piano ferie individuabile su `ag.ch` tramite ricerca. Emergono solo
-  le basi legali (Schulgesetz SAR 401.100, Volksschulverordnung SAR 421.315), il che
-  suggerisce delega ai comuni come in ZH. **Da confermare con accesso diretto.**
+- **Luzern**: two documents — one multi-year cantonal 2026/27→2031/32 and one
+  **by municipality** (`ferienplan_gemeinden_sj26_27.pdf`, 6 pages). The municipalities diverge:
+  Adligenswil and Aesch have autumn 26.09–18.10, Alberswil closes 11.10. Model
+  "5/3" (5 weeks of summer, 3 of autumn).
+- **St. Gallen**: The Bildungsrat sets the framework, but the City of St. Gallen publishes the
+  own plan **and an open data dataset with ICS export**
+  (`daten.stadt.sg.ch/.../schulferien-feiertage-stadt-stgallen/exports/ical`). He's the only one
+  case of machine-readable school data encountered so far.
+- **Aargau**: No holiday plans identifiable on `ag.ch` via search. They just emerge
+  the legal bases (Schulgesetz SAR 401.100, Volksschulverordnung SAR 421.315), which
+  suggests delegation to the municipalities as in ZH. **To be confirmed with direct access.**
 
-### 8bis.6 Conseguenza sul costo
+### 8bis.6 Cost Impact
 
-Dieci cantoni, cinque modelli, nessuna regola predittiva: né la lingua, né la dimensione,
-né la regione geografica anticipano quale modello usi un cantone.
+Ten cantons, five models, no predictive rules: neither language nor size,
+nor does the geographic region predict which model a canton uses.
 
-**Il costo di ~14 min per cantone non è comprimibile con scorciatoie.** I 16 cantoni
-rimanenti vanno aperti uno per uno.
+**The cost of ~14 min per canton cannot be reduced with shortcuts.** The 16 cantons
+remaining ones must be opened one by one.
 
-> ✅ **Fatti**: il censimento è stato completato su tutti e 26. Risultati in **§8ter**,
-> che sostituisce questa stima parziale.
+> ✅ **Facts**: The census has been completed on all and 26. Results in **§8ter**,
+> which replaces this partial estimate.
 
 ---
 
-## 8ter. Copertura completa: tutti i 26 cantoni 🟢/🟡
+## 8ter. Complete coverage: all 26 cantons 🟢/🟡
 
-Completato il 2026-09-21.
+Completed the 2026-09-21.
 
-> **Confidenza.** Tutti i cantoni di questa sezione sono stati verificati **scaricando e
-> leggendo il documento o l'API autorevole**, salvo FR e VS, per i quali il motivo del
-> mancato dato è documentato in §8ter.8. Nessun dato proviene da riassunti di ricerca.
+> **Confidence.** All the cantons in this section have been verified **by downloading and
+> reading the authoritative document or API**, except FR and VS, for which the reason for the
+> missing data is documented in §8ter.8. No data comes from research summaries.
 
-### 8ter.1 Tassonomia finale, 26 cantoni su 6 modelli
+### 8ter.1 Final taxonomy, 26 cantons on 6 models
 
-| Modello | Cantoni | n |
+| Model | Cantons | n |
 |---|---|---|
-| **Uniforme cantonale** | VD, TI, NE, JU, GE, ZG, BS, BL, TG, SH, NW, GL | 12 |
-| **Per comune, in documento cantonale** | GR, LU, SO, UR, SZ | 5 |
-| **Per regione linguistica** | BE, VS | 2 |
-| **Uniforme con eccezioni nominate** | FR, OW, AI | 3 |
-| **Quadro cantonale + scelta comunale** | AG, AR, SG | 3 |
-| **Delegato ai comuni** | ZH | 1 |
+| **Cantonal uniform** | VD, TI, NE, JU, GE, ZG, BS, BL, TG, SH, NW, GL | 12 |
+| **By municipality, in cantonal document** | GR, LU, SO, UR, SZ | 5 |
+| **By linguistic region** | BE, VS | 2 |
+| **Uniform with exceptions named** | FR, OW, AI | 3 |
+| **Cantonal framework + municipal choice** | AG, AR, SG | 3 |
+| **Delegate to the municipalities** | ZH | 1 |
 
-### 8ter.2 Vacanze d'autunno 2026, verificate sul documento
+### 8ter.2 Autumn holidays 2026, verified on the document
 
-Ordinate per data d'inizio. Ogni riga proviene dal documento o dall'API dell'autorità.
+Sort by start date. Each row comes from the authority's document or API.
 
-| Cantone | Inizio – fine 2026 | Sett. | Fonte letta |
+| Canton | Start – end 2026 | Sept. | Source read |
 |---|---|---|---|
-| **BE** germanofono | **19.09 – 11.10** | 3 | PDF cantonale |
-| OW (salvo Engelberg) | 25.09 – 11.10 | 2 | PDF `ow.ch/_doc/454867` |
-| **NW** | dal **26.09** | 2 | PDF `nw.ch/_doc/456520` |
+| **BE** German-speaking | **19.09 – 11.10** | 3 | Cantonal PDF |
+| OW (except Engelberg) | 25.09 – 11.10 | 2 | PDF `ow.ch/_doc/454867` |
+| **NW** | from **26.09** | 2 | PDF `nw.ch/_doc/456520` |
 | **BS** | **26.09 – 11.10** | 2 | API `data.bs.ch` |
 | **BL** | **26.09 – 11.10** | 2 | API `data.bl.ch` |
-| BL — Gymnasium Laufental-Thierstein | 26.09 – 18.10 | 3 | API, eccezione dichiarata |
-| **SH** | **26.09 – 18.10** | 3 | pagina `schule.sh.ch` |
+| BL — Gymnasium Laufental-Thierstein | 26.09 – 18.10 | 3 | API, exception declared |
+| **SH** | **26.09 – 18.10** | 3 | page `schule.sh.ch` |
 | AI — Bezirk Oberegg | 26.09 – 18.10 | 3 | PDF `ferienplan-ai_2026-2029` |
-| UR — Seelisberg | 26.09 – 11.10 | 2 | PDF cantonale |
-| **SO** | **28.09 – 16.10** | 3 | PDF cantonale, 8 pagine |
-| **SZ** (la maggioranza) | **28.09 – 16.10** | 3 | PDF cantonale |
-| SZ — Gersau, Küssnacht, Schwyz, Illgau | 28.09 – 09.10 | 2 | PDF cantonale |
-| SG | 28.09 – 18.10 *(da regola KW 40–42)* | 3 | pagina `sg.ch` |
+| UR — Seelisberg | 26.09 – 11.10 | 2 | Cantonal PDF |
+| **SO** | **28.09 – 16.10** | 3 | Cantonal PDF, 8 pages |
+| **SZ** (the majority) | **28.09 – 16.10** | 3 | Cantonal PDF |
+| SZ — Gersau, Küssnacht, Schwyz, Illgau | 28.09 – 09.10 | 2 | Cantonal PDF |
+| SG | 28.09 – 18.10 *(by KW rule 40–42)* | 3 | page `sg.ch` |
 | **GL** | **03.10 – 18.10** | 2 | PDF `Ferienpläne_2026-2029` |
 | **ZG** | **03.10 – 18.10** | 2 | PDF `Schulferien 202627-203031` |
-| **UR** (quadro cantonale) | **03.10 – 18.10** | 2 | PDF `..._nach_Gemeinden` |
-| AI — Innerer Landesteil | 03.10 – 18.10 | 2 | PDF cantonale |
-| OW — Engelberg | 03.10 – 25.10 | 3 | PDF cantonale |
-| **BE** francofono / **NE** / **JU** | **05.10 – 16.10** | 2 | PDF + pagine cantonali |
+| **UR** (cantonal framework) | **03.10 – 18.10** | 2 | PDF `..._nach_Gemeinden` |
+| AI — Innerer Landesteil | 03.10 – 18.10 | 2 | Cantonal PDF |
+| OW — Engelberg | 03.10 – 25.10 | 3 | Cantonal PDF |
+| **BE** French-speaking / **NE** / **JU** | **05.10 – 16.10** | 2 | PDF + cantonal pages |
 | **AR** | **05.10 – 16.10** | 2 | PDF `Ferienrichtdaten v1.3` |
 | **TG** | **05.10 – 18.10** | 2 | PDF `Ferienplan_SJ_2026_2027` |
-| **VD** | **10.10 – 25.10** | 2 | PDF pluriennale |
-| **GR** — Scuol | **10.10 – 25.10** | 2 | PDF cantonale, 164 righe |
-| **GE** | **19.10 – 23.10** | **1** | pagina `ge.ch` |
-| **TI** | **31.10 – 08.11** | **1** | PDF cantonale |
-| **ZH** | — | — | delegato ai comuni |
-| **AG** | durata variabile per comune | 2 o 3 | pagina `schulen-aargau.ch` |
-| **LU** | variabile per comune, modello 5/3 | 2 o 3 | PDF per comune, 6 pagine |
-| FR, VS | non catturate — vedi §8ter.8 | | |
+| **VD** | **10.10 – 25.10** | 2 | Multi-year PDF |
+| **GR** — Scuol | **10.10 – 25.10** | 2 | Cantonal PDF, 164 lines |
+| **GE** | **19.10 – 23.10** | **1** | page `ge.ch` |
+| **TI** | **31.10 – 08.11** | **1** | Cantonal PDF |
+| **ZH** | — | — | delegate to the municipalities |
+| **AG** | variable duration per municipality | 2 or 3 | page `schulen-aargau.ch` |
+| **LU** | variable per municipality, model 5/3 | 2 or 3 | PDF for municipality, 6 pages |
+| FR, VS | not captured — see §8ter.8 | | |
 
-**Dal 19 settembre all'8 novembre: sette settimane di dispersione.** Durate da **una
-settimana** (GE, TI) a **tre**. Ginevra e Vaud confinano e non si sovrappongono di un
-solo giorno. Basilea Città e Basilea Campagna coincidono; Appenzello Interno si divide
-in due al suo interno.
+**From 19 September to 8 November: seven weeks of dispersal.** Lasts from **one
+week** (GE, TI) to **three**. Geneva and Vaud border and do not overlap by one
+only day. Basel City and Basel Country coincide; Appenzell Innerrhoden divides
+two inside.
 
-Qualsiasi inferenza geografica, linguistica o di vicinanza è sbagliata.
+Any geographic, linguistic, or proximity inference is wrong.
 
-### 8ter.2b Correzioni emerse aprendo i documenti
+### 8ter.2b Corrections that emerged when opening documents
 
-Rispetto a quanto avevo dedotto dai riassunti di ricerca:
+Compared to what I had deduced from the research summaries:
 
-| Cantone | Dato di seconda mano | Dato verificato |
+| Canton | Given second hand | Verified data |
 |---|---|---|
-| **ZG** | "2–17 ottobre **2027**" | **03.10 – 18.10.2026** — era la colonna dell'anno successivo |
-| **SG** | "3–24 ottobre **2027**" | regola **KW 40–42**, quadro cantonale |
-| **AI** | date prese da `gymnasium.ai.ch` | il liceo è una **colonna diversa**: due zone, Innerer Landesteil e Oberegg |
-| **SO** | "varia per comune" | **autunno uniforme**; variano Sport- e Frühlingsferien |
-| **AG** | "l'autunno è cantonale" | varia la **durata** dell'autunno per comune (2 o 3 settimane) |
-| **AR** | PDF v1.1 del 2025-04-01 | quel file dà **404**: la versione corrente è **v1.3 del 2026-06-23** |
+| **ZG** | "2–17 ottobre **2027**" | **03.10 – 18.10.2026** — was the following year's column |
+| **SG** | "3–24 ottobre **2027**" | rule **KW 40–42**, cantonal framework |
+| **AI** | dates taken from `gymnasium.ai.ch` | the high school is a **different column**: two areas, Innerer Landesteil and Oberegg |
+| **SO** | "varies by municipality" | **autumn uniform**; vary Sport- and Frühlingsferien |
+| **AG** | "l'autunno è cantonale" | the **duration** of autumn varies per municipality (2 or 3 weeks) |
+| **AR** | PDF v1.1 of 2025-04-01 | that file gives **404**: the current version is **v1.3 of the 2026-06-23** |
 
-Cinque affermazioni su sei erano sbagliate o imprecise. Il campionamento di seconda mano
-serve a dimensionare il lavoro, **mai a rispondere**.
+Five out of six statements were wrong or inaccurate. Second-hand sampling
+it serves to size the work, **never to answer**.
 
-### 8ter.3 Eccezioni nominate: il singolo comune dentro un cantone uniforme
+### 8ter.3 Named exceptions: the single municipality within a uniform canton
 
-- **OW**: il piano vale per la *"Volksschule ohne Engelberg"*. Engelberg ha
-  **03.10 – 25.10.2026** contro **25.09 – 11.10.2026** del resto del cantone.
-- **FR**: **tre** varianti — calendario di maggioranza, più adattamenti per le regioni
-  di **Morat/Murten** e **Kerzers**. Cantone bilingue, documenti in FR e DE.
-- **AI**: date diverse tra la parte interna del cantone e Oberegg.
+- **OW**: The plan applies to the *"Volksschule ohne Engelberg"*. Engelberg has
+  **03.10 – 25.10.2026** against **25.09 – 11.10.2026** of the rest of the canton.
+- **FR**: **three** variants — majority calendar, more adaptations for the regions
+  by **Morat/Murten** and **Kerzers**. Bilingual canton, documents in FR and DE.
+- **AI**: different dates between the internal part of the canton and Oberegg.
 
-Un cantone "uniforme" può contenere un comune con date completamente diverse, dichiarato
-nel titolo stesso del documento. Leggere il titolo, non solo la tabella.
+A "uniforme" canton can contain a municipality with completely different dates, declared
+in the title of the document itself. Read the title, not just the table.
 
-### 8ter.4 Quadro cantonale + scelta comunale: tre varianti diverse
+### 8ter.4 Cantonal framework + municipal choice: three different variants
 
-- **AG**: il Bildungsrat fissa 2 settimane ciascuna per primavera, autunno e Natale più
-  3 d'estate; **le restanti 4 settimane le fissano i comuni**. L'autunno è quindi
-  cantonale, il resto no.
-- **AR**: il documento cantonale si chiama **`Ferienrichtdaten`** — dati *indicativi*, non
-  vincolanti. I comuni fissano autonomamente **2 delle 13 settimane**.
-- **SG**: il Bildungsrat fissa il quadro, i comuni variano. La Città di San Gallo pubblica
-  il proprio piano.
+- **AG**: the Bildungsrat fixes 2 weeks each for spring, autumn and Christmas plus
+  3 in summer; **the remaining 4 weeks are set by the municipalities**. Autumn is then
+  cantonal, the rest not.
+- **AR**: the cantonal document is called **`Ferienrichtdaten`** — *indicative* data, not
+  binding. The municipalities independently set **2 of the 13 weeks**.
+- **SG**: Bildungsrat sets the framework, municipalities vary. The City of St. Gallen publishes
+  your own plan.
 
-### 8ter.5 🔴 Il portale scolastico non sta quasi mai sul dominio cantonale
+### 8ter.5 🔴 The school portal is almost never on the cantonal domain
 
-Il motivo per cui la mia prima ricerca su `ag.ch` non trovò nulla:
+The reason why my first search on `ag.ch` found nothing:
 
-| Cantone | Dominio del portale scolastico autorevole |
+| Canton | Authoritative school portal domain |
 |---|---|
 | AG | `schulen-aargau.ch` |
 | SH | `schule.sh.ch` |
@@ -1091,187 +1096,187 @@ Il motivo per cui la mia prima ricerca su `ag.ch` non trovò nulla:
 | GE | `ge.ch` + `edu.ge.ch` |
 | AI | `ai.ch` + `gymnasium.ai.ch` |
 
-**Un registro di fonti costruito sul pattern `<codice-cantone>.ch` fallisce.** Il dominio
-va verificato a mano per ogni cantone, come per i comuni (§4.1).
+**A source registry built on the `<canton-code>.ch` pattern fails.** The domain
+it must be verified manually for each canton, as for the municipalities (§4.1).
 
-⚠️ Aggiornamento 2026-09-22: `vsa.zh.ch` risponde ma **redirige** a
-`www.zh.ch/de/bildungsdirektion/volksschulamt.html`. Il dominio corto resta valido come
-punto di ingresso, ma la pagina da citare è quella di destinazione. `www.vsa.zh.ch`
-con il prefisso `www.` dà invece **hostname mismatch sul certificato**: il sottodominio
-va usato esattamente come pubblicato, senza aggiungere `www.`.
+⚠️ 2026-09-22 Update: `vsa.zh.ch` replies but **redirects** to
+`www.zh.ch/de/bildungsdirektion/volksschulamt.html`. The short domain remains valid as
+entry point, but the page to be cited is the destination page. `www.vsa.zh.ch`
+with the prefix `www.` instead gives **hostname mismatch on the certificate**: the subdomain
+should be used exactly as published, without adding `www.`.
 
-### 8ter.6 Cinque fonti machine-readable — e una con un avvertimento
+### 8ter.6 Five machine-readable sources — and one with a warning
 
-| Cantone | Fonte | Formato |
+| Canton | Source | Format |
 |---|---|---|
 | BS | `data.bs.ch/explore/assets/100397/` | open data + iCal |
-| BL | `data.bl.ch/explore/assets/13350/` | open data + iCal, copre 2026/27–2031/32 |
+| BL | `data.bl.ch/explore/assets/13350/` | open data + iCal, covers 2026/27–2031/32 |
 | SZ | `data.sz.ch/explore/dataset/ferienplan-kanton-schwyz/` | open data |
-| SG (città) | `daten.stadt.sg.ch/.../schulferien-feiertage-stadt-stgallen/exports/ical` | ICS |
-| VD | import in agenda via QR | ICS presunto |
+| SG (city) | `daten.stadt.sg.ch/.../schulferien-feiertage-stadt-stgallen/exports/ical` | ICS |
+| VD | import to agenda via QR | ICS alleged |
 
-> 🔴 **Il dataset di Schwyz dichiara di non essere vincolante**: i dati sono forniti senza
-> garanzia e *"i piani vincolanti sono quelli emanati dalle autorità scolastiche"*.
+> 🔴 **The Schwyz dataset claims to be non-binding**: the data is provided without
+> guarantee, and *"i piani vincolanti sono quelli emanati dalle autorità scolastiche"*.
 >
-> Una fonte cantonale ufficiale, machine-readable e comoda, che **si auto-dichiara non
-> autoritativa**. Va usata per il lookup, ma la citazione deve puntare al PDF vincolante.
-> È il caso più sottile di tutta la raccolta: qui non sbagli fonte né versione — sbagli
-> *status giuridico* della fonte.
+> An official cantonal source, machine-readable and convenient, which **self-declares not
+> authoritative**. It should be used for the lookup, but the citation must point to the binding PDF.
+> It's the most subtle case of the entire collection: here you don't get the source or version wrong — you make a mistake
+> *legal status* of the source.
 >
-> Analogamente **BL esclude esplicitamente** dal proprio calendario il Regionales
-> Gymnasium Laufental-Thierstein, e **AR** pubblica "Richtdaten" indicativi.
+> Similarly **BL explicitly excludes** the Regionales from its calendar
+> Gymnasium Laufental-Thierstein, and **AR** publishes indicative "Richtdaten".
 
-### 8ter.6b ⚠️ Non esistono altre fonti open data: verificato, non supposto
+### 8ter.6b ⚠️ No other open data sources exist: verified, not assumed
 
-Scansionati il 2026-09-22 i 26 portali open data cantonali candidati, con paginazione
-completa del catalogo Opendatasoft dove esiste (non solo la prima pagina).
+2026-09-22 and 26 candidate cantonal open data portals scanned, with pagination
+complete with the Opendatasoft catalog where it exists (not just the first page).
 
-**Vivi: sei.** `data.bl.ch` (184 dataset), `data.bs.ch` (361), `data.sz.ch` (363),
-`data.tg.ch` (456), `daten.sg.ch` (225), `data.gr.ch` (51). Gli altri venti hostname
-non risolvono affatto, o non espongono quell API.
+**Alive: six.** `data.bl.ch` (184 dataset), `data.bs.ch` (361), `data.sz.ch` (363),
+`data.tg.ch` (456), `daten.sg.ch` (225), `data.gr.ch` (51). The other twenty hostnames
+they don't resolve at all, or they don't expose that API.
 
-**Dataset di vacanze scolastiche trovati: tre, e sono i tre già noti** — BL 13350,
-BS 100397, SZ `ferienplan-kanton-schwyz`. Turgovia, Grigioni e il portale cantonale di
-San Gallo hanno dataset scolastici in quantità (allievi, sedi, statistiche) ma **nessun
-calendario delle vacanze**. Anche `opendata.swiss` non ne indicizza: la ricerca
-`vacances scolaires` dà 71 risultati e nessuno è un calendario.
+**School holidays dataset found: three, and they are the three already known** — BL 13350,
+BS 100397, SZ `ferienplan-kanton-schwyz`. Thurgau, Grisons and the cantonal portal of
+St. Gallen has plenty of school datasets (students, locations, statistics) but **none
+holiday calendar**. `opendata.swiss` also does not index any: the search
+`vacances scolaires` gives 71 results and neither is a calendar.
 
-> Per la patente una sola fonte ha coperto 26 cantoni (§9.7). **Per le vacanze quella
-> scorciatoia non esiste**, ed è ora verificato invece che supposto: i cantoni restanti
-> vanno aperti uno per uno, come §8ter.10 aveva stimato.
+> For the driving license only one source covered 26 cantons (§9.7). **For the holidays that
+> shortcut does not exist**, and is now verified rather than assumed: the remaining cantons
+> they must be opened one by one, as §8ter.10 had estimated.
 
-### 8ter.7 Basi legali cantonali individuate
+### 8ter.7 Cantonal legal bases identified
 
-Utili perché l'ask-back va citato, non asserito:
+Useful because the ask-back should be mentioned, not asserted:
 
-| Cantone | Norma |
+| Canton | Norm |
 |---|---|
-| BE | LEO/VSG art. 8 cpv. 3 — RSB/BSG 432.210 |
-| ZH | BiG §7; VSV §32 cpv. 2 — LS 412.101 |
+| BE | LEO/VSG art. 8 para. 3 — RSB/BSG 432.210 |
+| ZH | BiG §7; VSV §32 para. 2 — LS 412.101 |
 | SH | SHR 410.114, *Verfügung über die Festlegung der Schulferien* |
-| AG | ⚠️ **corretto 2026-09-22**: Volksschulgesetz (VSG) del 23.09.2025, **SAR 421.100 §§ 61 e 63**; Volksschulverordnung (V VSG) del 18.02.2026, SAR 421.315 § 48. La voce precedente diceva `SAR 401.100` e *Schulgesetz*: sbagliata. **Il VSG è entrato in vigore il 1° agosto 2026** e il piano ferie cantonale è stato riadattato quel giorno — §8quinquies |
+| AG | ⚠️ **corrected 2026-09-22**: Volksschulgesetz (VSG) of 23.09.2025, **SAR 421.100 §§ 61 and 63**; Volksschulverordnung (V VSG) of 18.02.2026, SAR 421.315 § 48. The previous entry said `SAR 401.100` and *Schulgesetz*: wrong. **The VSG took effect on 1 August 2026** and the cantonal holiday plan was adjusted that day — §8quinquies |
 | OW | Bildungsgesetz GDB 410.1 |
 
-### 8ter.8 I due cantoni che restano aperti, e perché
+### 8ter.8 The two cantons that remain open, and why
 
-**Friburgo — il documento che sembrava giusto era di un altro tipo di scuola.**
-L'URL `fr.ch/sites/default/files/2024-02/calendrier-scolaire-2026--2027.pdf` ha un nome
-perfetto ed è su dominio cantonale. Aprendolo si scopre che è il calendario delle
-**scuole professionali**, emanato dal *Service de la formation professionnelle*:
+**Freiburg — the document that seemed right was from another type of school.**
+The URL `fr.ch/sites/default/files/2024-02/calendrier-scolaire-2026--2027.pdf` has a name
+perfect and is under cantonal dominion. Opening it you discover that it is the calendar of
+**professional schools**, issued by the *Service de la formation professionnelle*:
 *"Ecoles professionnelles – Berufsfachschulen"*, *"Accueil des personnes en formation de
-1re année"*. Non è la scuola dell'obbligo.
+1re année"*. It's not compulsory school.
 
-La pagina corretta è `fr.ch/dfac/vacances-scolaires` e conferma le **varianti multiple**:
-per il 2027 coesistono *"du Lu 18. octobre au Ven 29. octobre"* e *"du Lu 4. octobre au
-Ven 22. octobre"* — due settimane di scarto e durate diverse, nello stesso cantone e
-anno. Le date 2026 non sono state catturate.
+The correct page is `fr.ch/dfac/vacances-scolaires` and confirms **multiple variants**:
+for 2027, both *"du Lu 18. octobre au Ven 29. octobre"* and *"du Lu 4. octobre au
+Ven 22. octobre"* appear — two weeks apart and different durations within the same canton and
+year. 2026 dates were not captured.
 
-> **Dominio giusto + nome file giusto + anno giusto ≠ documento giusto.** Il tipo di
-> scuola è una dimensione di giurisdizione al pari del territorio.
+> **Right domain + right file name + right year ≠ right document.** The type of
+> school is a dimension of jurisdiction like the territory.
 
-**Vallese — le date non esistono come testo.**
-Il `Plan de scolarité valais romand 2026/2027` è una **griglia mensile da colorare**
-(*"Colorier en bleu les jours entiers de classe et en jaune les demi-jours"*): i giorni
-di vacanza sono segnati graficamente con asterischi e grassetto. L'estrazione testo
-restituisce la griglia dei numeri ma non quali giorni siano vacanza.
+**Valais — dates do not exist as text.**
+The `Plan de scolarité valais romand 2026/2027` is a **monthly coloring grid**
+(*"Colorier en bleu les jours entiers de classe et en jaune les demi-jours"*): the days
+holidays are graphically marked with asterisks and bold. Text extraction
+returns the grid of numbers but not which days are holidays.
 
-Serve analisi di layout o OCR, oppure una fonte diversa. È l'unico caso incontrato in cui
-la fonte autorevole è **illeggibile a una pipeline testuale**.
+You need layout analysis or OCR, or a different source. It is the only case encountered where
+the authoritative source is **unreadable to a text pipeline**.
 
-### 8ter.9 Note operative dalla verifica
+### 8ter.9 Operational notes from the verification
 
-- **Marciume dei deep link, confermato tre volte**: i PDF di AR, OW e NW indicizzati dai
-  motori danno **404**. In tutti e tre i casi il documento corrente si trova solo
-  passando dalla pagina di atterraggio. Per AR il file indicizzato era la **versione
-  v1.1 superata dalla v1.3**.
-- **Sciaffusa chiede esplicitamente di non copiare il suo calendario**: *"Bitte bilden Sie
+- **Deep link rot, confirmed three times**: AR, OW and NW PDFs indexed by
+  engines damage **404**. In all three cases the current document is found alone
+  passing through the landing page. For AR the indexed file was the **version
+  v1.1 superseded by v1.3**.
+- **Schaffhausen explicitly asks not to copy its calendar**: *"Bitte bilden Sie
   auf Schulwebseiten keinen eigenen Ferienkalender ab, sondern verweisen auf diese
-  Seite."* Un'autorità che chiede il link invece della copia — argomento in più contro
-  gli aggregatori.
-- **Le due Basilea hanno API pulite**: `data.bs.ch` e `data.bl.ch` rispondono in JSON via
-  `/api/explore/v2.1/catalog/datasets/<id>/records`, con le eccezioni dichiarate come
-  record separati (es. *"Herbstferien Gymnasium Laufental-Thierstein
-  (Ausnahmeregelung)"*). È il formato migliore incontrato.
-- **Regole a numero di settimana**: BE (DIN 39–41), SH (KW 40–42), SG (KW 40–42) e OW
-  (*"sei settimane dopo l'inizio dell'anno, durata due settimane"*) pubblicano regole
-  oltre alle date. Le regole vanno risolte in date, e la risoluzione va citata come
-  derivata.
+  Seite."* An authority asking for the link instead of the copy — yet another argument against it
+  the aggregators.
+- **The two Basels have clean APIs**: `data.bs.ch` and `data.bl.ch` respond in JSON via
+  `/api/explore/v2.1/catalog/datasets/<id>/records`, with exceptions declared as
+  separate records (e.g. *"Herbstferien Gymnasium Laufental-Thierstein
+  (Ausnahmeregelung)"*). It is the best format encountered.
+- **Week number rules**: BE (DIN 39–41), SH (KW 40–42), SG (KW 40–42) and OW
+  (*"sei settimane dopo l'inizio dell'anno, durata due settimane"*) publish rules
+  in addition to the dates. The rules must be resolved on dates, and the resolution must be cited as
+  derivative.
 
-### 8ter.10 Costo consolidato
+### 8ter.10 Consolidated cost
 
-26 cantoni, 6 modelli, nessun predittore. Il tempo reale di questo censimento conferma
-**~12–15 min per cantone** per identificare fonte e modello, **più** un tempo equivalente
-per aprire e validare ogni documento (i 🟡 di questa sezione).
+26 cantons, 6 models, no predictors. The real time of this census confirms this
+**~12–15 min per canton** to identify source and model, **plus** an equivalent time
+to open and validate each document (the 🟡 in this section).
 
-**Stima finale per il tema vacanze scolastiche: ~6 ore per l'identificazione, ~6 ore per
-la validazione documentale. ~12 ore-persona in totale**, contro le ~6 stimate all'inizio.
-Il raddoppio è dovuto a eccezioni nominate, varianti regionali e verifica dello status
-giuridico delle fonti — tutte cose che a campione non si vedevano.
+**Final estimate for the school holidays theme: ~6 hours for identification, ~6 hours for
+document validation. ~12 person-hours in total**, versus the ~6 initially estimated.
+The doubling is due to named exceptions, regional variations and status verification
+legal sources - all things that were not seen in the sample.
 
 ---
 
-## 8quater. Campione sul secondo tipo di vacanza 🟢
+## 8quater. sample on the second type of holiday 🟢
 
-Verificato il 2026-09-22 aprendo le fonti autorevoli, mai riassunti. Serve a decidere una
-cosa sola: **le righe `subtopic = "*"` del manifest sono un'affermazione sostenibile, o
-sovra-dichiarano?** Tutto §8ter è un censimento del **solo autunno**; ogni riga `*` estende
-quel risultato agli altri quattro tipi senza averli guardati.
+Verified the 2026-09-22 by opening the authoritative sources, never summarized. It helps to decide one
+one thing: **the `subtopic = "*"` lines of the manifest are a defensible statement, or
+do they over-report?** All §8ter is a census from **fall only**; each line `*` extends
+that result to the other four types without having looked at them.
 
-Campionate **tre classi di risoluzione su sei**, non cantoni a caso: è la classe che si
-vuole falsificare. Tipo scelto: **sport/carnevale**, dove la divergenza è già nota (BE
-febbraio comunale, SO sport e primavera variabili). Natale sarebbe stato il campione più
-compiacente.
+Sampled **three out of six resolution classes**, not random cantons: it is the class that yes
+wants to falsify. Type chosen: **sport/carnival**, where the divergence is already known (BE
+February municipal, SO sports and spring variable). Christmas would have been the best sample
+compliant.
 
-### 8quater.1 Esito: la classe regge, il dettaglio no
+### 8quater.1 Result: the class holds up, the detail doesn't
 
-| Cantone | Classe | Esito su tutti i tipi |
+| Canton | Class | I hesitate on all types |
 |---|---|---|
-| **BS** | uniforme | 🟢 **1 variante per tipo, 8 anni, zero eccezioni** |
-| **BL** | uniforme | 🟢 1 variante per tipo, 6 anni — ma l'eccezione di tipo di scuola vale su **due** tipi |
-| **NW** | uniforme | 🟢 1 variante per tipo, 6 anni, tipi di scuola persino accorpati |
-| **SZ** | per comune nella fonte | 🟡 regge, ma il **numero di varianti cambia per tipo e per anno** |
-| **OW** | uniforme con eccezioni | 🔴 l'eccezione nominata vale su **3 tipi su 5** |
+| **BS** | uniform | 🟢 **1 variant by type, 8 years, zero exceptions** |
+| **BL** | uniform | 🟢 1 variant for type, 6 years — but the school type exception applies to **two** types |
+| **NW** | uniform | 🟢 1 variant by type, 6 years, even merged school types |
+| **SZ** | by municipality in the source | 🟡 holds up, but the **number of variants changes by type and by year** |
+| **OW** | uniform with exceptions | 🔴 the named exception applies to **3 types to 5** |
 
-**Nelle tre classi qui sopra la CLASSE non cambia fra tipi di vacanza.** Un cantone
-uniforme in autunno è uniforme anche a Natale e a carnevale. Questo è il risultato che
-autorizza la riga `*` per `resolution_level` e `on_missing_place` — **per quelle classi**.
+**In the three classes above the CLASS does not change between types of holiday.** One canton
+uniform in autumn is also uniform at Christmas and carnival. This is the result that
+authorizes the `*` line for `resolution_level` and `on_missing_place` — **for those classes**.
 
-Ma dentro la classe, **il dettaglio è per tipo**, e il censimento dell'autunno lo perde.
+But inside the classroom, **the detail is by type**, and the fall census loses it.
 
-> ⚠️ **§8quinquies smentisce l'estensione a tutte le classi.** Nella classe *quadro
-> cantonale + scelta comunale* (AG, AR, SG) la classe **cambia** fra tipi, in tutti e tre
-> i cantoni. La previsione di §8quater.6 era giusta.
+> ⚠️ **§8quinquies denies the extension to all classes.** In the *framework class
+> cantonal + municipal choice* (AG, AR, SG) the class **changes** between types, in all three
+> the cantons. §8quater.6's prediction was right.
 
-### 8quater.2 🔴 OW: l'eccezione nominata esiste per alcuni tipi e non per altri
+### 8quater.2 🔴 OW: Named exception exists for some types and not others
 
-Dal PDF `ow.ch/_doc/454867`, `Schulferienplan_2026-27`, due tabelle nello stesso foglio:
+From PDF `ow.ch/_doc/454867`, `Schulferienplan_2026-27`, two tables in the same sheet:
 
-| Tipo | Volksschule (ohne Engelberg) | Engelberg | Divergono? |
+| Type | Volksschule (ohne Engelberg) | Engelberg | Do they diverge? |
 |---|---|---|---|
-| Herbstferien | 25.09 – 11.10.2026 | 03.10 – 25.10.2026 | **sì** |
-| Weihnachtsferien | 24.12.2026 – 06.01.2027 | 24.12.2026 – 06.01.2027 | **no, identiche** |
-| Fasnachtsferien | 30.01 – 14.02.2027 | 04.02 – 14.02.2027 | **sì** |
-| Osterferien | 26.03 – 11.04.2027 | 26.03 – 11.04.2027 | **no, identiche** |
-| Sommerferien | 03.07 – 15.08.2027 | 26.06 – 08.08.2027 | **sì** |
+| Herbstferien | 25.09 – 11.10.2026 | 03.10 – 25.10.2026 | **yes** |
+| Weihnachtsferien | 24.12.2026 – 06.01.2027 | 24.12.2026 – 06.01.2027 | **no, identical** |
+| Fasnachtsferien | 30.01 – 14.02.2027 | 04.02 – 14.02.2027 | **yes** |
+| Osterferien | 26.03 – 11.04.2027 | 26.03 – 11.04.2027 | **no, identical** |
+| Summer holidays | 03.07 – 15.08.2027 | 26.06 – 08.08.2027 | **yes** |
 
-> **Un'eccezione nominata non è una proprietà del comune: è una proprietà della coppia
-> (comune × tipo di vacanza).** Engelberg è un'eccezione in autunno, a carnevale e
-> d'estate, e non lo è a Natale e a Pasqua.
+> **A named exception is not the property of the municipality: it is the property of the couple
+> (municipality × type of holiday).** Engelberg is an exception in autumn, at carnival and
+> in summer, and not at Christmas and Easter.
 
-Nel caso OW è innocuo, perché entrambe le tabelle stanno nello stesso PDF e citano la
-stessa autorità: rispondere dalla riga Engelberg per Natale dà la data giusta e la fonte
-giusta. **Diventa pericoloso quando l'eccezione ha una fonte propria**, perché allora si
-cita un documento che per quel tipo non è competente.
+In the OW case it is harmless, because both tables are in the same PDF and cite the
+same authority: answer from the Engelberg line for Christmas gives the right date and source
+right. **It becomes dangerous when the exception has its own source**, because then yes
+cites a document that is not competent for that type.
 
-Il rischio simmetrico è peggiore e questo campione non lo esclude: un comune che diverge
-**solo** a carnevale, in un cantone uniforme in autunno, **non compare affatto** in un
-censimento dell'autunno. Il server risponderebbe con sicurezza e sbagliato.
+The symmetric risk is worse and this sample does not exclude it: a municipality that diverges
+**only** at carnival, in a uniform canton in autumn, **does not appear at all** in a
+autumn census. The server would respond confidently and wrong.
 
-### 8quater.3 BL: l'eccezione era sotto-registrata
+### 8quater.3 BL: Exception was under-logged
 
-§8ter.6 registra l'esclusione del Regionales Gymnasium Laufental-Thierstein **solo per
-l'autunno**, perché solo l'autunno era stato guardato. L'API `data.bl.ch` dataset `13350`
-mostra che esiste anche per l'**estate**, e in tutti e sei gli anni scolastici pubblicati:
+§8ter.6 records the exclusion of the Regionales Gymnasium Laufental-Thierstein **only for
+autumn**, because only autumn had been watched. The `data.bl.ch` API `13350` dataset
+shows that it also exists for **summer**, and in all six published school years:
 
 ```
 Herbstferien                                                    2026-09-26 -> 2026-10-11
@@ -1280,674 +1285,674 @@ Sommerferien                                                    2027-07-03 -> 20
 Sommerferien Gymnasium Laufental-Thierstein (Ausnahmeregelung)  2027-07-10 -> 2027-08-15
 ```
 
-Natale, carnevale e primavera non hanno eccezione. Tre tipi su cinque puliti, due no.
+Christmas, carnival and spring are no exception. Three out of five guys are clean, two aren't.
 
-### 8quater.4 SZ: il numero di varianti cambia per tipo E per anno
+### 8quater.4 SZ: The number of variants changes by type AND by year
 
-Dataset `ferienplan-kanton-schwyz`, filtrato alla sola scuola dell'obbligo (32 unità
-scolastiche; il tipo di scuola è giurisdizione, CONTRACT §4.4):
+Dataset `ferienplan-kanton-schwyz`, filtered to compulsory school only (32 unit
+scholastic; the type of school is jurisdiction, CONTRACT §4.4):
 
-| Tipo | varianti 2025/26 | varianti 2026/27 |
+| Type | variants 2025/26 | variants 2026/27 |
 |---|---|---|
 | Herbstferien | **1** | **2** |
 | Weihnachtsferien | **3** | **6** |
 | Sportferien | 2 | 2 |
 | Frühlingsferien | 1 | 1 |
-| Sommerferien | *assenti dal dataset* | *assenti dal dataset* |
+| Summer holidays | *absent from dataset* | *absent from dataset* |
 
-Natale ha **sei** calendari diversi nello stesso cantone e nello stesso anno; la primavera
-ne ha uno. E l'autunno passa da 1 variante a 2 **cambiando anno**.
+Christmas has **six** different calendars in the same canton and in the same year; spring
+he has one. And autumn goes from 1 variant to 2 **changing year**.
 
-> **Una validazione è valida per un anno scolastico, non per il cantone.** `validated_at`
-> da solo non lo cattura: va letto insieme all'anno di riferimento del documento.
+> **A validation is valid for a school year, not for the canton.** `validated_at`
+> alone does not capture it: it must be read together with the reference year of the document.
 
-⚠️ Il dataset **non contiene le vacanze estive**. Una fonte machine-readable comoda può
-essere incompleta su un tipo, e la lacuna non si vede se si interroga solo l'autunno.
+⚠️ The dataset **does not contain summer holidays**. A convenient machine-readable source can
+be incomplete on a type, and the gap is not seen if only the autumn is queried.
 
-### 8quater.5 🔴 I nomi dei tipi di vacanza non sono una tassonomia condivisa
+### 8quater.5 🔴 Vacation type names are not a shared taxonomy
 
-Raccolti dalle fonti di questo campione:
+Collected from the sources of this sample:
 
-| Slot | Nomi reali incontrati |
+| Slots | Real names encountered |
 |---|---|
-| sport / carnevale | `Sportferien` (SZ) · `Fasnachtsferien` (BL, OW, NW) · `Fasnachts- und Sportferien` (BS) |
-| primavera | `Frühlingsferien` (SZ) · `Frühjahrsferien` (BS, BL) · **`Osterferien`** (OW) · `Ostern` (NW) |
+| sports / carnival | `Sportferien` (SZ) · `Fasnachtsferien` (BL, OW, NW) · `Fasnachts- und Sportferien` (BS) |
+| spring | `Frühlingsferien` (SZ) · `Frühjahrsferien` (BS, BL) · **`Osterferien`** (OW) · `Ostern` (NW) |
 
-`Osterferien` è ancorata alla Pasqua, non al mese: chiamarla "primavera" è una nostra
-convenzione, non la loro. Un utente che scrive *"Wann sind die Osterferien?"* sta chiedendo
-lo stesso slot di chi scrive *"Frühjahrsferien"*, e il parametro `holiday_type` deve
-mapparli entrambi. Vale anche per il francese (`relâches`, `vacances de Pâques`) e
-l'italiano (`vacanze di carnevale`).
+`Osterferien` is anchored to Easter, not to the month: calling it "primavera" is our
+convention, not theirs. A user who writes *"Wann sind die Osterferien?"* is asking
+the same slot as the writer *"Frühjahrsferien"*, and the parameter `holiday_type` must
+map them both. Also valid for French (`relâches`, `vacances de Pâques`) and
+Italian (`vacanze di carnevale`).
 
-### 8quater.6 Cosa NON copre questo campione
+### 8quater.6 What this sample does NOT cover
 
-- **5 cantoni su 26**, e **3 classi su 6**. Mancano `per_regione_linguistica`,
-  `quadro cantonale + scelta comunale` e `delegato`.
-- La classe **quadro + scelta comunale** è quella dove ci si aspetta il crollo, ed è
-  l'unica non testata: §8ter.4 dice che in **AG** il Bildungsrat fissa 2 settimane per
-  primavera, autunno e Natale più 3 d'estate, e che **le restanti 4 settimane le fissano i
-  comuni**. Se è esatto, in AG la classe *cambia* fra tipi. Il manifest tiene già AG su
-  `ask` per tutto, che è la scelta conservativa e resta valida in entrambi i casi.
-- **Un solo tipo alternativo guardato a fondo** (sport/carnevale), più quello che le fonti
-  multi-tipo davano gratis. Estate e Natale sono coperti solo dove la fonte li elencava.
+- **5 cantons on 26**, and **3 classes on 6**. `per_regione_linguistica` is missing,
+  `quadro cantonale + scelta comunale` and `delegato`.
+- The **framework + municipal choice** class is the one where collapse is expected, and it is
+  the only one not tested: §8ter.4 says that in **AG** the Bildungsrat sets 2 weeks for
+  spring, autumn and Christmas plus 3 in summer, and that **the remaining 4 weeks are set by
+  municipalities**. If this is correct, in AG the class *changes* between types. The manifest already holds AG up
+  `ask` for everything, which is the conservative choice and remains valid in both cases.
+- **Only one alternative type looked at thoroughly** (sports/carnival), more than the sources
+  multi-type they gave free. Summer and Christmas are covered only where the source listed them.
 
 ---
 
-## 8quinquies. La classe che cambia per tipo: AG, AR, SG 🟢
+## 8quinquies. The class that changes by type: AG, AR, SG 🟢
 
-Verificato il 2026-09-22 aprendo i documenti, raggiunti **partendo dalla pagina di
-atterraggio** e non da URL indovinati (§8ter.9). §8quater.6 dichiarava questa classe non
-testata e prevedeva che fosse quella dove la classe stessa poteva cambiare. **La
-previsione era giusta, e vale per tutti e tre i cantoni.**
+Verified the 2026-09-22 by opening the documents, reached ** starting from the page
+landing** and not from guessed URLs (§8ter.9). §8quater.6 declared this class not
+tested and expected it to be the one where the class itself could change. **The
+prediction was right, and applies to all three cantons.**
 
-### 8quinquies.1 Le vacanze di sport non sono nel documento cantonale. In nessuno dei tre.
+### 8quinquies.1 Sports holidays are not in the cantonal document. In none of the three.
 
-| Cantone | Tipi fissati dal cantone | Tipo lasciato ai comuni | Fonte letta |
+| Canton | Types set by the canton | Type left to the municipalities | Source read |
 |---|---|---|---|
-| **AG** | autunno, Natale, primavera, estate | **Sportferien** — assenti dal PDF cantonale | PDF Erziehungsrat, 3 pagine |
-| **AR** | autunno, Natale, primavera, estate (11 settimane) | **2 settimane su 13** | PDF `Ferienrichtdaten v1.3` |
-| **SG** | autunno, Natale, primavera, estate | **Sport- bzw. Winterferien** | pagina `sg.ch` |
+| **AG** | autumn, Christmas, spring, summer | **Sportferien** — absent from the cantonal PDF | PDF Erziehungsrat, 3 pages |
+| **AR** | autumn, Christmas, spring, summer (11 weeks) | **2 weeks on 13** | PDF `Ferienrichtdaten v1.3` |
+| **SG** | autumn, Christmas, spring, summer | **Sports- bzw. Winter holidays** | page `sg.ch` |
 
-Le tre fonti lo dicono, ciascuna a modo suo:
+The three sources say it, each in their own way:
 
 > **AG** — *"Je zwei Wochen Frühlings-, Herbst- und Weihnachtsferien sowie drei Wochen
 > Sommerferien werden einheitlich durch den Erziehungsrat festgelegt. Die restlichen vier
 > Ferienwochen legen die Gemeinden selber fest."* · *"Regionale Unterschiede gibt es bei
-> den Sportferien sowie der Dauer der Sommer- bzw. Herbstferien."*
+> den Sportferien sowie der Dauer der Sommerbzw. Herbstferien."*
 >
 > **SG** — *"Die Sport- bzw. Winterferien werden durch die Schulträger (Gemeinde)
 > festgelegt und unterscheiden sich je nach Schulort."*
 >
-> **AR** — il PDF elenca solo autunno, Natale, primavera ed estate; le 2 settimane
-> comunali non compaiono.
+> **AR** — PDF lists fall, Christmas, spring, and summer only; the 2 weeks
+> municipal ones do not appear.
 
-> **Il documento cantonale non è incompleto per sciatteria: è completo rispetto a ciò che
-> il cantone decide.** Cercare le vacanze di sport lì dentro e non trovarle è il
-> comportamento corretto della fonte, non un suo difetto. Un `no_match` su quella fonte
-> non significa "il fatto non esiste" (CONTRACT §5.1).
+> **The cantonal document is not incomplete due to sloppiness: it is complete with respect to what
+> the canton decides.** Looking for sports holidays in there and not finding them is the
+> correct behavior of the source, not its defect. A `no_match` on that source
+> does not mean "the fact does not exist" (CONTRACT §5.1).
 
-### 8quinquies.2 AG: il cantone fissa l'inizio, il comune la durata
+### 8quinquies.2 AG: the canton sets the start, the municipality the duration
 
-È la contraddizione aperta in §10, e si scioglie: **entrambe le letture erano vere.**
+It's the open contradiction in §10, and it dissolves: **both readings were true.**
 
-- Il cantone fissa **l'inizio** dell'autunno e un **minimo di due settimane**
+- The canton sets the **start** of autumn and a **minimum of two weeks**
   (2026/27: KW 40/41, 28.09 – 09.10.2026).
-- Il comune può usare le sue quattro settimane libere per **estendere** autunno a 3
-  settimane o estate a 5: *"Dies betrifft den Beginn der zweiwöchigen Sportferien und die
-  Dauer der Sommerferien (4 oder 5 Wochen) bzw. Herbstferien (2 oder 3 Wochen)."*
+- The municipality can use its four free weeks to **extend** autumn to 3
+  weeks or summer at 5: *"Dies betrifft den Beginn der zweiwöchigen Sportferien und die
+  Dauer der Sommerferien (4 oder 5 Wochen) bzw. Herbstferien (2 or 3 Wochen)."*
 
-Quindi per l'autunno in AG **la data d'inizio è rispondibile senza il comune, la data di
-fine no**. Una risposta che dà solo l'inizio è corretta e incompleta; una che dà anche la
-fine senza il comune è sbagliata nella metà dei casi.
+So for autumn in AG **the start date can be answered without the municipality, the date of
+end no**. An answer that gives only the beginning is correct and incomplete; one who also gives the
+end without the municipality is wrong in half the cases.
 
-Il PDF chiude con *"Wir bitten um Kenntnisnahme und Einhaltung dieser **verbindlichen**
-Daten"*: vincolante, a differenza di AR.
+The PDF ends with *"Wir bitten um Kenntnisnahme und Einhaltung dieser **verbindlichen**
+Daten"*: binding, unlike AR.
 
-### 8quinquies.3 🔴 SG: la data in §8ter.2 è sbagliata di un giorno
+### 8quinquies.3 🔴 SG: The date in §8ter.2 is off by one day
 
-§8ter.2 riporta per SG **28.09 – 18.10.2026**, *derivata* dalla regola KW 40–42. La
-pagina cantonale pubblica le date, e sono **domenica 27.09.26 – domenica 18.10.26**.
+§8ter.2 reports for SG **28.09 – 18.10.2026**, *derived* from the KW rule 40–42. The
+cantonal page publishes the dates, and they are **Sunday 27.09.26 – Sunday 18.10.26**.
 
-La regola dice KW 40–42; il cantone fa iniziare le vacanze la **domenica** che apre la
-settimana 40, non il lunedì. Derivare una regola in date senza leggere la convenzione di
-inizio e fine sposta la risposta di un giorno — è §8.8 applicato a un caso nuovo.
+The rule says KW 40–42; the canton allows holidays to begin on the **Sunday** that opens
+week 40, not Monday. Deriving a rule in dates without reading the convention
+start and end moves the answer one day — it is §8.8 applied to a new case.
 
-**Regola operativa**: quando la fonte pubblica sia la regola sia le date, si citano le
-**date**, e la regola serve solo a spiegarle.
+**Operational rule**: when the source publishes both the rule and the dates, the
+**date**, and the rule only serves to explain them.
 
-### 8quinquies.4 AR resta indicativo, e ora si sa quanto
+### 8quinquies.4 AR remains indicative, and now we know how much
 
-Il documento si chiama `Ferienrichtdaten` e non è vincolante (§8ter.4). Ma elenca
-**11 delle 13 settimane** con date precise su quattro anni scolastici. Le 2 settimane
-comunali sono l'unica parte davvero aperta.
+The document is called `Ferienrichtdaten` and is not binding (§8ter.4). But list
+**11 of 13 weeks** with precise dates over four school years. The 2 weeks
+municipal offices are the only part that is truly open.
 
-Autunno 2026/27: **Lu 05.10 – Ve 16.10.2026**, coerente con §8ter.2. Nota che AR usa
-lunedì–venerdì come primo e ultimo giorno di vacanza, mentre SG usa domenica–domenica e
-BE *"den ersten und letzten vollen Ferientag"*: **tre convenzioni diverse in tre cantoni**.
+Autumn 2026/27: **Mo 05.10 – Fri 16.10.2026**, consistent with §8ter.2. Note which AR uses
+Monday–Friday as the first and last day of vacation, while SG uses Sunday–Sunday and
+BE *"den ersten und letzten vollen Ferientag"*: **three different agreements in three cantons**.
 
-### 8quinquies.5 Conseguenza sul manifest, e un errore che costa punti
+### 8quinquies.5 Consequence on the manifest, and a mistake that costs points
 
-Le righe `subtopic = "*"` per questi tre cantoni erano tutte sbagliate, in due direzioni
-opposte:
+The `subtopic = "*"` lines for these three cantons were all wrong, in two directions
+opposite:
 
-| Cantone | Prima | Dopo | Perché |
+| Canton | Before | After | Why |
 |---|---|---|---|
-| **AG** | `ask` su tutto | `ask` su `*`, **`answer` su Natale e primavera** | Natale e primavera sono interamente cantonali: chiedere il comune è penalizzato |
-| **AR** | `answer` su tutto | `answer` su `*`, **`ask` su sport** | le vacanze di sport non sono nella fonte cantonale |
-| **SG** | `ask` su tutto | `answer` su `*`, **`ask` su sport** | quattro tipi su cinque erano rispondibili, e chiedevamo |
+| **AG** | `ask` on everything | `ask` on `*`, **`answer` on Christmas and Spring** | Christmas and spring are entirely cantonal: asking the municipality is penalized |
+| **AR** | `answer` on everything | `answer` on `*`, **`ask` on sports** | sports holidays are not in the cantonal source |
+| **SG** | `ask` on everything | `answer` on `*`, **`ask` on sports** | four out of five types were answerable, and we asked |
 
-Il caso SG è il più caro: CHALLENGE §5.4 dice che **chiedere quando la domanda è già
-rispondibile conta come sbagliato**, alla pari del rispondere senza un dato essenziale.
-Una domanda sulle vacanze di Natale a San Gallo riceveva un ask-back inutile.
+The SG case is the most expensive: CHALLENGE §5.4 says that **ask when the question is already
+answerable counts as wrong**, on a par with answering without an essential piece of data.
+A question about the Christmas holidays in St. Gallen received a useless ask-back.
 
 ---
 
-## 8sexies. I tre rischi aperti del campione, chiusi 🟢
+## 8sexies. The sample's three open risks, closed 🟢
 
-Verificato il 2026-09-22. Chiude i tre punti che §10 teneva aperti sulle vacanze: il
-rischio San Gallo, Friburgo e il Vallese. **Due su tre hanno smentito ciò che il
-documento diceva di loro**, e in entrambi i casi l'errore era nella stessa direzione:
-una fonte era stata descritta senza essere stata letta fino in fondo.
+Verified the 2026-09-22. Closes the three points that §10 kept open on holidays: the
+risk St. Gallen, Friborg and Valais. **Two out of three denied what the
+document said about them**, and in both cases the error was in the same direction:
+a source had been described without having been read thoroughly.
 
-### 8sexies.1 🟢 San Gallo: il rischio non esiste, e si sa perché
+### 8sexies.1 🟢 St. Gallen: the risk does not exist, and we know why
 
-§9 dell'handoff chiedeva: **il piano della Città di San Gallo diverge sui quattro tipi
-cantonali?** Se sì, la riga `SG` sovra-dichiara, perché risponde `answer` con le date
-cantonali anche a chi vive nel capoluogo.
+§9 of the handoff asked: **the plan of the City of St. Gallen differs on the four types
+cantonal?** If yes, the line `SG` over-declares, because it responds `answer` with the dates
+cantonal also for those who live in the capital.
 
-La città pubblica `schulferien-feiertage-stadt-stgallen` su `daten.stadt.sg.ch`
-(Opendatasoft, nessuna auth). Trenta record, dal 2022 al luglio 2025.
+The city publishes `schulferien-feiertage-stadt-stgallen` on `daten.stadt.sg.ch`
+(Opendatasoft, no auth). Thirty records, from 2022 to July 2025.
 
-**Le due fonti non si sovrappongono nel tempo**: la città si ferma a luglio 2025, il
-cantone pubblica da 2026/27 a 2029/30. Un confronto diretto delle date 2026 è
-impossibile. Si confronta quindi la **regola**, ed è un confronto valido perché la
-regola cantonale è espressa in settimane ISO.
+**The two sources do not overlap in time**: the city stops in July 2025, the
+canton publishes from 2026/27 to 2029/30. A direct comparison of the dates 2026 is
+impossible. We then compare the **rule**, and it is a valid comparison because the
+cantonal rule is expressed in ISO weeks.
 
-Prima serve la convenzione del dataset comunale, e due record festivi la fissano senza
-ambiguità: `Auffahrt 2025-05-29 → 2025-05-30` (l'Ascensione 2025 è giovedì 29) e
-`Pfingstmontag 2025-06-09 → 2025-06-10` (lunedì 9). In entrambi **`endet_am` è
-esclusivo**, come il `DTEND` di un evento ICS all-day.
+First you need the convention of the municipal dataset, and two holiday records set it without
+ambiguity: `Auffahrt 2025-05-29 → 2025-05-30` (the Ascension 2025 is Thursday 29) and
+`Pfingstmontag 2025-06-09 → 2025-06-10` (Monday 9). In both **`endet_am` is
+exclusive**, such as the `DTEND` of an ICS all-day event.
 
-Con quella convenzione, le settimane scolastiche effettivamente libere in città:
+With that agreement, the school weeks actually free in the city:
 
-| tipo | città di San Gallo, 2022–2025 | regola cantonale |
+| type | city ​​of St. Gallen, 2022–2025 | cantonal rule |
 |---|---|---|
 | Herbstferien | KW 40, 41, 42 | KW 40–42 ✅ |
-| Frühlingsferien | KW 15, 16 | KW 15 e 16 ✅ |
-| Sommerferien | KW 28–32 | KW 28–32 ✅ |
-| Weihnachtsferien | KW 52 + KW 1 | 2 settimane ✅ |
-| Winterferien | KW 5, una settimana, 4 anni su 4 | **non nel piano cantonale** |
+| Frühlingsferien | KW 15, 16 | KW 15 and 16 ✅ |
+| Summer holidays | KW 28–32 | KW 28–32 ✅ |
+| Weihnachtsferien | KW 52 + KW 1 | 2 weeks ✅ |
+| Winter holidays | KW 5, one week, 4 years on 4 | **not in the cantonal plan** |
 
-Le uniche differenze sono di forma, non di sostanza: la città registra come primo giorno
-il **sabato** adiacente, che è già non scolastico, mentre il cantone pubblica
-domenica–domenica; e due estensioni ai festivi mobili (Karfreitag il 07.04.2023,
-Ostermontag il 21.04.2025), che sono giorni festivi e non vacanze.
+The only differences are of form, not of substance: the city registers as the first day
+on **Saturday** adjacent, which is already non-scholastic, while the canton publishes
+Sunday–Sunday; and two extensions to movable holidays (Karfreitag on 07.04.2023,
+Ostermontag on 21.04.2025), which are public holidays and not holidays.
 
-> **La riga `SG` non sovra-dichiara.** Le `Winterferien` sono l'unica cosa che la città
-> decide da sé, e sono esattamente il tipo `sport` già coperto dall'override `ask`
-> introdotto in §8quinquies.5. Il rischio si chiude confermando la riga, non correggendola.
+> **The `SG` line does not over-declare.** The `Winterferien`s are the only thing the city
+> decides for itself, and they are exactly the `sport` type already covered by the `ask` override
+> introduced in §8quinquies.5. The risk is closed by confirming the line, not correcting it.
 
-Due dettagli emersi leggendo la tabella cantonale per intero:
+Two details emerged when reading the cantonal table in full:
 
-- **Il Natale a SG non è una regola in settimane.** La nota 1 dice: *"Die
-  Weihnachtsferien dauern 2 Wochen. Der erste Weihnachtstag (25. Dezember) ist in der
-  ersten Ferienwoche."* È ancorato al 25 dicembre, non a una KW.
-- **La primavera cede alla Pasqua.** La nota 3 sul 2029/30: *"Ferienende ist der
-  Ostersonntag."* La regola KW 15–16 è quindi derogabile, e il documento lo dichiara.
+- **Christmas in SG is not a rule in weeks.** Note 1 says: *"Die
+  Weihnachtsferien dauern 2 Wochen. The first Weihnachtstag (25. Dezember) is in der
+  ersten Ferienwoche."* It is pegged to the December 25, not to a KW.
+- **Spring gives way to Easter.** The note 3 on the 2029/30: *"Ferienende ist der
+  Ostersonntag."* The KW 15–16 rule is therefore derogable, and the document declares it.
 
-Date cantonali 2026/27, da citare così come sono: autunno 27.09–18.10.26, Natale
-20.12.26–03.01.27, primavera 11.04–25.04.27, estate 11.07–15.08.27.
+Cantonal dates 2026/27, to be cited as they are: autumn 27.09–18.10.26, Christmas
+20.12.26–03.01.27, spring 11.04–25.04.27, summer 11.07–15.08.27.
 
-### 8sexies.2 🔴 Friburgo: la divergenza era attribuita alla regione sbagliata
+### 8sexies.2 🔴 Freiburg: Divergence was attributed to the wrong region
 
-Le date 2026 mancavano perché si era cercato un PDF. **Non serve**: `fr.ch/dfac/vacances-scolaires`
-pubblica tutte e tre le varianti in HTML testuale, con PDF e ICS per anno, fino al 2029/30.
+The 2026 dates were missing because a PDF was searched. **Not needed**: `fr.ch/dfac/vacances-scolaires`
+publishes all three variants in text-based HTML, with PDF and ICS by year, up to 2029/30.
 
-§8ter.8 registrava che *"per il 2027 coesistono du Lu 18. octobre e du Lu 4. octobre"* e
-la riga `FR/Morat-Murten` del manifest ne portava la traccia. Aprendo la pagina, quelle
-due date sono **majoritaire contro Kerzers**. Morat/Murten non c'entra.
+§8ter.8 recorded that *"per il 2027 coesistono du Lu 18. octobre e du Lu 4. octobre"* and
+the `FR/Morat-Murten` line of the manifest bore the trace. Opening the page, those
+two dates are **majoritaire against Kerzers**. Morat/Murten has nothing to do with it.
 
 | 2026/27 | majoritaire | Morat/Murten | Kerzers |
 |---|---|---|---|
-| rentrée | 27.08.26 | = | **24.08.26** |
-| automne | 12–23.10.26 | = | = |
+| rentree | 27.08.26 | = | **24.08.26** |
+| automatically | 12–23.10.26 | = | = |
 | Noël | 21.12.26–01.01.27 | = | = |
 | carnaval | 08–12.02.27 | = | **22–26.02.27** |
 | Pâques | 26.03–09.04.27 | = | **26.03–16.04.27** |
 
 | 2027/28 | majoritaire | Morat/Murten | Kerzers |
 |---|---|---|---|
-| automne | 18–29.10.27 | = | **04–22.10.27**, tre settimane contro due |
+| automatically | 18–29.10.27 | = | **04–22.10.27**, three weeks versus two |
 | Noël | 20–31.12.27 | = | = |
 | carnaval | 28.02–03.03.28 | = | **21–25.02.28** |
 | Pâques | 14–28.04.28 | = | **10–21.04.28** |
 
-Tre conseguenze:
+Three consequences:
 
-1. **Morat/Murten non è una variante di vacanze**, in nessuno dei due anni. Differisce
-   nei *jours fériés* (niente Toussaint, Immaculée Conception, Fête-Dieu; in più il
-   *Jour après la Solennité*) e ha due *jours joker* invece di uno. La riga si tiene lo
-   stesso: è una regione scolastica dichiarata dal cantone, e il punto 2 dice perché.
-2. **Quali tipi divergono cambia per anno.** Nel 2026/27 l'autunno di Kerzers coincide
-   col majoritaire; nel 2027/28 dista due settimane e dura una settimana in più. È lo
-   stesso pattern di SZ (§8quater.4), su un cantone diverso. Un campione su un anno solo
-   non dice quali tipi sono stabili.
-3. ⚠️ **La regione di Kerzers contiene quattro comuni bernesi**: Gurbrü, Wileroltigen,
-   Golaten, Ferenbalm, accanto a Kerzers, Fräschels e Ried b. Kerzers. Per quei quattro
-   la risposta giusta sta nel calendario **friburghese**. È il primo caso incontrato in
-   cui il confine della giurisdizione scolastica taglia un confine cantonale, e il
-   risolutore di luogo deve saperlo: un lookup per cantone li manderebbe su BE.
+1. **Morat/Murten is not a holiday variant**, in either year. It differs
+   in *jours fériés* (no Toussaint, Immaculée Conception, Fête-Dieu; plus the
+   *Jour après la Solemnity*) and has two *jours joker* instead of one. The line is held there
+   itself: it is a school region declared by the canton, and point 2 says why.
+2. **Which types diverge changes by year.** In 2026/27 the Kerzers autumn coincides
+   with the majoritaire; in the 2027/28 it is two weeks away and lasts one week longer. It is
+   same pattern as SZ (§8quater.4), on a different canton. A sample of just one year
+   it doesn't say which types are stable.
+3. ⚠️ **The Kerzers region contains four Bernese municipalities**: Gurbrü, Wileroltigen,
+   Golaten, Ferenbalm, next to Kerzers, Fräschels and Ried b. Kerzers. For those four
+   the right answer lies in the **Fribourg** calendar. It is the first case encountered in
+   where the border of the school jurisdiction cuts a cantonal border, and the
+   place solver must know: a lookup by canton would send them to BE.
 
-L'estate non è elencata come periodo, ma è derivabile senza ambiguità dai due capi
-(*Dernier jour de classe* → *Début de l'année scolaire* successivo), e la pagina
-pubblica abbastanza anni perché entrambi i capi esistano sempre.
+Summer is not listed as a period, but is unambiguously derivable from the two heads
+(*Dernier jour de scuola* → *Début de l'année scolaire* next), and the page
+publish enough years for both leaders to always exist.
 
-### 8sexies.3 🔴 Vallese: non è un problema di OCR, il dato non c'è
+### 8sexies.3 🔴 Valais: it's not an OCR problem, the data isn't there
 
-§8ter.8 lo chiamava *"l'unico caso in cui la fonte autorevole è illeggibile a una
-pipeline testuale"* e prevedeva OCR o analisi di layout. **Entrambi sarebbero stati
-lavoro sprecato.** Il `Plan de scolarité valais romand` non è un calendario reso male:
-è un **modulo vuoto**.
+§8ter.8 called it *"the only case in which the authoritative source is illegible to a
+text pipeline"* and involved OCR or layout analysis. **Both would have been
+wasted work.** The `Plan de scolarité valais romand` is not a poorly rendered calendar:
+it is an **empty form**.
 
-Il testo estratto lo dice per intero: *"Colorier en bleu les jours entiers de classe et
-en jaune les demi-jours"*, e la legenda dichiara che il grassetto sono *"Samedis,
-dimanches et jours fériés"* — **non** le vacanze. Le uniche cifre nel documento sono i
-conteggi mensili di giorni di scuola e il totale (165.5, *Solde* −1). Nessun OCR può
-estrarre una data che nel documento non è mai stata scritta.
+The extracted text says: *"Colorier en bleu les jours entiers de classe et
+en jaune les demi-jours"*, and the legend says bold dates are *"Samedis,
+dimanches et jours fériés"* — **not** the holidays. The only figures in the document are i
+monthly counts of school days and the total (165.5, *Solde* −1). No OCR can
+extract a date that was never written in the document.
 
-La pagina cantonale conferma che è voluto:
+The cantonal page confirms that it is desired:
 
 > *"Attention, les plans sont indicatifs. Pour toutes dates de vacances plus précises,
 > s'adresser directement à la Direction d'école (ou Commune) concernée."*
 
-**L'altra metà del cantone invece è risolta**, e la fonte era a un clic di distanza:
+**The other half of the canton is resolved**, and the source was just one click away:
 
-- `Schul- und Ferienplan 2026-2027.pdf` — PDF **immagine**, `pypdf` estrae 0 caratteri su
-  2 pagine. È il documento che il nome fa sembrare quello giusto.
-- `Übersicht Schul- und Ferienplan 2026-2027.pdf` — **tabella testuale, una riga per
-  comune, tutti i tipi**, estratta pulita. È la fonte da usare.
+- `Schul- und Ferienplan 2026-2027.pdf` — PDF **image**, `pypdf` extracts 0 characters on
+  2 pages. It is the document that the name makes it sound like the right one.
+- `Übersicht Schul- und Ferienplan 2026-2027.pdf` — **text table, one line per
+  municipality, all types**, drawn clean. It is the source to use.
 
-> ⚠️ L'`Übersicht` è elencata **solo sulla landing tedesca** `vs.ch/de/web/se/plans-de-scolarite`.
-> La landing francese, stesso path senza `/de/`, non la mostra. In un cantone bilingue le
-> due lingue del sito non servono lo stesso insieme di documenti: cambiare lingua è un
-> passo di ricerca, non una traduzione.
+> ⚠️ The `Übersicht` is listed **only on the German landing page** `vs.ch/de/web/se/plans-de-scolarite`.
+> The French landing, same path without `/de/`, does not show it. In a bilingual canton the
+> two site languages do not serve the same set of documents: changing the language is a
+> search step, not a translation.
 
-Valori di maggioranza 2026/27 e le varianti:
+Majority values 2026/27 and variants:
 
-| | Schulbeginn | Herbst | Weihnachten | Fasnacht/Sport | Ostern | Maiferien |
+| | Schulbeginn | Herbst | Weihnachten | Fasnacht/Sports | Ostern | Maiferien |
 |---|---|---|---|---|---|---|
-| maggioranza | 17.08. | 09.10.–26.10. | 18.12.–04.01. | 19.02.–08.03. | 25.03.–30.03. | 30.04.–10.05. |
+| majority | 17.08. | 09.10.–26.10. | 18.12.–04.01. | 19.02.–08.03. | 25.03.–30.03. | 30.04.–10.05. |
 | Leukerbad, Zermatt, Saas | 17.08. | = | = | **26.02.**–08.03. | = | **23.04.**–10.05. |
 
-Due cose che questa tabella insegna e che valgono oltre il Vallese:
+Two things that this table teaches and which are valid beyond Valais:
 
-- 🔴 **Esiste un sesto tipo di vacanza.** La colonna `Maiferien` non ha uno slot
-  nell'enum `holiday_type` di `src/tools.ts`. Una domanda sulle vacanze di maggio in
-  Vallese non ha dove andare. È §8quater.5 su un caso nuovo, e stavolta non è un nome
-  locale per uno slot esistente: è un periodo in più.
-- **Una quarta convenzione di estremi.** Le colonne sono *Beginn **abends*** / *Ende
-  **morgens***: `Herbst 09.10.–26.10.` significa che le vacanze cominciano la sera del 9
-  e finiscono la mattina del 26, cioè i giorni pieni sono **10.10.–25.10.** Dopo SG
-  (domenica–domenica), AR (lunedì–venerdì) e BE (primo e ultimo giorno pieno), è la
-  quarta in quattro cantoni. Citare la data grezza senza la convenzione sbaglia di un
-  giorno per estremo.
+- 🔴 **There is a sixth type of holiday.** The `Maiferien` column does not have a slot
+  in the `holiday_type` enum of `src/tools.ts`. A question about the May holidays in
+  Valais has nowhere to go. It's §8quater.5 on a new case, and this time it's not a name
+  local for an existing slot: it is an extra period.
+- **A fourth convention of extrema.** Columns are *Beginn **abends*** / *Ende
+  **morgens***: `Herbst 09.10.–26.10.` means that the holidays begin on the evening of 9
+  and end on the morning of 26, i.e. full days are **10.10.–25.10.** After SG
+  (Sunday–Sunday), AR (Monday–Friday) and BE (first and last full day), is the
+  fourth in four cantons. Citing the raw date without the convention makes a mistake
+  day to extreme.
 
-Il perimetro dell'`Übersicht` è *deutschsprachige Primar- und Orientierungsschulen*:
-tipo di scuola oltre che territorio (CONTRACT §4.4). Per questo contiene righe per le
-scuole tedesche di **Siders e Sitten**, che stanno in territorio romando.
+The scope of the `Übersicht` is *deutschsprachige Primar- und Orientierungsschulen*:
+type of school as well as territory (CONTRACT §4.4). This is why it contains lines for
+German schools of **Siders and Sitten**, which are in Roman territory.
 
 ---
 
-## 8septies. Tutte le righe delle vacanze, aperte sul documento 🟢
+## 8septies. All the holiday lines, open on the document 🟢
 
-Verificato il 2026-09-23. Ogni riga ancora vuota di `coverage/school_holidays.toml` è
-stata chiusa aprendo il documento e leggendo **tutti e cinque i tipi**. Esito: tutte le
-righe validate tranne **`SZ/summer`**, lasciata vuota di proposito (sotto). Le date sono
-nelle `notes` di ogni riga; qui sta ciò che vale oltre la singola riga.
+Verified the 2026-09-23. Any still empty row of `coverage/school_holidays.toml` is
+closed by opening the document and reading **all five types**. Result: all
+validated lines except **`SZ/summer`**, left blank on purpose (below). The dates are
+in the `notes` of each row; here lies what is worth beyond the single line.
 
-### 8septies.1 🔴 Sette affermazioni date per verificate erano sbagliate
+### 8septies.1 🔴 Seven statements believed to have been verified were wrong
 
-| Riga | Cosa diceva | Cosa dice la fonte |
+| Line | What he said | What the source says |
 |---|---|---|
-| **`SO/autumn`** | override: autunno uniforme, `answer` | **3 varianti su 85 enti**, stessa struttura su 2025/26 e 2026/27. Con l'override 6 enti ricevevano una data sbagliata senza che si chiedesse il luogo. Uniforme è il **Natale** (85/85, due anni): l'override ora sta lì |
-| **ZH, ask-back** | *"set by each municipality (VSV §32 para. 2)"* | §32 cpv. 2 VSV permette ai comuni **quattro giorni liberi**, non fissa chi decide le vacanze. Citazione falsa nel punto dove il principio era "citare, non asserire" |
-| **ZH, Natale** | coperto dall'ask-back | **cantonale e vincolante** (*"im Kanton einheitlich festgelegt"*). Chiedere il comune era la mossa che CHALLENGE §5.4 penalizza. Nuovo override `ZH/christmas` |
-| **GE** | *"confina con VD e non si sovrappone di un giorno"* | l'autunno GE 19–23.10.26 sta **dentro** l'autunno VD 10–25.10.26 |
-| **SH** | pubblica la regola, non le date | pubblica **entrambe**, fino al 2034/35 |
-| **AI** | il liceo è una colonna diversa | nel documento 2026–2029 il Gymnasium è **incluso** nel Landesteil interno |
-| **§8.4c, Biel** | bilingue, classificata germanofona | **alterna**: calendario DE negli anni scolastici che iniziano in anno pari, BEJUNE in quelli dispari. Vale anche per Evilard, Orvin, Plagne, Romont, Vauffelin |
+| **`SO/autumn`** | override: uniform autumn, `answer` | **3 variants on 85 entities**, same structure on 2025/26 and 2026/27. With the 6 override, entities received the wrong date without being asked for the location. Uniform is **Christmas** (85/85, two years): the override is now there |
+| **ZH, ask-back** | *"set by each municipality (VSV §32 para. 2)"* | §32 para. 2 VSV allows municipalities **four days off**; it does not establish who sets the holidays. The supposed citation did not support the claim. |
+| **ZH, Christmas** | covered by the ask-back | **cantonal and binding** (*"im Kanton einheitlich festgelegt"*). Asking the municipality was the move that CHALLENGE §5.4 penalizes. New override `ZH/christmas` |
+| **GE** | *"does not overlap with VD by even a day"* | GE autumn 19–23.10.26 falls **within** VD autumn 10–25.10.26 |
+| **SH** | publish the rule, not the dates | publish **both**, until 2034/35 |
+| **AI** | high school is a different column | in the document 2026–2029 the Gymnasium is **included** in the internal Landesteil |
+| **§8.4c, Biel** | bilingual, classified as German-speaking | **alternates**: DE calendar in school years starting in even-numbered years, BEJUNE in odd-numbered ones. Also applies to Evilard, Orvin, Plagne, Romont, Vauffelin |
 
-Tre di queste venivano da una sola estrazione o da un solo anno letto (§7.3
-dell'handoff): SO, GE, Biel. Il caso SO è il più istruttivo: §8ter.2b aveva scartato
-come falso un riassunto di ricerca che diceva il vero.
+Three of these came from a single extraction or a single year read (§7.3
+of the handoff): SO, GE, Biel. The SO case is the most instructive: §8ter.2b had discarded
+as false a research summary that told the truth.
 
-### 8septies.2 🔴 "Hiver" non è uno slot: è un falso amico
+### 8septies.2 🔴 "Hiver" is not a slot: it's a false friend
 
-| Nome locale | Cantone | Slot |
+| Local name | Canton | Slots |
 |---|---|---|
-| *Vacances d'hiver* | **NE, VD, BE francofono** | **christmas** |
-| *Winterferien* | GL, SO, città di SG | **sport** |
-| *Winterferien* | BE germanofono | **christmas** |
-| *Vacances du 1er mars* | NE | sport |
-| *Relâches* | VD | sport |
-| *Semaine blanche* | BE francofono | sport (delegata) |
+| *Hiver holidays* | **NE, VD, BE French-speaking** | **christmas** |
+| *Winterferien* | GL, SO, City of SG | **sport** |
+| *Winterferien* | BE German speaker | **christmas** |
+| *Holidays du 1er mars* | NE | sports |
+| *Relâches* | VD | sports |
+| *White week* | BE francophone | sports (delegate) |
 
-La stessa parola indica lo slot opposto a seconda del cantone, e perfino dentro BE. Il
-parametro `holiday_type` va mappato **per cantone**, mai per traduzione (§8quater.5).
+The same word indicates the opposite slot depending on the canton, and even within BE. The
+parameter `holiday_type` must be mapped **per canton**, never by translation (§8quater.5).
 
-### 8septies.3 ⚠️ Periodi che non stanno nei cinque slot
+### 8septies.3 ⚠️ Periods that do not fit into the five slots
 
-| Periodo | Dove | Stato |
+| Period | Where | Status |
 |---|---|---|
-| `Maiferien` | VS germanofono | **deciso 2026-09-23: non coperto** |
-| `Pfingstferien` | TG, 06.05–17.05.2027 | **deciso 2026-09-23: non coperto** |
-| `Auffahrtsferien` | ZG, 06.05–09.05.2027 | **deciso 2026-09-23: non coperto** |
+| `Maiferien` | VS German speaker | **decided 2026-09-23: not covered** |
+| `Pfingstferien` | TG, 06.05–17.05.2027 | **decided 2026-09-23: not covered** |
+| `Auffahrtsferien` | ZG, 06.05–09.05.2027 | **decided 2026-09-23: not covered** |
 
-Pfingst- e Auffahrtsferien sono lo stesso caso delle Maiferien. La decisione presa per
-queste ultime non si estende da sola: resta aperta in §10.
+Pfingst- and Auffahrtsferien are the same case as Maiferien. The decision made for
+the latter does not extend on its own: it remains open in §10.
 
-### 8septies.4 Tre giurisdizioni scolastiche che attraversano un confine cantonale
+### 8septies.4 Three school jurisdictions crossing a cantonal border
 
-- **FR/Kerzers** contiene quattro comuni bernesi (§8sexies.2), già deciso.
-- **TG/Neunforn**: gli allievi di **secondaria** frequentano a Ossingen (ZH) e ne seguono
-  le date — sport diverso, **nessuna** vacanza di primavera, Pentecoste diversa. Le
-  elementari seguono TG. È tipo di scuola più comune, quindi non una riga di comune:
-  trattato come BL (CONTRACT §4.4).
-- **LU**: una categoria di comuni *"richtet sich nach den Ferien des Kt. Zug"*. Le date
-  sono comunque stampate per comune; la categoria è segnata **solo col colore** e il
-  testo estratto non la porta.
+- **FR/Kerzers** contains four Bernese municipalities (§8sexies.2), already decided.
+- **TG/Neunforn**: **secondary** students attend in Ossingen (ZH) and follow
+  the dates — different sport, **no** spring break, different Pentecost. Le
+  elementary school follows TG. It's more common school type, so not a common line:
+  treated as BL (CONTRACT §4.4).
+- **LU**: a category of municipalities *"richtet sich nach den Ferien des Kt. Zug"*. The dates
+  they are however printed by municipality; the category is marked **only with color** and the
+  extracted text does not bring it.
 
-### 8septies.5 L'estate è quasi sempre derivata, e una volta non si può
+### 8septies.5 Summer is almost always derivative, and once you can't
 
-FR, TI, GR, UR e SZ non elencano l'estate come periodo: danno l'ultimo giorno di scuola e
-l'inizio dell'anno dopo. Si deriva, e dove serve si legge il documento dell'anno
-successivo (TI, UR). **SZ non si può**: né il PDF cantonale né il dataset danno il primo
-giorno 2027/28. Per questo `SZ/*` è validata sugli altri quattro tipi e `SZ/summer` è
-un override **non validato**, così `lookup(SZ, summer)` non cade su una riga coperta.
+FR, TI, GR, UR and SZ do not list summer as a period: they give the last day of school and
+the beginning of the following year. We derive it, and where necessary we read the document of the year
+next (TI, UR). **SZ cannot be**: neither the cantonal PDF nor the dataset gives the former
+day 2027/28. For this reason `SZ/*` is validated on the other four types and `SZ/summer` is
+an **unvalidated** override, so `lookup(SZ, summer)` doesn't fall on a covered row.
 
-### 8septies.6 Fonti che si dichiarano non vincolanti, o bozze
+### 8septies.6 Sources that declare themselves non-binding, or drafts
 
 - **SO**: *"Die Veröffentlichung erfolgt ohne Gewähr"* → `indicative`.
-- **SZ**: anche il PDF cantonale è *"Zusammenstellung ohne Gewähr. Verbindlich sind die
-  von den Schulräten erlassenen Ferienpläne"*. Il PDF vincolante cantonale che la vecchia
-  nota chiedeva di trovare **non esiste**.
-- **ZH**: il documento delle date è intestato **Entwurf** (26.06.2023). Si usa solo per la
-  data del Natale, che coincide con la regola *verbindlich* della pagina.
-- **JU**: l'arrêté del 10.03.2026 **abroga** quello del 2022, che copriva già fino al
-  2027/28. Le date sono state rifatte a metà periodo.
+- **SZ**: the cantonal PDF is also *"Zusammenstellung ohne Gewähr. Verbindlich sind die
+  von den Schulräten erlassenen Ferienpläne"*. The cantonal binding PDF that the old one
+  note asked to find **does not exist**.
+- **ZH**: the date document is headed **Entwurf** (26.06.2023). It is used only for
+  date of Christmas, which coincides with the *verbindlich* rule of the page.
+- **JU**: the arrêté of the 10.03.2026 **repeals** that of the 2022, which already covered up to
+  2027/28. The dates were redone halfway through the period.
 
-### 8septies.7 Trappole di accesso nuove
+### 8septies.7 New entry traps
 
-- **SH**: pagina renderizzata via JavaScript, `curl` vede 12 righe. Serve un browser.
-- **notes.zh.ch**: il link al testo di legge restituisce 200 con 156 byte di HTML e un
-  redirect JavaScript. Il PDF sta sul path del redirect.
-- **UR**: il deep link `_doc/432274` indicizzato dai motori dà 404; il vivo è `_doc/449362`.
-- **UR**: le celle contengono solo il giorno; il mese sta nell'intestazione.
-- **JU**: PDF servito come `application/octet-stream`.
-- **TI**: un riassunto di ricerca dichiarava le pagine protette da CAPTCHA. Il PDF si
-  scarica senza, e la landing risponde 200.
+- **SH**: page rendered via JavaScript, `curl` sees 12 rows. You need a browser.
+- **notes.zh.ch**: the link to the law text returns 200 with 156 bytes of HTML and a
+  JavaScript redirects. The PDF is on the redirect path.
+- **UR**: the deep link `_doc/432274` indexed by the engines gives 404; the live one is `_doc/449362`.
+- **UR**: the cells contain only the day; the month is in the header.
+- **JU**: PDF served as `application/octet-stream`.
+- **TI**: A search summary declared pages protected by CAPTCHA. The PDF yes
+  download without, and the landing responds 200.
 
-### 8septies.8 ⚠️ Eccezioni che la fonte ammette ma non nomina
+### 8septies.8 ⚠️ Exceptions that the source admits but does not name
 
-**BE**: i comuni in regione turistica alpina *possono* spostare la primavera fra le
-settimane 15 e 21, e nessuno dei due documenti dice quali. La riga `BE/*` risponde con la
-data cantonale; per quei comuni potrebbe essere sbagliata. Aperto in §10.
+**BE**: municipalities in the Alpine tourist region *can* move the spring between
+weeks 15 and 21, and neither document says which. The `BE/*` line responds with the
+cantonal date; for those municipalities it could be wrong. Opened in §10.
 
 ---
 
-## 9. Campionamento cantonale: patente estera 🟢
+## 9. Cantonal sampling: foreign driving license 🟢
 
-Stessi cinque cantoni, verificati il 2026-09-21. **Risultato opposto alle vacanze
-scolastiche: qui il modello è omogeneo, perché la sostanza è federale.**
+Same five cantons, verified 2026-09-21. **Result opposite to holidays
+schools: here the model is homogeneous, because the substance is federal.**
 
-### 9.1 La sostanza è federale, la procedura è cantonale
+### 9.1 The substance is federal, the procedure is cantonal
 
-Base legale verificata: **VZV / OAC, SR 741.51**, articoli 29, 42–44, 150.
+Verified legal basis: **VZV / OAC, SR 741.51**, articles 29, 42–44, 150.
 ELI: `https://www.fedlex.admin.ch/eli/cc/1976/2423_2423_2423/de` (200, HTML).
 
-Il **termine di 12 mesi** dall'entrata in Svizzera è diritto federale. Tutti e cinque i
-cantoni campionati lo riportano identico — perché lo ripetono, non perché lo stabiliscano.
-Federale è anche la regola su quali paesi richiedono una corsa di controllo.
+The **term of 12 months** from entry into Switzerland is federal law. All five
+sampled cantons report it identical — because they repeat it, not because they establish it.
+Also federal is the rule on which countries require a check ride.
 
-**Conseguenza**: una sola fonte federale copre la sostanza per tutti e 26 i cantoni.
-I 26 documenti cantonali servono solo per la procedura.
+**Consequence**: one federal source covers the substantive rule for all 26 cantons.
+The 26 cantonal documents are used only for the procedure.
 
-### 9.2 Cosa varia davvero, per cantone
+### 9.2 What really varies, by canton
 
-| Cantone | Ufficio | Elementi cantonali verificati |
+| Canton | Office | Verified cantonal elements |
 |---|---|---|
-| VD | SAN | modulo **220**; sedi Aigle, Lausanne, Nyon, Yverdon; 2–3 giorni lavorativi |
-| TI | Sezione della circolazione | modulo online; **CHF 150** (200 con categorie professionali); 1–2 settimane |
-| ZH | Strassenverkehrsamt | regole corsa di controllo per paese; sede Zürich-Albisgütli |
-| BE | SVSA | modulo + foto; **test della vista** da ottico o oculista svizzero; Schermenweg 5 |
-| GR | STVA | Ringstrasse 2, Chur; **modulo anche in romancio** |
+| VD | SAN | form **220**; locations Aigle, Lausanne, Nyon, Yverdon; 2–3 working days |
+| TI | Circulation section | online form; **CHF 150** (200 with professional categories); 1–2 weeks |
+| ZH | Strassenverkehrsamt | control drive rules by country; headquarters Zürich-Albisgütli |
+| BE | SVSA | form + photo; **eye test** by a Swiss optician or ophthalmologist; Schermenweg 5 |
+| GR | STVA | Ringstrasse 2, Chur; **form also in Romansh** |
 
-### 9.3 La domanda campione #2 richiede entrambi i livelli
+### 9.3 Sample question #2 requires both levels
 
 > *"Comment puis-je échanger mon permis de conduire étranger contre un permis suisse dans
 > le canton de Vaud, **et combien de temps ai-je pour le faire**?"*
 
-Il "come" è cantonale (modulo 220, sedi SAN). Il "quanto tempo" è **federale** (VZV).
+The "how" is cantonal (form 220, SAN offices). The "how long" is **federal** (VZV).
 
-Citare la pagina vodese come fonte del termine di 12 mesi attribuisce una norma federale
-all'autorità sbagliata. La review checklist punto 3 chiede esattamente di verificare che
-l'editore sia responsabile della materia. Una risposta completa cita **due fonti a due
-livelli**, ciascuna per la parte di cui è competente.
+Citing the Vaud page as the source of the term of 12 months attributes a federal regulation
+to the wrong authority. The review checklist point 3 asks you to verify exactly that
+the publisher is responsible for the matter. A complete response cites **two sources by two
+levels**, each for the part for which it is competent.
 
-### 9.4 ⚠️ Trappola di freschezza verificata su Berna
+### 9.4 ⚠️ Verified freshness trap on Bern
 
-Lo stesso ufficio compare su due domini:
+The same office appears on two domains:
 
-| URL | Esito |
+| URL | Outcome |
 |---|---|
-| `svsa.sid.be.ch/.../umtausch-fuehrerausweis-ausland.html` | **HTTP 200**, 180 KB — attuale |
-| `svsa.pom.be.ch/svsa_pom/de/.../umtausch-auslaendischer-fuehrerausweis.html` | **HTTP 000** — dominio morto |
+| `svsa.sid.be.ch/.../umtausch-fuehrerausweis-ausland.html` | **HTTP 200**, 180 KB — current |
+| `svsa.pom.be.ch/svsa_pom/de/.../umtausch-auslaendischer-fuehrerausweis.html` | **HTTP 000** — dead domain |
 
-Berna ha riorganizzato le direzioni (POM → SID) e il vecchio dominio non risponde più.
-**Ma la ricerca web restituisce ancora entrambi**, e il morto sembra autorevole quanto il
-vivo.
+Bern has reorganized the directions (POM → SID) and the old domain no longer responds.
+**But the web search still returns both**, and the dead page appears as authoritative as the
+alive.
 
-È letteralmente il fallimento della slide 3 del briefing: *"An old page outranks the
-current one."* Difesa obbligatoria: **validare che ogni URL del registro risponda al
-momento del build**, e registrare la data di validazione accanto alla fonte.
+It is literally the failure of the briefing slide 3: *"An old page outranks the
+current one."* Mandatory defense: **validate that each URL in the registry matches the
+build time**, and record the validation date next to the source.
 
-### 9.5 Romancio nativo, di nuovo
+### 9.5 Native Romansh, again
 
-I Grigioni pubblicano `Antrag_und_Umtausch_Führerausweis_RM.pdf` — modulo per il cambio
-della patente **in romancio**, 786 KB, verificato 200.
+Graubünden publishes `Antrag_und_Umtausch_Führerausweis_RM.pdf` — exchange form
+of the driving license **in Romansh**, 786 KB, verified 200.
 
-È il **secondo tema su due** in cui la fonte autorevole serve il romancio nativamente
-(il primo è il piano ferie GR trilingue, §8.6). Ipotesi di lavoro: nei Grigioni la
-copertura romancia è una prassi amministrativa, non un'eccezione — il che rende il
-romancio molto meno costoso di quanto temuto, purché le fonti siano quelle cantonali GR.
+It is the **second theme out of two** in which the authoritative source serves Romansh natively
+(the first is the trilingual GR holiday plan, §8.6). Working hypothesis: in Graubünden the
+Romansh coverage is an administrative practice, not an exception — which makes the
+Romansh much less expensive than feared, as long as the sources are the cantonal GR ones.
 
-### 9.4b Altri due hostname che non reggono, verificati 2026-09-22
+### 9.4b Two more hostnames that don't hold up, verified 2026-09-22
 
-Emersi validando il manifest di copertura contro la rete:
+Emerged by validating the coverage manifest against the network:
 
-| Hostname | Esito | Lettura |
+| Hostname | Outcome | Reading |
 |---|---|---|
-| `strassenverkehrsamt.zh.ch` | **getaddrinfo failed** — non risolve | Il nome ovvio dell'ufficio non è un dominio. La pagina va cercata sotto `zh.ch` |
-| `www.stva.gr.ch` | **catena SSL incompleta** (`unable to get local issuer certificate`) | Il sito esiste e il DNS risolve; il server non serve la catena intermedia. Una pipeline con verifica TLS standard lo scarta, un browser no |
+| `strassenverkehrsamt.zh.ch` | **getaddrinfo failed** — does not resolve | The obvious office name is not a domain. The page should be searched under `zh.ch` |
+| `www.stva.gr.ch` | **incomplete SSL chain** (`unable to get local issuer certificate`) | The site exists and the DNS resolves; the server does not serve the intermediate chain. A pipeline with standard TLS verification discards it, a browser does not |
 
-Il secondo caso è nuovo rispetto a §9.4: lì il dominio era **morto**, qui è **vivo ma
-non validabile**. Sono due fallimenti diversi e vanno distinti nel registro, perché il
-primo va sostituito e il secondo va solo verificato a mano.
+The second case is new compared to §9.4: there the domain was **dead**, here it is **alive but
+not validatable**. They are two different failures and must be distinguished in the register, because the
+the first must be replaced and the second must only be checked by hand.
 
-### 9.6 Costo di ricerca e confronto tra i due temi cantonali
+### 9.6 Cost of research and comparison between the two cantonal themes
 
-| | Vacanze scolastiche | Patente estera |
+| | School holidays | Foreign driving license |
 |---|---|---|
-| Modello | **5 cantoni, 5 modelli** | **omogeneo** |
-| Sostanza | cantonale o comunale | **federale** (VZV) |
-| Cosa varia | granularità, formato, regole | modulo, tassa, sede, canale |
-| Inferenza tra cantoni | **letale** (3 settimane di scarto) | sicura sulla sostanza, vietata sulla procedura |
-| Ask-back necessario | sì, in ZH e BE-febbraio | **no** |
-| Costo per cantone | ~14 min, varianza alta | **~8–10 min, varianza bassa** |
-| Stima 26 cantoni | ~6h | **~4h** |
+| Model | **5 cantons, 5 models** | **homogeneous** |
+| Substance | cantonal or municipal | **federal** (VZV) |
+| What varies | granularity, format, rules | form, fee, location, channel |
+| Inference between cantons | **lethal** (3 weeks waste) | safe on the substance, prohibited on the procedure |
+| Ask-back needed | yes, in ZH and BE-February | **no** |
+| Cost per canton | ~14 min, high variance | **~8–10 min, low variance** |
+| Estimate 26 cantons | ~6h | **~4h** |
 
-La patente estera è il tema cantonale più economico e prevedibile dei due, e la stima
-iniziale di 4.5h regge. Le vacanze scolastiche sono l'opposto: costano di più e
-richiedono il campo "livello di risoluzione" di §8.7.
+The foreign driving license is the cheaper and more predictable cantonal issue of the two, and the estimate
+initial of 4.5h holds. School holidays are the opposite: they cost more and
+require the "livello di risoluzione" field of §8.7.
 
 ---
 
-### 9.7 🟢 I 26 uffici da un registro solo, invece di 21 ricerche
+### 9.7 🟢 The 26 offices from one registry only, instead of 21 searches
 
-§10 elencava *"21 cantoni restanti, meccanici"*. Non erano 21 ricerche: erano una.
-L'associazione degli uffici cantonali della circolazione pubblica l'elenco completo su
-`asa.ch/strassenverkehrsaemter/adressen/`, con nome dell'ufficio, telefono, email e link
-al sito per tutti i cantoni più il Liechtenstein.
+§10 listed *"21 cantoni restanti, meccanici"*. They weren't 21 searches: they were one.
+The association of cantonal traffic offices publishes the complete list on
+`asa.ch/strassenverkehrsaemter/adressen/`, with office name, telephone, email and link
+to the site for all cantons plus Liechtenstein.
 
-**Il registro non dichiara le sigle cantonali**: i blocchi sono in ordine alfabetico
-tedesco e l'etichetta è il nome esteso. Assegnare per posizione è fragile, e lo si è
-visto subito: un controllo incrociato con dominio ed email ha mostrato uno sfasamento di
-una riga da Obvaldo in poi. Il motivo è nel dato, non nel parser — vedi sotto.
-L'assegnazione finale è fatta sul **nome esteso dentro l'etichetta del link**, che
-nomina il cantone, con dominio ed email come seconda conferma.
+**The register does not declare the cantonal acronyms**: the blocks are in alphabetical order
+German and the label is the long name. Assigning by position is fragile, and it is
+seen immediately: a cross-check with domain and email showed a mismatch of
+a line from Obwalden onwards. The reason is in the data, not in the parser — see below.
+The final assignment is made on the **extended name inside the link label**, which
+name the canton, with domain and email as second confirmation.
 
-Le 26 landing sono in `coverage/driving_licence.toml`, ciascuna verificata con una
-richiesta e **registrata all'URL finale dopo i redirect**. `validated_at` resta vuoto su
-tutte: è verificata la landing dell'ufficio, non la pagina di procedura.
+The 26 landings are in `coverage/driving_licence.toml`, each verified with a
+requested and **registered to the final URL after redirects**. `validated_at` remains empty on
+all: the office landing is verified, not the procedure page.
 
-Quattro cose che il registro ha insegnato, e che valgono oltre questo tema:
+Four things that the register taught, and which are valid beyond this topic:
 
-- 🔴 **Obvaldo non esiste nel registro.** `NidwaldenVerkehrssicherheitszentrum OW/NW`:
-  un blocco solo, etichettato Nidwalden, e solo il *nome dell'ufficio* rivela che serve
-  anche Obvaldo. Un censimento che conta le voci del registro trova 25 cantoni e non se
-  ne accorge. È il secondo ufficio intercantonale del progetto, dopo il calendario
+- 🔴 **Obwalden does not exist in the registry.** `NidwaldenVerkehrssicherheitszentrum OW/NW`:
+  a single block, labeled Nidwalden, and only the *office name* reveals that it is needed
+  also Obwalden. A census that counts the register entries finds 25 cantons and not if
+  he notices it. It is the second intercantonal office of the project, after the calendar
   BEJUNE (§8bis.1).
-- 🔴 **Il registro autorevole contiene un hostname morto.** Per Turgovia punta a
-  `www.stva.tg.ch`, che non si connette affatto (`curl` 000). Il vivo è
-  `strassenverkehrsamt.tg.ch`. È il secondo caso dopo `svsa.pom.be.ch` (§9.4), ma quello
-  veniva da un motore di ricerca: **qui il link morto sta nel registro di categoria.**
-- ⚠️ **Basilea Campagna risponde 403 agli automi.** `baselland.ch` rifiuta `curl` anche
-  con uno User-Agent di browser completo, mentre la pagina si apre normalmente nel
-  browser pane. Non è un URL marcio: è un WAF. Una pipeline che decide la validità di
-  una fonte dal codice HTTP la scarterebbe a torto — e un server che facesse fetch **a
-  runtime** su questa fonte fallirebbe in produzione.
-- **Sette landing su ventisei redirigono altrove** (AG, AR, BS, FR, JU, LU, VS). Il
-  registro è aggiornato quanto basta a portare sul sito giusto, non a dare l'URL
-  corrente.
+- 🔴 **The authoritative registry contains a dead hostname.** For Thurgau it points to
+  `www.stva.tg.ch`, which does not connect at all (`curl` 000). The living is
+  `strassenverkehrsamt.tg.ch`. It is the second case after `svsa.pom.be.ch` (§9.4), but that
+  it came from a search engine: **here the dead link is in the category register.**
+- ⚠️ **Basel Countryside responds 403 to the automatons.** `baselland.ch` also rejects `curl`
+  with a full browser User-Agent, while the page opens normally in the
+  bread browser. It's not a rotten URL - it's a WAF. A pipeline that decides the validity of
+  a source from HTTP code would wrongly discard it — and a server that would fetch **a
+  runtime** on this source would fail in production.
+- **Seven out of twenty-six landings redirect elsewhere** (AG, AR, BS, FR, JU, LU, VS). The
+  registry is updated just enough to take you to the right site, not to give the URL
+  current.
 
-🟢 **Un thread aperto si chiude per strada**: §10 registrava che `stva.gr.ch` ha una
-catena SSL incompleta. Il registro dà per i Grigioni
-`gr.ch/DE/institutionen/verwaltung/djsg/stva/Seiten/Start.aspx`, che risponde 200 senza
-problemi di certificato. La fonte grigionese non era irraggiungibile: era raggiunta
-dall'hostname sbagliato.
+🟢 **An open thread closes along the way**: §10 recorded that `stva.gr.ch` has a
+incomplete SSL chain. The register gives for Grisons
+`gr.ch/DE/institutionen/verwaltung/djsg/stva/Seiten/Start.aspx`, which responds 200 without
+certificate problems. The Graubünden source was not unreachable: it was reached
+from the wrong hostname.
 
-Cinque cantoni non hanno l'ufficio sul dominio cantonale: **FR** (`ocn.ch`), **NE**
+Five cantons do not have an office on the cantonal domain: **FR** (`ocn.ch`), **NE**
 (`scan-ne.ch`), **NW/OW** (`vsz.ch`), **TG** (`strassenverkehrsamt.tg.ch`), **LU**
-(`strassenverkehrsamt.lu.ch`). È §8ter.5 confermato su un secondo tema: il portale del
-servizio quasi mai sta su `<sigla>.ch`.
+(`strassenverkehrsamt.lu.ch`). It is §8ter.5 confirmed on a second topic: the portal of
+service almost never stands on `<sigla>.ch`.
 
 ---
 
-### 9.8 🟢 Le 27 righe della patente, aperte sulla fonte
+### 9.8 🟢 The 27 lines of the license, open on the source
 
-Verificato il 2026-09-23: la riga federale sul testo consolidato della VZV, le 26
-cantonali sulla **pagina di procedura** di ciascun ufficio (non la landing). Il
-dettaglio di ogni cantone sta nelle `notes`; qui ciò che vale oltre la riga.
+2026-09-23 verified: the federal line on the consolidated text of the VZV, the 26
+cantonal information on the **procedure page** of each office (not the landing page). The
+detail of each canton is in `notes`; here what is worth beyond the line.
 
-**Tre correzioni alla riga federale.**
+**Three corrections to the federal line.**
 
-- **Il termine non decorre dall'ingresso.** Art. 42 cpv. 3bis lett. a VZV: serve la
-  patente svizzera a chi *abita* in Svizzera da dodici mesi senza essere stato all'estero
-  più di tre mesi di fila. Quasi tutti i cantoni scrivono "12 mesi dall'ingresso": è la
-  loro semplificazione, non la norma.
-- **La lista dei paesi non sta nella VZV.** L'art. 44 impone la corsa di controllo a
-  tutti; l'art. 150 cpv. 5 lett. e autorizza ASTRA a esentare. La lista sta
-  nell'**Anhang 2 della Weisung ASTRA** *Führerausweise von Personen mit Wohnsitz im
-  Ausland* (01.10.2013, Stand 15.07.2021), che SVSA Bern linka. Un post del blog ASTRA del
-  2023 riporta le stesse liste ma omette una riserva: **Taiwan vale solo per A1 e B**.
-- **Due gruppi, non uno.** Gruppo A (UE/AELS più Grossbritannien): esenti da corsa **e**
-  da teoria professionale. Gruppo B (tra cui USA, Canada, Giappone, Australia): esenti
-  **solo** dalla corsa.
+- **The term does not start from entry.** Art. 42 par. 3bis lit. to VZV: you need it
+  Swiss driving license for those who have *lived* in Switzerland for twelve months without having been abroad
+  more than three months in a row. Almost all the cantons write "12 mesi dall'ingresso": it is the
+  their simplification, not the norm.
+- **The list of countries is not in the VZV.** The art. 44 forces control travel to
+  everyone; the art. 150 para. 5 read. and authorizes ASTRA to exempt. The list goes
+  in the **Anhang 2 of Weisung ASTRA** *Führerausweise von Personen mit Wohnsitz im
+  Ausland* (01.10.2013, Stand 15.07.2021), which SVSA Bern links. A post from the ASTRA blog of
+  2023 reports the same lists but omits a reservation: **Taiwan applies only to A1 and B**.
+- **Two groups, not one.** Group A (EU/EFTA plus Grossbritannien): exempt from racing **and**
+  from professional theory. Group B (including USA, Canada, Japan, Australia): exempt
+  **only** from running.
 
-**⚠️ La regola dei cinque anni, senza fonte federale trovata.** LU, TG, VD e ZG
-dichiarano che chi converte più di cinque anni dopo l'ingresso fa la corsa di
-controllo anche se viene da un paese esente (VD e ZG: salvo attestato di guida regolare).
-Non sta nell'Anhang 2 né nel resto della Weisung. Quattro cantoni indipendenti rendono
-improbabile un'invenzione locale, ma finché la fonte non è trovata va attribuita ai
-cantoni che la scrivono, non alla Confederazione. Aperto in §10.
+**⚠️ The five-year rule, no federal source found.** LU, TG, VD and ZG
+they declare that those who convert more than five years after entry make the race of
+check even if you come from an exempt country (VD and ZG: unless you have a regular driving certificate).
+It is not in the Anhang 2 nor in the rest of Weisung. Four independent cantons make it
+a local invention is unlikely, but until the source is found it should be attributed to
+cantons that write it, not to the Confederation. Opened in §10.
 
-**Le tasse sono un dato cantonale e spesso assente.** Stampate da 8 cantoni su 26:
+**Taxes are a cantonal data and are often absent.** Printed by 8 cantons on 26:
 
-| Cantone | Cambio senza corsa | Note |
+| Canton | Shiftless shift | Notes |
 |---|---|---|
-| FR | Fr. 80 forfait | con corsa B Fr. 260 |
-| SG | Fr. 80–100 | corsa a parte |
-| ZG | Fr. 75 | corsa B Fr. 90 |
-| VS | CHF 70 + 53.50 | corsa B CHF 90 |
-| NE | Fr. 105 | corsa Fr. 120 in più |
+| FR | Fr. 80 flat rate | with stroke B Fr. 260 |
+| SG | Br. 80–100 | separate race |
+| ZG | Br. 75 | race B Fr. 90 |
+| VS | CHF 70 + 53.50 | race B CHF 90 |
+| NE | Br. 105 | race Fr. 120 more |
 | BE | CHF 120 | |
-| GE | CHF 150 | CHF 200 per C, C1, D |
-| TI | Fr. 150 | Fr. 200 con categorie professionali |
+| GE | CHF 150 | CHF 200 for C, C1, D |
+| TI | Br. 150 | Fr. 200 with professional categories |
 
-Gli altri rimandano a un tariffario separato. Una risposta sulla tassa deve dire **da
-dove** viene il numero, e per 18 cantoni oggi non ce l'abbiamo.
+The others refer to a separate price list. An answer about the tax must say **from
+where** comes the number, and for 18 cantons today we don't have it.
 
-**Procedure che una risposta generica sbaglia.**
-- **TI** dal 17.11.2025 accetta la richiesta **solo online**.
-- **BS** vuole il Gesuch **almeno un mese prima** della scadenza dei 12 mesi.
-- **NW/OW**: la corsa va fatta **entro tre mesi** dal deposito.
-- **SH**: il comune **può fatturare** l'identificazione.
-- **ZG**: l'ufficio non fornisce il veicolo per la corsa.
-- **VD**: il permesso deve essere stato preso **prima** dell'ingresso in Svizzera.
-- **SG** cita per la non ripetibilità della corsa l'art. 29 cpv. 4 VZV; per i permessi
-  esteri la norma è l'art. 44 cpv. 1bis. Citazione cantonale da non riprendere.
+**Procedures that a generic answer gets wrong.**
+- **TI** from 17.11.2025 accepts the request **online only**.
+- **BS** wants the Gesuch **at least one month before** the expiration of the 12 months.
+- **NW/OW**: the ride must be made **within three months** of deposit.
+- **SH**: the municipality **can invoice** the identification.
+- **ZG**: the office does not provide the vehicle for the ride.
+- **VD**: the permit must have been obtained **before** entering Switzerland.
+- **SG** cites art. for the non-repeatability of the race. 29 para. 4 VZV; for permits
+  foreign countries the norm is art. 44 para. 1bis. Cantonal citation not to be taken back.
 
-**Trappole di accesso nuove.** SH (FAQ in accordion via JS: il testo sta nel
-`textContent`, non nell'`innerText`) e SO si leggono solo nel browser; BL resta dietro il
-WAF (§9.7). Il Merkblatt UR indicizzato dai motori dà 404.
+**New entry traps.** SH (FAQ in accordion via JS: the text is in the
+`textContent`, not in `innerText`) and SO can only be read in the browser; BL remains behind the
+WAF (§9.7). The Merkblatt UR indexed by the engines gives 404.
 
 ---
 
-## 10. Cosa resta da verificare
+## 10. What remains to be verified
 
-**Bloccante per la decisione di scope:**
-- **Fattibilità dei 15 comuni romanci**: pubblicano un calendario rifiuti? in che formato?
-  Da controllare su 4-5 di essi prima di impegnarsi su una rivendicazione "area romancia
-  completa". Una dichiarazione mancata è peggio di una non fatta.
+**Scope Decision Blocker:**
+- **Feasibility of 15 Romansh municipalities**: do they publish a waste calendar? in what format?
+  Check 4-5 of them before committing to a "Romansh area" claim
+  complete". A missed declaration is worse than one not made.
 
-**Aperto:**
-- **Se i premi 2027 escono durante l'hackathon** (il BAG pubblica verso fine settembre):
-  decidere in anticipo come si comporta il server — anno esplicito nella risposta, e
-  quale anno è il default.
-- ~~`holiday_type` non ha uno slot per le `Maiferien`~~ → **deciso 2026-09-23: tipo dichiarato
-  non coperto** (`scope.toml`, `subtopics`). Nessuno slot nuovo, il gate di routing resta valido
-- **Il risolutore di luogo mappa Gurbrü, Wileroltigen, Golaten e Ferenbalm su `FR/Kerzers`**
-  per le vacanze scolastiche: **deciso 2026-09-23** (§8sexies.2). Da implementare col risolutore
-- ~~`Pfingstferien` (TG) e `Auffahrtsferien` (ZG)~~ → **deciso 2026-09-23: non coperti**, come
-  le Maiferien (`scope.toml`, `subtopics`)
-- ~~BE, primavera nei comuni turistici alpini~~ → **deciso 2026-09-23: si chiede il comune**.
-  Override `BE/spring` con ask-back (§8septies.8)
-- **`SZ/summer`**: non validabile finché il cantone non pubblica il primo giorno 2027/28
+**Open:**
+- **If the 2027 premiums are released during the hackathon** (the BAG publishes towards the end of September):
+  decide in advance how the server will respond — state the year explicitly, and
+  which year is the default.
+- ~~`holiday_type` does not have a slot for `Maiferien`~~ → **decided 2026-09-23: declared type
+  not covered** (`scope.toml`, `subtopics`). No new slots, routing gate remains valid
+- **Location solver maps Gurbrü, Wileroltigen, Golaten and Ferenbalm to `FR/Kerzers`**
+  for school holidays: **decided 2026-09-23** (§8sexies.2). To be implemented with the solver
+- ~~`Pfingstferien` (TG) and `Auffahrtsferien` (ZG)~~ → **decided 2026-09-23: not covered**, as
+  the Maiferien (`scope.toml`, `subtopics`)
+- ~~BE, spring in the Alpine tourist municipalities~~ → **decided 2026-09-23: the municipality asks**.
+  Override `BE/spring` with ask-back (§8septies.8)
+- **`SZ/summer`**: not validatable until the canton publishes 2027/28 on the first day
   (§8septies.5)
-- **Vallese romando**: aperto, ma non è più un problema tecnico. Il piano cantonale è un
-  modulo vuoto e il cantone rimanda a scuola o comune (§8sexies.3). Si chiude solo
-  decidendo se campionare fonti comunali romande o lasciare l'ask-back
-- **Le altre vacanze oltre l'autunno**: campionate su 8 cantoni e 4 classi
-  (§8quater, §8quinquies). Esito in due parti: nelle classi *uniforme*, *per comune nella
-  fonte* e *uniforme con eccezioni* la classe regge fra tipi e cambia solo il dettaglio;
-  nella classe *quadro + scelta comunale* **la classe cambia**, in tutti e tre i cantoni,
-  e le vacanze di sport non stanno nel documento cantonale.
-  Restano non campionate le classi **per regione linguistica** (BE, VS) e **delegato**
-  (ZH), ma entrambe chiedono già il luogo per ogni tipo: il rischio è basso
-- **Tassonomia dei tipi di vacanza** (§8quater.5): `Osterferien` in OW e NW non è
-  `Frühlingsferien`, ed è ancorata alla Pasqua. Il parametro `holiday_type` deve mappare
-  i nomi reali, non i nostri slot
-- ~~Patente estera, 27 righe~~ → **chiuse 2026-09-23** (§9.8), tutte validate
-- ~~Patente, regola dei cinque anni~~ → **deciso 2026-09-23: resta cantonale**, attribuita
-  solo a LU, TG, VD, ZG nelle rispettive righe (§9.8)
-- **Patente, tasse**: stampate da 8 cantoni su 26; per gli altri serve il tariffario (§9.8)
-- ~~Argovia, contraddizione interna~~ → **chiusa in §8quinquies.2**: entrambe le letture
-  erano vere. Il cantone fissa l'inizio e un minimo di 2 settimane, il comune può
-  estendere a 3. L'organo è l'**Erziehungsrat**, non il Bildungsrat
-- Licenze dei repo MCP esistenti, per valutare il riuso
-- Se ch.ch espone una ricerca strutturata o solo la SPA
-- Quota e rate limit di `api3.geo.admin.ch` per uso intensivo
+- **Romanian Valais**: open, but it is no longer a technical problem. The cantonal plan is a
+  blank form and the canton refers you to the school or municipality (§8sexies.3). It just closes
+  deciding whether to sample Romande municipal sources or leave the ask-back
+- **Other holidays beyond autumn**: sampled on 8 cantons and 4 classes
+  (§8quater, §8quinquies). Outcome in two parts: in *uniform* classes, *for municipality in
+  source* and *uniform with exceptions* the class holds between types and only the detail changes;
+  in the class *framework + municipal choice* **the class changes**, in all three cantons,
+  and sports holidays are not in the cantonal document.
+  The classes **by linguistic region** (BE, VS) and **delegate** remain unsampled
+  (ZH), but both are already asking for the location for each type: the risk is low
+- **Taxonomy of holiday types** (§8quater.5): `Osterferien` in OW and NW is not
+  `Frühlingsferien`, and is anchored to Easter. The `holiday_type` parameter must map
+  real names, not our slots
+- ~~Foreign driving licence, 27 lines~~ → **closed 2026-09-23** (§9.8), all validated
+- ~~License, five-year rule~~ → **decided 2026-09-23: remains cantonal**, attributed
+  only to LU, TG, VD, ZG in the respective lines (§9.8)
+- **License, taxes**: printed by 8 cantons on 26; for others you need the price list (§9.8)
+- ~~Aargau, internal contradiction~~ → **closed in §8quinquies.2**: both readings
+  they were true. The canton sets the start and a minimum of 2 weeks, the municipality can
+  extend to 3. The body is the **Erziehungsrat**, not the Bildungsrat
+- Existing MCP repo licenses, to evaluate reuse
+- If ch.ch offers a structured search or just the SPA
+- Quota and rate limit of `api3.geo.admin.ch` for intensive use
 
-**Risolto**:
-- Non esiste un dataset ufficiale comune → sito web (`behördenverzeichnis` su CKAN =
-  `count: 0`); il registro comuni con numeri BFS esiste ed è in §7
-- **Parte francofona del canton Berna** → §8.4b–8.4e, chiusa
-- **Copertura romancia delle fonti GR**: il piano ferie cantonale è trilingue con
-  intestazioni in romancio (§8.6) e lo STVA pubblica il modulo patente in romancio
-  (§9.5). Due temi su due serviti nativamente
-- **Calendari rifiuti**: non più rilevante, ambito comunale fuori scope per decisione
-- **`Einzugsgebiete.csv`** → §3.2c: non è la mappatura delle regioni di premio, ma le
-  aree operative degli assicuratori. La mappatura vera è l'ordinanza SR 832.106 (§3.2d).
-  Domanda campione #3 risolta end-to-end in §3.2e
-- **Versione di SR 832.106 per l'anno di riferimento** → §3.2d-bis: il filestore Fedlex
-  è indirizzabile per data. Lugano è regione 1 in tutte le versioni verificate
-- **Allineamento BEJUNE** → §8bis.1: confermato su `ne.ch` e `jura.ch` **solo per
-  l'autunno**. L'inverno diverge nei tre cantoni
-- **Città di San Gallo** → §8sexies.1: **non diverge**. Segue le settimane cantonali su
-  tutti e quattro i tipi; le sue `Winterferien` sono il tipo `sport`, già coperto
-  dall'override. La riga `SG` si conferma, non si corregge
-- **Friburgo** → §8sexies.2: chiuso su due anni scolastici, tutti i tipi, in HTML
-  testuale. §8ter.8 attribuiva però la divergenza alla regione sbagliata: è **Kerzers**,
-  non Morat/Murten
-- **Vallese, metà germanofona** → §8sexies.3: chiuso. La fonte è l'`Übersicht Schul- und
-  Ferienplan`, tabella testuale per comune, elencata **solo sulla landing tedesca**
+**Resolved**:
+- There is no municipality official dataset → website (`behördenverzeichnis` on CKAN =
+  `count: 0`); the municipalities registry with BFS numbers exists and is in §7
+- **French-speaking part of the canton of Bern** → §8.4b–8.4e, closed
+- **Romansh coverage of GR sources**: the cantonal holiday plan is trilingual with
+  headings in Romansh (§8.6) and the STVA publishes the driving license form in Romansh
+  (§9.5). Two out of two themes served natively
+- **Waste calendars**: no longer relevant, municipal area out of scope by decision
+- **`Einzugsgebiete.csv`** → §3.2c: it is not the mapping of the premium regions, but the
+  insurers' operational areas. The actual mapping is the SR order 832.106 (§3.2d).
+  Sample question #3 solved end-to-end in §3.2e
+- **Version of SR 832.106 for the reference year** → §3.2d-bis: the Fedlex filestore
+  It is addressable by date. Lugano is 1 region in all verified versions
+- **BEJUNE alignment** → §8bis.1: confirmed on `ne.ch` and `jura.ch` **only for
+  autumn**. Winter diverges in the three cantons
+- **City of St. Gallen** → §8sexies.1: **does not diverge**. Follows the cantonal weeks on
+  all four types; his `Winterferien` are the type `sport`, already covered
+  from the override. The `SG` line is confirmed, not corrected
+- **Freiburg** → §8sexies.2: closed on two school years, all types, in HTML
+  textual. However, §8ter.8 attributed the divergence to the wrong region: it is **Kerzers**,
+  not Morat/Murten
+- **Valais, half German-speaking** → §8sexies.3: closed. The source is the `Übersicht Schul- und
+  Ferienplan`, textual table by municipality, listed **only on the German landing page**
