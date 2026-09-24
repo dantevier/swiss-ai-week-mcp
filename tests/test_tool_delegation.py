@@ -8,19 +8,27 @@ import pytest
 from mcp_boilerplate import (
     bfs,
     customs,
+    driving_licence,
     geodata,
+    health_insurance,
+    housing,
     migration,
     opendata_catalog,
     political_rights,
     weather,
 )
+from mcp_boilerplate.source_access import SourceAccess
 from mcp_boilerplate.tools import (
     bfs_tools,
     customs_tools,
+    driving_licence_tools,
     geo_tools,
+    health_insurance_tools,
+    housing_tools,
     migration_tools,
     opendata_tools,
     political_rights_tools,
+    source_tools,
     weather_tools,
 )
 
@@ -208,3 +216,72 @@ def test_injected_weather_clients_serve_both_queries(monkeypatch) -> None:
     assert result["values"] == [{"valid_time_utc": stamp.isoformat(), "temperature_c": 15.5}]
     result = asyncio.run(weather_tools.swiss_weather_observations("BER"))
     assert result["values"][0]["temperature_c"] == 13.4
+
+
+@pytest.mark.parametrize(
+    ("tool", "service", "method", "args"),
+    [
+        (
+            housing_tools.swiss_reference_interest_rate,
+            housing.Housing,
+            "reference_interest_rate",
+            ("2026-10-15", "de"),
+        ),
+        (housing_tools.swiss_housing_info, housing.Housing, "info", ("deposit", "de", None, 2)),
+        (
+            driving_licence_tools.get_driving_licence_exchange_info,
+            driving_licence.DrivingLicence,
+            "exchange_info",
+            ("ZH", "fee"),
+        ),
+        (
+            health_insurance_tools.swiss_health_insurance_premiums,
+            health_insurance.HealthInsurance,
+            "premiums",
+            (26, 1, 2500),
+        ),
+    ],
+)
+def test_database_tool_wrappers_delegate_to_injected_services(
+    monkeypatch, tool, service, method, args
+):
+    expected = {"status": "answered", "arguments": args}
+
+    def implementation(self, *received):
+        assert received == args
+        return expected
+
+    monkeypatch.setattr(service, method, implementation)
+    assert tool(*args) == expected
+
+
+def test_source_tool_wrappers_use_injected_dependencies(monkeypatch):
+    calls = []
+
+    class FakeCrawler:
+        async def crawl(self, level, source):
+            calls.append((level, source))
+            return {"level": level, "source": source}
+
+    class FakeKnowledge:
+        async def search(self, query, limit):
+            calls.append((query, limit))
+            return {"query": query}
+
+        def get(self, level, source):
+            calls.append((level, source))
+            return {"source": source}
+
+    service = SourceAccess(
+        FakeCrawler, FakeKnowledge, lambda: {"status": "ok"}, lambda: "http://localhost/"
+    )
+    monkeypatch.setattr(source_tools, "sources", service)
+    assert asyncio.run(source_tools.crawl_federal_sources("sample")) == {
+        "level": "federal",
+        "source": "sample",
+    }
+    assert asyncio.run(source_tools.search_knowledge("rent", 2)) == {"query": "rent"}
+    assert source_tools.get_source("federal", "sample") == {"source": "sample"}
+    assert source_tools.source_status() == {"status": "ok"}
+    assert source_tools.open_dashboard() == {"url": "http://localhost/"}
+    assert calls == [("federal", "sample"), ("rent", 2), ("federal", "sample")]

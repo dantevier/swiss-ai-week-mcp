@@ -3,7 +3,7 @@
 import importlib.util
 from pathlib import Path
 
-from .tools import driving_licence_tools, housing_tools
+from .config.database_paths import driving_licence_path, housing_path
 from .utils.logger import setup_logger
 
 logger = setup_logger("mcp_boilerplate.local_databases")
@@ -24,8 +24,8 @@ def build_local_databases() -> None:
     every start keeps the database in step with data/ after a pull.
     """
     for script, database in (
-        ("import_housing", housing_tools._database_path()),
-        ("import_driving_licence", driving_licence_tools._database_path()),
+        ("import_housing", housing_path()),
+        ("import_driving_licence", driving_licence_path()),
     ):
         try:
             _import_rows(script, database)
