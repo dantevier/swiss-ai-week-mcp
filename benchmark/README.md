@@ -46,9 +46,14 @@ It tests whether an assistant (an LLM on its own, or an LLM connected to an MCP 
 | config | items | how the answers were obtained |
 |---|---|---|
 | `verified` (`data/qa.jsonl`) | 32 | checked by hand against the responsible authority's page; 15 of the 16 briefing topic areas |
-| `generated` (`data/generated.jsonl`) | 870 | computed by `build/generate.py` from official open data; ids start with `gen-` |
+| `generated` (`data/generated.jsonl`) | 870 | computed by `build/generate.py` from the offline official-data database; ids start with `gen-` |
 
-The generated items come from four official sources: the BAG health insurance premiums 2026 (217,472 rows), SR 832.106 Annex 1 (premium region per municipality, version in force on 1 Jan 2026, from the Fedlex filestore), and the BFS register of municipalities (snapshot and mutations since 2015). Each item quotes the data rows its answer came from in `evidence`.
+The generated items come from `../data/swiss_public_data.sqlite`. That reusable
+runtime database was built from the BAG health insurance premiums 2026 (217,472
+rows), SR 832.106 Annex 1 (premium region per municipality, version in force on
+1 Jan 2026, from the Fedlex filestore), and the BFS register of municipalities
+(snapshot and mutations since 2015). Each item quotes the data rows its answer
+came from in `evidence`.
 
 | kind | n | what it tests |
 |---|---|---|
@@ -63,10 +68,17 @@ The generated items come from four official sources: the BAG health insurance pr
 Regenerate, for example after the BAG publishes new premiums:
 
 ```bash
-python benchmark/build/generate.py        # downloads into .cache/bench (about 35 MB), writes data/generated.jsonl
+python scripts/build_knowledge_db.py       # network at build time; writes data/swiss_public_data.sqlite
+python benchmark/build/generate.py         # offline; writes benchmark/data/generated.jsonl
 ```
 
-The generator stops if its self-check fails: Lugano, adult, CHF 2,500 deductible, no accident cover must give CHF 449.90, the figure verified by hand. It also stops if Fedlex returns its JavaScript shell instead of the law text. The same seed and data give byte-identical output. Items whose answer a regex cannot separate from the typical wrong answer are left out, for example mergers where the new name is part of the old one (Bad Zurzach became Zurzach).
+The database builder stops if Fedlex returns its JavaScript shell instead of the
+law text or if any current municipality cannot be assigned a premium region.
+The benchmark generator stops if its self-check fails: Lugano, adult, CHF 2,500
+deductible, no accident cover must give CHF 449.90, the figure verified by hand.
+The same seed and database give byte-identical output. Items whose answer a regex
+cannot separate from the typical wrong answer are left out, for example mergers
+where the new name is part of the old one (Bad Zurzach became Zurzach).
 
 ## Expected behaviour
 

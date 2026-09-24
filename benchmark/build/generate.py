@@ -1,47 +1,30 @@
 #!/usr/bin/env python3
-"""Generate benchmark questions whose answers are computed from official Swiss open data.
+"""Generate benchmark questions from the offline Swiss knowledge database.
 
-    python benchmark/build/generate.py            # downloads into .cache/bench, writes data/generated.jsonl
+    python scripts/build_knowledge_db.py
+    python benchmark/build/generate.py
 
-Sources (all public, no credentials):
-- BAG health insurance premiums 2026 (archive behind opendata.bagnet.ch)
-- SR 832.106 Annex 1, premium region per municipality, version in force on 1 Jan 2026 (Fedlex filestore)
-- BFS official register of municipalities: snapshot, levels, mutations since 2015
-
-Every answer is looked up in these files, never typed by hand, and each item quotes the rows it came from.
+The database was built from BAG, Fedlex and BFS official data. This generator does not
+access the network. Runtime and evaluation therefore use the same deterministic facts.
 Standard library only. Same seed, same data -> same output.
 """
 
 from __future__ import annotations
 
 import argparse
-import csv
-import html
-import io
 import json
 import random
 import re
-import urllib.request
-import zipfile
+import sqlite3
 from collections import defaultdict
+from decimal import Decimal
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CACHE = ROOT / ".cache" / "bench"
+DEFAULT_DB = ROOT / "data" / "swiss_public_data.sqlite"
 OUT = ROOT / "benchmark" / "data" / "generated.jsonl"
-UA = "swiss-grounding-benchmark/0.1 (Swiss AI Weeks hackathon)"
 TODAY = "2026-09-24"
 REGISTER_DATE = "24-09-2026"
-
-URLS = {
-    "premiums.zip": "https://opendata.bagnet.ch/?r=/download&path=L1ByYWVtaWVuL0FyY2hpdl9QcmFlbWllbl8yMDI2LnppcA%3D%3D",
-    "regions.html": "https://www.fedlex.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/2022/184/20260101/de/html/"
-                    "fedlex-data-admin-ch-eli-cc-2022-184-20260101-de-html.html",
-    "communes.csv": f"https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date={REGISTER_DATE}",
-    "levels.csv": f"https://www.agvchapp.bfs.admin.ch/api/communes/levels?date={REGISTER_DATE}",
-    "mutations.csv": "https://www.agvchapp.bfs.admin.ch/api/communes/mutations?startPeriod=01-01-2015"
-                     f"&endPeriod={REGISTER_DATE}&includeTerritoryExchange=false",
-}
 PREMIUM_PAGE = "https://opendata.swiss/de/dataset/health-insurance-premiums"
 REGION_PAGE = "https://www.fedlex.admin.ch/eli/cc/2022/184/de"
 REGISTER_PAGE = "https://www.agvchapp.bfs.admin.ch/de/communes/query"
@@ -62,28 +45,7 @@ CANTON_NAMES = {
     "VS": ["Wallis", "Valais", "Vallese"], "NE": ["Neuenburg", "Neuchâtel"], "GE": ["Genf", "Genève", "Ginevra", "Geneva"],
     "JU": ["Jura", "Giura"],
 }
-LANG_OF_REGION = {"1": "de", "2": "fr", "3": "it", "4": "de"}
-
-
-def fetch(name: str) -> Path:
-    path = CACHE / name
-    if not path.exists():
-        CACHE.mkdir(parents=True, exist_ok=True)
-        req = urllib.request.Request(URLS[name], headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=300) as r:
-            path.write_bytes(r.read())
-    return path
-
-
-def read_csv(name: str, delimiter: str = ",") -> list[dict[str, str]]:
-    return list(csv.DictReader(io.StringIO(fetch(name).read_text(encoding="utf-8-sig")), delimiter=delimiter))
-
-
-def zip_csv(member: str, delimiter: str) -> list[dict[str, str]]:
-    with zipfile.ZipFile(fetch("premiums.zip")) as z:
-        name = next(n for n in z.namelist() if n.endswith(member))
-        text = z.read(name).decode("utf-8-sig")
-    return list(csv.DictReader(io.StringIO(text), delimiter=delimiter))
+LANG_OF_REGION = {1: "de", 2: "fr", 3: "it", 4: "de"}
 
 
 def base_name(name: str) -> str:
@@ -125,57 +87,92 @@ def item(**kw) -> dict:
 
 
 class Data:
-    def __init__(self) -> None:
-        self.cantons = {c["BfsCode"]: c["ShortName"] for c in read_csv("communes.csv") if c["Level"] == "1"}
-        self.communes = {}
-        for c in read_csv("levels.csv"):
-            self.communes[c["BfsCode"]] = {
-                "bfs": c["BfsCode"], "name": c["Name"], "canton": self.cantons[c["CantonId"]],
-                "lang": LANG_OF_REGION.get(c["SPRGEB2020"], "de"),
+    def __init__(self, db_path: Path) -> None:
+        if not db_path.exists():
+            raise SystemExit(
+                f"knowledge database not found: {db_path}\n"
+                "Run: python scripts/build_knowledge_db.py"
+            )
+        self.connection = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+        self.connection.row_factory = sqlite3.Row
+        self.communes = {
+            str(row["bfs_code"]): {
+                "bfs": str(row["bfs_code"]),
+                "name": row["name"],
+                "canton": row["canton"],
+                "lang": LANG_OF_REGION.get(row["language_region"], "de"),
+                "region": str(row["premium_region"]),
             }
-        self.mutations = read_csv("mutations.csv")
-        self.regions = self._regions()
-        self.premiums = self._premiums()
+            for row in self.connection.execute(
+                "SELECT * FROM communes ORDER BY source_order"
+            )
+        }
+        self.mutations = [
+            {
+                "MutationNumber": str(row["mutation_number"]),
+                "MutationDate": ".".join(reversed(row["mutation_date"].split("-"))),
+                "InitialHistoricalCode": str(row["initial_historical_code"]),
+                "InitialCode": str(row["initial_bfs_code"]),
+                "InitialName": row["initial_name"],
+                "TerminalHistoricalCode": str(row["terminal_historical_code"]),
+                "TerminalCode": str(row["terminal_bfs_code"]),
+                "TerminalName": row["terminal_name"],
+            }
+            for row in self.connection.execute(
+                "SELECT * FROM municipality_mutations"
+            )
+        ]
 
-    def _regions(self) -> dict[str, str]:
-        doc = fetch("regions.html").read_text(encoding="utf-8")
-        if "no-script-warning" in doc:
-            raise SystemExit("Fedlex returned the SPA shell instead of the consolidated text")
-        table = {}
-        for tr in re.findall(r"<tr>(.*?)</tr>", doc, re.S):
-            cells = [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", td))).strip()
-                     for td in re.findall(r"<td[^>]*>(.*?)</td>", tr, re.S)]
-            if len(cells) == 3 and cells[0].isdigit() and cells[2].isdigit():
-                table[cells[0]] = cells[2]
-        return table
+    def region_of(self, commune: dict) -> str:
+        return commune["region"]
 
-    def _premiums(self) -> dict[tuple, list[dict]]:
-        catchment = {(int(x["Versicherer"]), x["Kanton"], x["Region"], x["Tarif"])
-                     for x in zip_csv("Einzugsgebiete.csv", ";")}
-        by_key = defaultdict(list)
-        for r in zip_csv("Prämien_CH.csv", ","):
-            if r["Altersklasse"] not in ("AKL-ERW", "AKL-JUG"):
-                continue
-            offered = r["Tariftyp"] == "TAR-BASE" or (int(r["Versicherer"]), r["Kanton"], r["Region"], r["Tarif"]) in catchment
-            if offered:
-                by_key[(r["Kanton"], r["Region"], r["Altersklasse"], r["Franchise"], r["Unfalleinschluss"])].append(r)
-        return by_key
-
-    def region_of(self, commune: dict) -> str | None:
-        multi = {k[1] for k in self.premiums if k[0] == commune["canton"]}
-        if multi == {"PR-REG CH0"}:
-            return "0"
-        return self.regions.get(commune["bfs"])
-
-    def cheapest(self, commune: dict, age: str, franchise: int, accident: bool, standard: bool) -> dict | None:
-        region = self.region_of(commune)
-        if region is None:
+    def cheapest(
+        self,
+        commune: dict,
+        age: str,
+        franchise: int,
+        accident: bool,
+        standard: bool,
+    ) -> dict | None:
+        standard_filter = "AND tariff_type = 'TAR-BASE'" if standard else ""
+        row = self.connection.execute(
+            f"""
+            SELECT * FROM premium_offers
+            WHERE canton = ?
+              AND premium_region = ?
+              AND business_year = 2026
+              AND age_class = ?
+              AND deductible_chf = ?
+              AND accident_included = ?
+              AND is_offered_in_region = 1
+              {standard_filter}
+            ORDER BY monthly_premium_rappen, insurer_id, tariff_code
+            LIMIT 1
+            """,
+            (
+                commune["canton"],
+                int(commune["region"]),
+                age,
+                franchise,
+                int(accident),
+            ),
+        ).fetchone()
+        if row is None:
             return None
-        rows = self.premiums.get((commune["canton"], f"PR-REG CH{region}", age, f"FRA-{franchise}",
-                                  "MIT-UNF" if accident else "OHN-UNF"), [])
-        if standard:
-            rows = [r for r in rows if r["Tariftyp"] == "TAR-BASE"]
-        return min(rows, key=lambda r: float(r["Prämie"])) if rows else None
+        return {
+            "Versicherer": str(row["insurer_id"]),
+            "Kanton": row["canton"],
+            "Region": f"PR-REG CH{row['premium_region']}",
+            "Altersklasse": row["age_class"],
+            "Unfalleinschluss": (
+                "MIT-UNF" if row["accident_included"] else "OHN-UNF"
+            ),
+            "Tarif": row["tariff_code"],
+            "Tariftyp": row["tariff_type"],
+            "Franchise": f"FRA-{row['deductible_chf']}",
+            "Prämie": str(Decimal(row["monthly_premium_rappen"]) / 100),
+            "Tarifbezeichnung": row["tariff_name"],
+        }
 
 
 def premium_row_evidence(row: dict) -> str:
@@ -534,10 +531,11 @@ def main() -> int:
     parser.add_argument("--regions", type=int, default=80)
     parser.add_argument("--cantons", type=int, default=150)
     parser.add_argument("--mergers", type=int, default=150)
+    parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--out", type=Path, default=OUT)
     args = parser.parse_args()
 
-    data = Data()
+    data = Data(args.db)
     lugano = next(c for c in data.communes.values() if c["name"] == "Lugano")
     check = data.cheapest(lugano, "AKL-ERW", 2500, False, False)
     if not check or check["Prämie"] != "449.9":
