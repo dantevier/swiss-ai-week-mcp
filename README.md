@@ -1,24 +1,34 @@
 # Swiss AI Week MCP
 
-Three MCP tools crawl a reviewed starter set of Swiss public sources: `crawl_federal_sources`, `crawl_cantonal_sources`, and `crawl_municipal_sources`.
+A Python/FastMCP server with a local SQLite knowledge base of 13 reviewed Swiss authority pages. The starter coverage spans five federal, four cantonal, and four local or regional sources; it is not complete Swiss coverage.
 
 ## Run
 
+Install dependencies with `uv sync --all-extras --dev`, then start the stdio server:
+
 ```sh
-uv sync --all-extras --dev
+uv run python -m mcp_boilerplate.main
 ```
 
-Set `CRAWLORA_API_KEY` in your environment or a local `.env` file, then run `uv run python -m mcp_boilerplate.main`. Restart Codex after changing this MCP server's code or configuration.
+The package includes a database built from fresh crawls. On first use, the server copies it to `~/.swiss-ai-week-mcp/knowledge.sqlite3`. Later starts preserve that writable copy. Set `KNOWLEDGE_DB_PATH` to use another location. Restart your MCP client after changing server code or configuration.
 
-## Crawl
+## Retrieve saved knowledge
 
-Each tool accepts at most one of `source` or `url`:
+- `search_knowledge(query, limit=5)` returns relevant passages, source URLs, authority names, crawl times, and any failed-refresh time. The limit must be 1–10.
+- `get_source(level, source)` returns the complete saved page and metadata. Levels are `federal`, `cantonal`, and `municipal`; names are in [the approved source list](src/mcp_boilerplate/sources.py).
 
-- `source` is a registered short name, or `all`. Omitting both arguments also crawls all sources for that level.
-- `url` is a pasted HTTPS webpage or PDF address on an official host already registered for that level. Other hosts are rejected. Pasted URLs are returned directly and are not saved as snapshots.
+Search uses OpenAI `text-embedding-3-small` for semantic ranking. Set `OPENAI_API_KEY` in the environment or a local `.env` file for live semantic queries. If the embedding API is unavailable, search returns locally ranked keyword matches with `method: "keyword_fallback"`. The key is never stored in SQLite. Saved pages retain their source language.
 
-Registered sources are in [`src/mcp_boilerplate/sources.py`](src/mcp_boilerplate/sources.py). Federal names: `health_insurance_premiums`, `premium_regions_2026`, `reference_interest_rate`, `reference_interest_rate_law`, `foreign_driving_licence_law`. Cantonal names: `gr_school_holidays_2026_27`, `vd_school_holidays_2023_31`, `ti_school_holidays_2026_27`, `zh_school_holidays`. Municipal names: `scuol_waste`, `bern_arrival`, `st_gallen_school_holidays`, `lausanne_arrival`.
+## Refresh sources
 
-Named crawls save JSON snapshots under `data/<level>_sources/`. HTML pages use Crawlora; PDFs are downloaded and text-extracted locally. A single-source crawl returns its extracted text; an `all` crawl returns a per-source summary. These are starter sets, not complete coverage of every canton or municipality.
+Set both `CRAWLORA_API_KEY` and `OPENAI_API_KEY` before refreshing. The three `crawl_*_sources(source=None)` MCP tools refresh one approved source by name or every source at that authority level. They accept no pasted URLs. HTML and JSON normally use Crawlora, with direct retrieval of an approved URL if Crawlora is unavailable; PDFs are downloaded and text-extracted locally. A refresh must return successful content, the expected approved URL, and a source-specific topic phrase. Only then are its page and passages replaced. A failure preserves the previous version and records its time.
 
-Run `uv run pytest -q` to check the crawler and MCP tool registration.
+To rebuild the packaged seed from **fresh crawls of every approved URL**:
+
+```sh
+uv run python -m scripts.build_knowledge_base
+```
+
+The builder replaces the seed only after all 13 sources succeed. It does not import the older JSON snapshots. The `scuol_waste` entry uses the responsible regional authority linked by Scuol, since Scuol's own page blocks direct retrieval.
+
+Run `uv run pytest -q` for local checks. Credentials belong in local environment variables or `.env`, never in the repository.

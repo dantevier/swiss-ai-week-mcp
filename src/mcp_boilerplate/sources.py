@@ -13,7 +13,7 @@ class Source:
 SOURCES: dict[str, dict[str, Source]] = {
     "federal": {
         "health_insurance_premiums": Source(
-            "https://opendata.swiss/api/3/action/package_show?id=health-insurance-premiums",
+            "https://ckan.opendata.swiss/api/3/action/package_show?id=health-insurance-premiums",
             "Federal Office of Public Health (BAG)",
             "Archiv_Praemien_2026.zip",
         ),
@@ -70,9 +70,9 @@ SOURCES: dict[str, dict[str, Source]] = {
     },
     "municipal": {
         "scuol_waste": Source(
-            "https://www.scuol.net/de/informationen/abfallentsorgung.html/108",
-            "Municipality of Scuol",
-            "Abfallentsorgung",
+            "https://www.regiunebvm.ch/de/kehricht/",
+            "Region Engiadina Bassa / Val Müstair",
+            "Kehricht",
         ),
         "bern_arrival": Source(
             "https://www.bern.ch/themen/zuzug-umzug-wegzug/",

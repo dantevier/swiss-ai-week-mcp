@@ -5,6 +5,7 @@ import io
 import os
 import urllib.request
 from datetime import UTC, datetime
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -57,6 +58,59 @@ class CrawloraFetcher:
             raise RuntimeError("Crawlora returned no page text")
         check_url(level, data.get("metadata", {}).get("source_url", url))
         return data
+
+
+class DirectFetcher:
+    """Read an approved public page when Crawlora is unavailable."""
+
+    async def fetch(self, url: str, level: str) -> dict:
+        return await asyncio.to_thread(self._fetch, url, level)
+
+    @staticmethod
+    def _fetch(url: str, level: str) -> dict:
+        class CheckedRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, request, fp, code, msg, headers, newurl):
+                check_url(level, newurl)
+                return super().redirect_request(request, fp, code, msg, headers, newurl)
+
+        class TextExtractor(HTMLParser):
+            def __init__(self):
+                super().__init__(convert_charrefs=True)
+                self.hidden = 0
+                self.parts = []
+
+            def handle_starttag(self, tag, attrs):
+                if tag in {"script", "style", "noscript", "nav", "footer"}:
+                    self.hidden += 1
+
+            def handle_endtag(self, tag):
+                if tag in {"script", "style", "noscript", "nav", "footer"} and self.hidden:
+                    self.hidden -= 1
+
+            def handle_data(self, data):
+                if not self.hidden and data.strip():
+                    self.parts.append(data.strip())
+
+        check_url(level, url)
+        opener = urllib.request.build_opener(CheckedRedirect)
+        request = urllib.request.Request(url, headers={"User-Agent": "swiss-ai-week-mcp/0.1"})
+        with opener.open(request, timeout=30) as response:
+            raw = response.read(20_000_001)
+            if len(raw) > 20_000_000:
+                raise ValueError("Page exceeds 20 MB limit")
+            content = raw.decode(response.headers.get_content_charset() or "utf-8", errors="replace")
+            if "html" in response.headers.get_content_type():
+                parser = TextExtractor()
+                parser.feed(content)
+                content = "\n".join(parser.parts)
+            return {
+                "markdown": content,
+                "metadata": {
+                    "source_url": response.url,
+                    "status_code": response.status,
+                    "content_type": response.headers.get_content_type(),
+                },
+            }
 
 
 class PdfFetcher:
@@ -124,7 +178,12 @@ class Crawler:
                     if urlparse(entry.url).path.lower().endswith(".pdf")
                     else self.web_fetcher
                 )
-                data = await fetcher.fetch(entry.url, level)
+                try:
+                    data = await fetcher.fetch(entry.url, level)
+                except Exception:
+                    if fetcher is not self.web_fetcher or not isinstance(fetcher, CrawloraFetcher):
+                        raise
+                    data = await DirectFetcher().fetch(entry.url, level)
                 markdown = data.get("markdown", "")
                 metadata = data.get("metadata", {})
                 if not markdown or entry.expected.casefold() not in " ".join(markdown.split()).casefold():

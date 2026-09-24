@@ -18,8 +18,6 @@ mcp = FastMCP(
 
 # Import all components to register them with the mcp instance
 from .tools import *  # This will register all tools
-from .resources import *  # This will register all resources  
-from .prompts import *  # This will register all prompts
 
 logger.info(f"Initialized FastMCP server: {settings.server_name}")
 
