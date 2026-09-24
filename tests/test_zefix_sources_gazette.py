@@ -41,7 +41,7 @@ async def test_publications_for_uid_parses_the_fixture():
 
     with respx.mock(assert_all_called=True) as mocked:
         mocked.get(f"{settings.gazette_base_url}/publications").respond(200, json=SEARCH_FIXTURE)
-        pubs = await gazette.publications_for_uid("CHE101654423", limit=5, budget_s=10.0, language="de")
+        pubs = await gazette.GazetteClient().publications_for_uid("CHE101654423", limit=5, budget_s=10.0, language="de")
 
     assert len(pubs) == 2
     ids = {p.id for p in pubs}
@@ -70,7 +70,7 @@ async def test_publications_for_uid_retries_on_503_then_succeeds():
 
     with respx.mock(assert_all_called=True) as mocked:
         route = mocked.get(f"{settings.gazette_base_url}/publications").mock(side_effect=_side_effect)
-        pubs = await gazette.publications_for_uid("CHE101654423", limit=5, budget_s=10.0)
+        pubs = await gazette.GazetteClient().publications_for_uid("CHE101654423", limit=5, budget_s=10.0)
 
     assert len(pubs) == 2
     assert route.calls.call_count == 2
@@ -83,7 +83,7 @@ async def test_publications_for_uid_gives_up_after_max_three_attempts():
     with respx.mock(assert_all_called=True) as mocked:
         mocked.get(f"{settings.gazette_base_url}/publications").respond(503)
         with pytest.raises(SourceUnavailable) as excinfo:
-            await gazette.publications_for_uid("CHE101654423", limit=5, budget_s=10.0)
+            await gazette.GazetteClient().publications_for_uid("CHE101654423", limit=5, budget_s=10.0)
 
     assert excinfo.value.source == "gazette"
     assert mocked.calls.call_count <= 3
@@ -100,7 +100,7 @@ async def test_publications_for_uid_raises_gazette_filter_ignored_when_total_imp
     with respx.mock(assert_all_called=True) as mocked:
         mocked.get(f"{settings.gazette_base_url}/publications").respond(200, json=payload)
         with pytest.raises(gazette.GazetteFilterIgnored):
-            await gazette.publications_for_uid("CHE101654423", limit=5, budget_s=10.0)
+            await gazette.GazetteClient().publications_for_uid("CHE101654423", limit=5, budget_s=10.0)
 
 
 async def test_publications_for_uid_never_sends_a_non_allow_listed_param():
@@ -110,7 +110,7 @@ async def test_publications_for_uid_never_sends_a_non_allow_listed_param():
 
     with respx.mock(assert_all_called=True) as mocked:
         route = mocked.get(f"{settings.gazette_base_url}/publications").respond(200, json=SEARCH_FIXTURE)
-        await gazette.publications_for_uid("CHE101654423", limit=5, budget_s=10.0)
+        await gazette.GazetteClient().publications_for_uid("CHE101654423", limit=5, budget_s=10.0)
 
     request = route.calls.last.request
     sent_params = set(httpx.QueryParams(request.url.query).keys())

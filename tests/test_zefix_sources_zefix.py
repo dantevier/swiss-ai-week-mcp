@@ -88,7 +88,7 @@ async def test_firm_detail_parses_the_fixture():
     payload = json.loads(FIXTURE.read_text())
     with respx.mock(assert_all_called=True) as mocked:
         mocked.get(f"{settings.zefix_base_url}/firm/1287765.json").respond(200, json=payload)
-        enrichment = await zefix.firm_detail(1287765, budget_s=5.0)
+        enrichment = await zefix.ZefixClient().firm_detail(1287765, budget_s=5.0)
 
     assert enrichment.status == "EXISTIEREND"
     assert enrichment.shab_date == "2025-03-14"
@@ -114,7 +114,7 @@ async def test_firm_detail_never_exposes_shab_message():
 
     with respx.mock(assert_all_called=True) as mocked:
         mocked.get(f"{settings.zefix_base_url}/firm/1287765.json").respond(200, json=payload)
-        enrichment = await zefix.firm_detail(1287765, budget_s=5.0)
+        enrichment = await zefix.ZefixClient().firm_detail(1287765, budget_s=5.0)
 
     field_names = " ".join(vars(enrichment).keys()).lower()
     assert "message" not in field_names
@@ -123,16 +123,16 @@ async def test_firm_detail_never_exposes_shab_message():
         assert "redigiert" not in serialised.lower()
 
 
-async def test_firm_detail_basic_auth_when_credentials_set(settings_override):
+async def test_firm_detail_basic_auth_when_credentials_set():
     """PRD §6.3: "Basic auth if settings.zefix_username and zefix_password set."."""
     from mcp_boilerplate.zefix.sources import rest as zefix
 
-    settings_override(zefix_username="tester", zefix_password="secret")
+    client = zefix.ZefixClient(username="tester", password="secret")
     payload = json.loads(FIXTURE.read_text())
 
     with respx.mock(assert_all_called=True) as mocked:
         route = mocked.get(f"{settings.zefix_base_url}/firm/1287765.json").respond(200, json=payload)
-        await zefix.firm_detail(1287765, budget_s=5.0)
+        await client.firm_detail(1287765, budget_s=5.0)
 
     request = route.calls.last.request
     assert "authorization" in {k.lower() for k in request.headers.keys()}
@@ -149,7 +149,7 @@ async def test_firm_detail_timeout_raises_source_unavailable_zefix():
             side_effect=httpx.TimeoutException("timed out")
         )
         with pytest.raises(SourceUnavailable) as excinfo:
-            await zefix.firm_detail(415941, budget_s=5.0)
+            await zefix.ZefixClient().firm_detail(415941, budget_s=5.0)
 
     assert excinfo.value.source == "zefix"
 
@@ -159,26 +159,26 @@ async def test_firm_detail_timeout_raises_source_unavailable_zefix():
 # ---------------------------------------------------------------------------
 
 
-def test_enrichment_allowed_false_by_default(settings_override):
+def test_enrichment_allowed_false_by_default():
     """PRD §6.5: respect_robots_txt=True and no credentials -> enrichment not allowed."""
     from mcp_boilerplate.zefix.sources import rest as zefix
 
-    settings_override(respect_robots_txt=True, zefix_username=None, zefix_password=None)
-    assert zefix.enrichment_allowed() is False
+    client = zefix.ZefixClient(respect_robots_txt=True, username=None, password=None)
+    assert client.enrichment_allowed() is False
 
 
-def test_enrichment_allowed_true_when_robots_disabled(settings_override):
+def test_enrichment_allowed_true_when_robots_disabled():
     """PRD §6.5: respect_robots_txt=False -> allowed even without credentials."""
     from mcp_boilerplate.zefix.sources import rest as zefix
 
-    settings_override(respect_robots_txt=False, zefix_username=None, zefix_password=None)
-    assert zefix.enrichment_allowed() is True
+    client = zefix.ZefixClient(respect_robots_txt=False, username=None, password=None)
+    assert client.enrichment_allowed() is True
 
 
-def test_enrichment_allowed_true_with_credentials_even_when_robots_respected(settings_override):
+def test_enrichment_allowed_true_with_credentials_even_when_robots_respected():
     """PRD §6.5: "the credential grant is the ToS acceptance" -- credentials allow
     enrichment under either value of respect_robots_txt."""
     from mcp_boilerplate.zefix.sources import rest as zefix
 
-    settings_override(respect_robots_txt=True, zefix_username="tester", zefix_password="secret")
-    assert zefix.enrichment_allowed() is True
+    client = zefix.ZefixClient(respect_robots_txt=True, username="tester", password="secret")
+    assert client.enrichment_allowed() is True

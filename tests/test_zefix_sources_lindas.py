@@ -138,7 +138,7 @@ async def test_find_by_uid_parses_a_full_company():
     body = _sparql_json(_swisscom_detail_rows())
     with respx.mock(assert_all_called=True) as mocked:
         mocked.post(settings.lindas_endpoint).respond(200, json=body)
-        company = await lindas.find_by_uid("CHE101654423", budget_s=10.0)
+        company = await lindas.LindasClient().find_by_uid("CHE101654423", budget_s=10.0)
 
     _assert_is_swisscom(company)
 
@@ -148,7 +148,7 @@ async def test_find_by_uid_zero_hits_returns_none():
     body = _sparql_json([])
     with respx.mock(assert_all_called=True) as mocked:
         mocked.post(settings.lindas_endpoint).respond(200, json=body)
-        company = await lindas.find_by_uid("CHE999999999", budget_s=10.0)
+        company = await lindas.LindasClient().find_by_uid("CHE999999999", budget_s=10.0)
 
     assert company is None
 
@@ -216,7 +216,7 @@ async def test_search_by_name_exact_hit_stops_at_stage0():
         route = mocked.post(settings.lindas_endpoint).mock(
             side_effect=_route_search_by_name(exact_hits=True, stage1_hits=True, stage2_hits=True, stage3_hits=True)
         )
-        results = await lindas.search_by_name("Swisscom (Schweiz) AG", budget_s=10.0)
+        results = await lindas.LindasClient().search_by_name("Swisscom (Schweiz) AG", budget_s=10.0)
         queries = [_query_text(call.request) for call in route.calls]
 
     assert len(results) == 1
@@ -232,7 +232,7 @@ async def test_search_by_name_falls_back_through_stages_in_order():
         route = mocked.post(settings.lindas_endpoint).mock(
             side_effect=_route_search_by_name(stage3_hits=True)
         )
-        results = await lindas.search_by_name("swisscom", budget_s=10.0)
+        results = await lindas.LindasClient().search_by_name("swisscom", budget_s=10.0)
         queries = [_query_text(call.request) for call in route.calls]
 
     assert len(results) == 1
@@ -250,7 +250,7 @@ async def test_search_by_name_stops_at_first_hitting_stage():
         route = mocked.post(settings.lindas_endpoint).mock(
             side_effect=_route_search_by_name(stage1_hits=True, stage2_hits=True, stage3_hits=True)
         )
-        results = await lindas.search_by_name("swisscom", budget_s=10.0)
+        results = await lindas.LindasClient().search_by_name("swisscom", budget_s=10.0)
         queries = [_query_text(call.request) for call in route.calls]
 
     assert len(results) == 1
@@ -263,7 +263,7 @@ async def test_search_by_name_zero_hits_all_stages_returns_empty():
     at most 4 upstream queries total."""
     with respx.mock(assert_all_called=True) as mocked:
         route = mocked.post(settings.lindas_endpoint).mock(side_effect=_route_search_by_name())
-        results = await lindas.search_by_name("ganz unbekannte gmbh xyz", budget_s=10.0)
+        results = await lindas.LindasClient().search_by_name("ganz unbekannte gmbh xyz", budget_s=10.0)
         queries = [_query_text(call.request) for call in route.calls]
 
     assert results == []
@@ -291,7 +291,7 @@ async def test_find_by_uid_timeout_raises_source_unavailable_lindas():
     with respx.mock(assert_all_called=True) as mocked:
         mocked.post(settings.lindas_endpoint).mock(side_effect=httpx.TimeoutException("timed out"))
         with pytest.raises(SourceUnavailable) as excinfo:
-            await lindas.find_by_uid("CHE101654423", budget_s=1.0)
+            await lindas.LindasClient().find_by_uid("CHE101654423", budget_s=1.0)
 
     assert excinfo.value.source == "lindas"
     assert excinfo.value.error_class
@@ -314,7 +314,7 @@ async def test_search_by_name_timeout_raises_timeout_scan():
     with respx.mock(assert_all_called=True) as mocked:
         mocked.post(settings.lindas_endpoint).mock(side_effect=_side_effect)
         with pytest.raises(SourceUnavailable) as excinfo:
-            await lindas.search_by_name("ganz unbekannte gmbh xyz", budget_s=1.0)
+            await lindas.LindasClient().search_by_name("ganz unbekannte gmbh xyz", budget_s=1.0)
 
     assert excinfo.value.source == "lindas"
     assert excinfo.value.error_class == "timeout_scan"
@@ -327,7 +327,7 @@ async def test_search_by_name_exact_stage_timeout_is_not_reclassified():
     with respx.mock(assert_all_called=True) as mocked:
         mocked.post(settings.lindas_endpoint).mock(side_effect=httpx.TimeoutException("timed out"))
         with pytest.raises(SourceUnavailable) as excinfo:
-            await lindas.search_by_name("Swisscom (Schweiz) AG", budget_s=1.0)
+            await lindas.LindasClient().search_by_name("Swisscom (Schweiz) AG", budget_s=1.0)
 
     assert excinfo.value.source == "lindas"
     assert excinfo.value.error_class != "timeout_scan"
@@ -340,6 +340,6 @@ async def test_find_by_uid_timeout_is_not_reclassified_as_timeout_scan():
     with respx.mock(assert_all_called=True) as mocked:
         mocked.post(settings.lindas_endpoint).mock(side_effect=httpx.TimeoutException("timed out"))
         with pytest.raises(SourceUnavailable) as excinfo:
-            await lindas.find_by_uid("CHE101654423", budget_s=1.0)
+            await lindas.LindasClient().find_by_uid("CHE101654423", budget_s=1.0)
 
     assert excinfo.value.error_class != "timeout_scan"

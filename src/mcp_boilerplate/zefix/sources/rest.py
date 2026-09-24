@@ -4,7 +4,7 @@ Zefix web-endpoint enrichment client (docs/prd-zefix-company-info.md §6.3).
 
 LINDAS (sources/lindas.py) is the primary, always-used Zefix source. This
 module adds a single optional enrichment call, `firm_detail`, gated by
-`enrichment_allowed()`: `GET {zefix_base_url}/firm/{ehraid}.json`. It never
+`enrichment_allowed()`: `GET {base_url}/firm/{ehraid}.json`. It never
 performs a search (LINDAS resolves the entity) and it never reads or returns
 `shabPub[].message`, which carries free-text SHAB wording that can include
 person names (PRD §6.6, N2).
@@ -14,6 +14,9 @@ L488-493), the canton code list (`CANTON_CODES`, L275-302), and the inline
 firm-detail GET used by `zefix_get_company` (~L908). Stripped: the `mcp` SDK
 tool decorators, markdown rendering, the Zefix search endpoint (not used
 here), and module-level env parsing — configuration comes from `settings`.
+
+Class wrapper: `ZefixClient` holds base URL, credentials and the robots flag;
+its methods keep the original module-function names, bodies and signatures.
 """
 
 from __future__ import annotations
@@ -80,18 +83,6 @@ def zefix_detail_url(ehraid: int, language: str = "de") -> str:
     return f"https://www.zefix.admin.ch/{language}/search/entity/list/firm/{ehraid}"
 
 
-def enrichment_allowed() -> bool:
-    """Whether the Zefix web-endpoint enrichment call may run (PRD §6.5).
-
-    Runs when robots/ToS compliance is turned off, or when credentials for the
-    documented ZefixPublicREST API are configured (the credential grant is
-    itself the ToS acceptance for that API).
-    """
-    return (not settings.respect_robots_txt) or bool(
-        settings.zefix_username and settings.zefix_password
-    )
-
-
 @dataclass
 class Enrichment:
     status: str | None = None
@@ -124,49 +115,97 @@ def _mutation_types_newest_first(shab_pub: list) -> list[str]:
     return out
 
 
+class _Unset:
+    """Type of `_UNSET`: marks a constructor argument that was not passed."""
+
+
+_UNSET = _Unset()
+
+
+class ZefixClient:
+    """Zefix web-endpoint enrichment client. Config is fixed at construction;
+    each argument defaults to the matching `settings` field read when the
+    client is built."""
+
+    def __init__(
+        self,
+        base_url: str | None = None,
+        username: str | None | _Unset = _UNSET,
+        password: str | None | _Unset = _UNSET,
+        respect_robots_txt: bool | None = None,
+    ) -> None:
+        # None is a real value for the credentials ("anonymous"), so they use
+        # the _UNSET sentinel to mean "take it from settings".
+        self.base_url = settings.zefix_base_url if base_url is None else base_url
+        self.username = settings.zefix_username if isinstance(username, _Unset) else username
+        self.password = settings.zefix_password if isinstance(password, _Unset) else password
+        self.respect_robots_txt = settings.respect_robots_txt if respect_robots_txt is None else respect_robots_txt
+
+    def enrichment_allowed(self) -> bool:
+        """Whether the Zefix web-endpoint enrichment call may run (PRD §6.5).
+
+        Runs when robots/ToS compliance is turned off, or when credentials for the
+        documented ZefixPublicREST API are configured (the credential grant is
+        itself the ToS acceptance for that API).
+        """
+        return (not self.respect_robots_txt) or bool(self.username and self.password)
+
+    async def firm_detail(self, ehraid: int, *, budget_s: float) -> Enrichment:
+        """GET {self.base_url}/firm/{ehraid}.json.
+
+        Basic auth is used when both `self.username` and `self.password` are
+        set (documented ZefixPublicREST API); otherwise the call is anonymous
+        (undocumented zefix.ch web endpoint).
+        Raises `SourceUnavailable(source="zefix", ...)` on any HTTP error,
+        timeout, or network failure. A 404 maps to error_class "http_404".
+        """
+        auth = None
+        if self.username and self.password:
+            auth = httpx.BasicAuth(self.username, self.password)
+
+        url = f"{self.base_url}/firm/{ehraid}.json"
+        try:
+            async with make_client(budget_s, auth=auth) as client:
+                resp = await client.get(url)
+                resp.raise_for_status()
+                data = resp.json()
+        except httpx.HTTPStatusError as exc:
+            error_class, retry_after_s = classify_error(exc)
+            raise SourceUnavailable("zefix", error_class, retry_after_s=retry_after_s) from exc
+        except httpx.TimeoutException as exc:
+            error_class, retry_after_s = classify_error(exc)
+            raise SourceUnavailable("zefix", error_class, retry_after_s=retry_after_s) from exc
+        except httpx.RequestError as exc:
+            error_class, retry_after_s = classify_error(exc)
+            raise SourceUnavailable("zefix", error_class, retry_after_s=retry_after_s) from exc
+
+        if not isinstance(data, dict):
+            raise SourceUnavailable("zefix", "bad_response")
+
+        old_names = [
+            n.get("name")
+            for n in (data.get("oldNames") or [])
+            if isinstance(n, dict) and n.get("name")
+        ]
+
+        return Enrichment(
+            status=data.get("status"),
+            shab_date=data.get("shabDate"),
+            delete_date=data.get("deleteDate"),
+            cantonal_excerpt_url=data.get("cantonalExcerptWeb"),
+            old_names=old_names,
+            mutation_types=_mutation_types_newest_first(data.get("shabPub") or []),
+        )
+
+
+# --- module-level shims ------------------------------------------------------
+
+
+# S4 shim: removed in S6 once CompanyLookup injects the client.
+def enrichment_allowed() -> bool:
+    return ZefixClient().enrichment_allowed()
+
+
+# S4 shim: removed in S6 once CompanyLookup injects the client.
 async def firm_detail(ehraid: int, *, budget_s: float) -> Enrichment:
-    """GET {settings.zefix_base_url}/firm/{ehraid}.json.
-
-    Basic auth is used when both `settings.zefix_username` and
-    `settings.zefix_password` are set (documented ZefixPublicREST API);
-    otherwise the call is anonymous (undocumented zefix.ch web endpoint).
-    Raises `SourceUnavailable(source="zefix", ...)` on any HTTP error,
-    timeout, or network failure. A 404 maps to error_class "http_404".
-    """
-    auth = None
-    if settings.zefix_username and settings.zefix_password:
-        auth = httpx.BasicAuth(settings.zefix_username, settings.zefix_password)
-
-    url = f"{settings.zefix_base_url}/firm/{ehraid}.json"
-    try:
-        async with make_client(budget_s, auth=auth) as client:
-            resp = await client.get(url)
-            resp.raise_for_status()
-            data = resp.json()
-    except httpx.HTTPStatusError as exc:
-        error_class, retry_after_s = classify_error(exc)
-        raise SourceUnavailable("zefix", error_class, retry_after_s=retry_after_s) from exc
-    except httpx.TimeoutException as exc:
-        error_class, retry_after_s = classify_error(exc)
-        raise SourceUnavailable("zefix", error_class, retry_after_s=retry_after_s) from exc
-    except httpx.RequestError as exc:
-        error_class, retry_after_s = classify_error(exc)
-        raise SourceUnavailable("zefix", error_class, retry_after_s=retry_after_s) from exc
-
-    if not isinstance(data, dict):
-        raise SourceUnavailable("zefix", "bad_response")
-
-    old_names = [
-        n.get("name")
-        for n in (data.get("oldNames") or [])
-        if isinstance(n, dict) and n.get("name")
-    ]
-
-    return Enrichment(
-        status=data.get("status"),
-        shab_date=data.get("shabDate"),
-        delete_date=data.get("deleteDate"),
-        cantonal_excerpt_url=data.get("cantonalExcerptWeb"),
-        old_names=old_names,
-        mutation_types=_mutation_types_newest_first(data.get("shabPub") or []),
-    )
+    return await ZefixClient().firm_detail(ehraid, budget_s=budget_s)

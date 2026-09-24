@@ -1,7 +1,10 @@
 """LINDAS backend (primary source) for the Zefix commercial-register graph.
 
+Class wrapper: `LindasClient` holds endpoint/timeout/cache TTL; its methods
+keep the original module-function names, bodies and signatures.
+
 docs/prd-zefix-company-info.md §6.2. SPARQL 1.1 over HTTP: POST form-encoded
-`query` to `settings.lindas_endpoint` (default `https://lindas.admin.ch/query`),
+`query` to `LindasClient.endpoint` (default `https://lindas.admin.ch/query`),
 `Accept: application/sparql-results+json`. Graph
 `<https://lindas.admin.ch/foj/zefix>` (27.3M triples, ~794k organisations).
 
@@ -269,49 +272,7 @@ class Company:
     source_url: str = ""  # https://register.ld.admin.ch/zefix/company/{ehraid}
 
 
-# --- low-level query execution ----------------------------------------------
-
-
-async def _run_query(query: str, timeout: float) -> dict:
-    """POST a SPARQL query to the LINDAS endpoint and return the parsed JSON.
-
-    Any httpx failure (timeout, network, non-2xx, egress denial) is mapped to
-    SourceUnavailable("lindas", ...). `timeout` must be > 0; callers clamp the
-    remaining call/query budget before calling this.
-    """
-    timeout = max(timeout, 0.1)
-    try:
-        async with make_client(timeout, accept="application/sparql-results+json") as client:
-            resp = await client.post(settings.lindas_endpoint, data={"query": query})
-            resp.raise_for_status()
-            return resp.json()
-    except httpx.HTTPError as exc:
-        error_class, retry_after_s = classify_error(exc)
-        raise SourceUnavailable("lindas", error_class, retry_after_s=retry_after_s) from exc
-    except SourceUnavailable:
-        raise
-    except Exception as exc:  # pragma: no cover - defensive (e.g. bad JSON body)
-        error_class, retry_after_s = classify_error(exc)
-        raise SourceUnavailable("lindas", error_class, retry_after_s=retry_after_s) from exc
-
-
-async def _run_search_query(query: str, timeout: float) -> dict:
-    """Like `_run_query`, but for the name-search path specifically.
-
-    A plain "timeout" here almost always means the endpoint's unindexed
-    `schema:name` literal scan (see module docstring - measured 12.7-18.5s
-    for a true negative) didn't finish in the budget, not a generic upstream
-    hiccup. Re-raised as `error_class="timeout_scan"` so callers/the tool
-    layer can tell "the name index scan ran out of time" apart from other
-    `source_unavailable` causes and suggest the UID path instead of just
-    retrying.
-    """
-    try:
-        return await _run_query(query, timeout)
-    except SourceUnavailable as exc:
-        if exc.error_class == "timeout":
-            raise SourceUnavailable("lindas", "timeout_scan", retry_after_s=exc.retry_after_s) from exc
-        raise
+# --- result aggregation ---------------------------------------------------
 
 
 def _binding_value(binding: dict, key: str) -> str | None:
@@ -407,30 +368,6 @@ def _aggregate_company(company_uri: str, rows: list[dict], known_uid: str | None
     )
 
 
-# --- public API --------------------------------------------------------------
-
-
-async def find_by_uid(uid: str, *, budget_s: float) -> Company | None:
-    """Look up one company by unformatted UID ("CHE123456789").
-
-    One SPARQL query (exact triple pattern on CompanyUID plus OPTIONAL blocks
-    for everything else, per the module interface); result rows are
-    aggregated into a single Company. Returns None on zero hits or on a
-    malformed uid (defensive - callers are expected to normalise first).
-    Raises SourceUnavailable("lindas", ...) on any transport/HTTP failure.
-    """
-    if not _UID_RE.match(uid):
-        return None
-
-    query = _find_by_uid_query(escape_literal(uid))
-    timeout = min(budget_s, settings.lindas_timeout_s)
-    data = await _run_query(query, timeout)
-    bindings = data.get("results", {}).get("bindings", [])
-    if not bindings:
-        return None
-    company_uri = bindings[0]["company"]["value"]
-    return _aggregate_company(company_uri, bindings, known_uid=uid)
-
 
 def _companies_from_bindings(bindings: list[dict]) -> list[Company]:
     """Group flat result rows by company (preserving first-seen order) and
@@ -454,133 +391,232 @@ def _companies_from_bindings(bindings: list[dict]) -> list[Company]:
 _MIN_STAGE_BUDGET_S = 3.0
 
 
-async def search_by_name(name: str, *, canton: str | None = None, limit: int = 10, budget_s: float) -> list[Company]:
-    """Search companies by name, staged from cheapest/most-selective to most
-    expensive, stopping at the first stage with hits, sharing `budget_s`
-    (computed with time.monotonic(), each stage bounded by what remains):
-
-    - Stage 0: exact literal match via `VALUES` on `schema:legalName` and
-      lang-tagged/plain `schema:name` (name trimmed, internal whitespace
-      collapsed, case preserved - no LCASE, no FILTER). This is an indexed
-      lookup on this endpoint, not a scan: fast even on a miss (measured
-      live 0.1-0.25s for "Swisscom (Schweiz) AG", "UBS AG", "Nestlé S.A."
-      and a miss - see module docstring, "Stage 0"). Added because a
-      STRSTARTS/CONTAINS scan for a name with very few matches (e.g. a full
-      legal name, exactly one hit) cannot stop early at LIMIT and ends up
-      scanning as much of the corpus as a true miss (measured 10s+, vs.
-      "swisscom"'s 2.5s where 10 matches are found quickly).
-    - Stage 1: `schema:legalName` STRSTARTS(LCASE) LIMIT `limit` (measured
-      ~1.2s on a hit, ~6s on a miss - legalName is untagged, one
-      literal/company, cheap to scan).
-    - Stage 2: `schema:name` STRSTARTS(LCASE) LIMIT `limit`, only attempted
-      if the remaining budget exceeds `_MIN_STAGE_BUDGET_S` (this predicate
-      is lang-tagged, ~4 literals/company, and its scan is the expensive one
-      - 12.7-18.5s for a true miss).
-    - Stage 3: `schema:legalName` CONTAINS(LCASE), only attempted if the
-      remaining budget exceeds `_MIN_STAGE_BUDGET_S`.
-
-    At most 4 upstream SPARQL queries total (one per stage, stopping at the
-    first hit). Each is a single query: candidate selection as an inner
-    `SELECT DISTINCT ?company ... LIMIT n` subquery joined to the shared
-    detail OPTIONAL block, so a hit at any stage resolves to full Company
-    rows without a separate detail round trip. Results are DISTINCT by
-    company, in the order the candidate subquery returned them.
-
-    A timeout at stage 1, 2 or 3 (the unindexed literal scans) is raised as
-    `SourceUnavailable("lindas", "timeout_scan", ...)`, not the generic
-    `"timeout"` `find_by_uid` uses, so callers can distinguish "the name
-    index scan ran out of time" from other source failures. Stage 0's exact
-    `VALUES` lookup is indexed, not a scan, so a timeout there keeps the
-    plain `"timeout"` class - it would mean a generic LINDAS problem, not an
-    exhausted scan.
-    """
-    original = " ".join(name.split())  # trim + collapse internal whitespace, case preserved
-    if not original:
-        return []
-    exact_literal = escape_literal(original)
-    needle = escape_literal(original.lower())
-    canton_norm = escape_literal(canton.strip().upper()) if canton else None
-
-    start = time.monotonic()
-    budget = min(budget_s, settings.lindas_timeout_s)
-
-    def remaining() -> float:
-        return budget - (time.monotonic() - start)
-
-    async def _attempt(query: str, timeout: float, *, reclassify_timeout: bool) -> list[Company]:
-        runner = _run_search_query if reclassify_timeout else _run_query
-        data = await runner(query, timeout)
-        return _companies_from_bindings(data.get("results", {}).get("bindings", []))
-
-    # Stage 0: exact literal match - an indexed lookup, not a scan (module
-    # docstring, "Stage 0"), so a timeout here is a generic LINDAS problem,
-    # not "the scan ran out of time": keep the plain "timeout" error_class.
-    r = remaining()
-    if r <= 0:
-        return []
-    hits = await _attempt(_search_exact_query(exact_literal, canton_norm, limit), r, reclassify_timeout=False)
-    if hits:
-        return hits
-
-    # Stages 1-3 are unindexed literal scans; their timeouts are reclassified
-    # as "timeout_scan" (see _run_search_query).
-
-    # Stage 1: legalName STRSTARTS.
-    r = remaining()
-    if r <= 0:
-        return []
-    hits = await _attempt(
-        _search_prefix_query(needle, "STRSTARTS", "schema:legalName", canton_norm, limit), r, reclassify_timeout=True
-    )
-    if hits:
-        return hits
-
-    # Stage 2: schema:name STRSTARTS - only if there's plausibly enough budget.
-    r = remaining()
-    if r > _MIN_STAGE_BUDGET_S:
-        hits = await _attempt(
-            _search_prefix_query(needle, "STRSTARTS", "schema:name", canton_norm, limit), r, reclassify_timeout=True
-        )
-        if hits:
-            return hits
-
-    # Stage 3: legalName CONTAINS - only if there's plausibly enough budget.
-    r = remaining()
-    if r > _MIN_STAGE_BUDGET_S:
-        hits = await _attempt(
-            _search_prefix_query(needle, "CONTAINS", "schema:legalName", canton_norm, limit), r, reclassify_timeout=True
-        )
-        if hits:
-            return hits
-
-    return []
-
-
 _dataset_modified_cache: dict[str, object] = {"value": None, "fetched_at": None}
 
 
-async def dataset_modified() -> str | None:
-    """Return the LINDAS zefix graph's `schema:dateModified` as "YYYY-MM-DD".
+# --- client ----------------------------------------------------------------
 
-    Cached in-process for settings.reference_cache_ttl_s. On any failure
-    (network, HTTP, missing binding) returns None rather than raising -
-    freshness metadata is never worth failing a call over.
-    """
-    now = time.monotonic()
-    fetched_at = _dataset_modified_cache["fetched_at"]
-    if _dataset_modified_cache["value"] is not None and fetched_at is not None:
-        if (now - fetched_at) < settings.reference_cache_ttl_s:
-            return _dataset_modified_cache["value"]  # type: ignore[return-value]
 
-    try:
-        data = await _run_query(_dataset_modified_query(), settings.lindas_timeout_s)
+class LindasClient:
+    """LINDAS SPARQL client. Config is fixed at construction; each argument
+    defaults to the matching `settings` field read when the client is built."""
+
+    def __init__(
+        self,
+        endpoint: str | None = None,
+        timeout_s: float | None = None,
+        cache_ttl_s: float | None = None,
+    ) -> None:
+        self.endpoint = settings.lindas_endpoint if endpoint is None else endpoint
+        self.timeout_s = settings.lindas_timeout_s if timeout_s is None else timeout_s
+        self.cache_ttl_s = settings.reference_cache_ttl_s if cache_ttl_s is None else cache_ttl_s
+
+    async def _run_query(self, query: str, timeout: float) -> dict:
+        """POST a SPARQL query to the LINDAS endpoint and return the parsed JSON.
+
+        Any httpx failure (timeout, network, non-2xx, egress denial) is mapped to
+        SourceUnavailable("lindas", ...). `timeout` must be > 0; callers clamp the
+        remaining call/query budget before calling this.
+        """
+        timeout = max(timeout, 0.1)
+        try:
+            async with make_client(timeout, accept="application/sparql-results+json") as client:
+                resp = await client.post(self.endpoint, data={"query": query})
+                resp.raise_for_status()
+                return resp.json()
+        except httpx.HTTPError as exc:
+            error_class, retry_after_s = classify_error(exc)
+            raise SourceUnavailable("lindas", error_class, retry_after_s=retry_after_s) from exc
+        except SourceUnavailable:
+            raise
+        except Exception as exc:  # pragma: no cover - defensive (e.g. bad JSON body)
+            error_class, retry_after_s = classify_error(exc)
+            raise SourceUnavailable("lindas", error_class, retry_after_s=retry_after_s) from exc
+
+
+    async def _run_search_query(self, query: str, timeout: float) -> dict:
+        """Like `_run_query`, but for the name-search path specifically.
+
+        A plain "timeout" here almost always means the endpoint's unindexed
+        `schema:name` literal scan (see module docstring - measured 12.7-18.5s
+        for a true negative) didn't finish in the budget, not a generic upstream
+        hiccup. Re-raised as `error_class="timeout_scan"` so callers/the tool
+        layer can tell "the name index scan ran out of time" apart from other
+        `source_unavailable` causes and suggest the UID path instead of just
+        retrying.
+        """
+        try:
+            return await self._run_query(query, timeout)
+        except SourceUnavailable as exc:
+            if exc.error_class == "timeout":
+                raise SourceUnavailable("lindas", "timeout_scan", retry_after_s=exc.retry_after_s) from exc
+            raise
+
+
+    async def find_by_uid(self, uid: str, *, budget_s: float) -> Company | None:
+        """Look up one company by unformatted UID ("CHE123456789").
+
+        One SPARQL query (exact triple pattern on CompanyUID plus OPTIONAL blocks
+        for everything else, per the module interface); result rows are
+        aggregated into a single Company. Returns None on zero hits or on a
+        malformed uid (defensive - callers are expected to normalise first).
+        Raises SourceUnavailable("lindas", ...) on any transport/HTTP failure.
+        """
+        if not _UID_RE.match(uid):
+            return None
+
+        query = _find_by_uid_query(escape_literal(uid))
+        timeout = min(budget_s, self.timeout_s)
+        data = await self._run_query(query, timeout)
         bindings = data.get("results", {}).get("bindings", [])
         if not bindings:
             return None
-        value = bindings[0]["d"]["value"]
-    except Exception:
-        return None
+        company_uri = bindings[0]["company"]["value"]
+        return _aggregate_company(company_uri, bindings, known_uid=uid)
 
-    _dataset_modified_cache["value"] = value
-    _dataset_modified_cache["fetched_at"] = now
-    return value
+    async def search_by_name(
+        self, name: str, *, canton: str | None = None, limit: int = 10, budget_s: float
+    ) -> list[Company]:
+        """Search companies by name, staged from cheapest/most-selective to most
+        expensive, stopping at the first stage with hits, sharing `budget_s`
+        (computed with time.monotonic(), each stage bounded by what remains):
+
+        - Stage 0: exact literal match via `VALUES` on `schema:legalName` and
+          lang-tagged/plain `schema:name` (name trimmed, internal whitespace
+          collapsed, case preserved - no LCASE, no FILTER). This is an indexed
+          lookup on this endpoint, not a scan: fast even on a miss (measured
+          live 0.1-0.25s for "Swisscom (Schweiz) AG", "UBS AG", "Nestlé S.A."
+          and a miss - see module docstring, "Stage 0"). Added because a
+          STRSTARTS/CONTAINS scan for a name with very few matches (e.g. a full
+          legal name, exactly one hit) cannot stop early at LIMIT and ends up
+          scanning as much of the corpus as a true miss (measured 10s+, vs.
+          "swisscom"'s 2.5s where 10 matches are found quickly).
+        - Stage 1: `schema:legalName` STRSTARTS(LCASE) LIMIT `limit` (measured
+          ~1.2s on a hit, ~6s on a miss - legalName is untagged, one
+          literal/company, cheap to scan).
+        - Stage 2: `schema:name` STRSTARTS(LCASE) LIMIT `limit`, only attempted
+          if the remaining budget exceeds `_MIN_STAGE_BUDGET_S` (this predicate
+          is lang-tagged, ~4 literals/company, and its scan is the expensive one
+          - 12.7-18.5s for a true miss).
+        - Stage 3: `schema:legalName` CONTAINS(LCASE), only attempted if the
+          remaining budget exceeds `_MIN_STAGE_BUDGET_S`.
+
+        At most 4 upstream SPARQL queries total (one per stage, stopping at the
+        first hit). Each is a single query: candidate selection as an inner
+        `SELECT DISTINCT ?company ... LIMIT n` subquery joined to the shared
+        detail OPTIONAL block, so a hit at any stage resolves to full Company
+        rows without a separate detail round trip. Results are DISTINCT by
+        company, in the order the candidate subquery returned them.
+
+        A timeout at stage 1, 2 or 3 (the unindexed literal scans) is raised as
+        `SourceUnavailable("lindas", "timeout_scan", ...)`, not the generic
+        `"timeout"` `find_by_uid` uses, so callers can distinguish "the name
+        index scan ran out of time" from other source failures. Stage 0's exact
+        `VALUES` lookup is indexed, not a scan, so a timeout there keeps the
+        plain `"timeout"` class - it would mean a generic LINDAS problem, not an
+        exhausted scan.
+        """
+        original = " ".join(name.split())  # trim + collapse internal whitespace, case preserved
+        if not original:
+            return []
+        exact_literal = escape_literal(original)
+        needle = escape_literal(original.lower())
+        canton_norm = escape_literal(canton.strip().upper()) if canton else None
+
+        start = time.monotonic()
+        budget = min(budget_s, self.timeout_s)
+
+        def remaining() -> float:
+            return budget - (time.monotonic() - start)
+
+        async def _attempt(query: str, timeout: float, *, reclassify_timeout: bool) -> list[Company]:
+            runner = self._run_search_query if reclassify_timeout else self._run_query
+            data = await runner(query, timeout)
+            return _companies_from_bindings(data.get("results", {}).get("bindings", []))
+
+        # Stage 0: exact literal match - an indexed lookup, not a scan (module
+        # docstring, "Stage 0"), so a timeout here is a generic LINDAS problem,
+        # not "the scan ran out of time": keep the plain "timeout" error_class.
+        r = remaining()
+        if r <= 0:
+            return []
+        hits = await _attempt(_search_exact_query(exact_literal, canton_norm, limit), r, reclassify_timeout=False)
+        if hits:
+            return hits
+
+        # Stages 1-3 are unindexed literal scans; their timeouts are reclassified
+        # as "timeout_scan" (see _run_search_query).
+
+        # Stage 1: legalName STRSTARTS.
+        r = remaining()
+        if r <= 0:
+            return []
+        hits = await _attempt(
+            _search_prefix_query(needle, "STRSTARTS", "schema:legalName", canton_norm, limit), r, reclassify_timeout=True
+        )
+        if hits:
+            return hits
+
+        # Stage 2: schema:name STRSTARTS - only if there's plausibly enough budget.
+        r = remaining()
+        if r > _MIN_STAGE_BUDGET_S:
+            hits = await _attempt(
+                _search_prefix_query(needle, "STRSTARTS", "schema:name", canton_norm, limit), r, reclassify_timeout=True
+            )
+            if hits:
+                return hits
+
+        # Stage 3: legalName CONTAINS - only if there's plausibly enough budget.
+        r = remaining()
+        if r > _MIN_STAGE_BUDGET_S:
+            hits = await _attempt(
+                _search_prefix_query(needle, "CONTAINS", "schema:legalName", canton_norm, limit), r, reclassify_timeout=True
+            )
+            if hits:
+                return hits
+
+        return []
+
+    async def dataset_modified(self) -> str | None:
+        """Return the LINDAS zefix graph's `schema:dateModified` as "YYYY-MM-DD".
+
+        Cached in-process for `self.cache_ttl_s`. On any failure
+        (network, HTTP, missing binding) returns None rather than raising -
+        freshness metadata is never worth failing a call over.
+        """
+        now = time.monotonic()
+        fetched_at = _dataset_modified_cache["fetched_at"]
+        if _dataset_modified_cache["value"] is not None and fetched_at is not None:
+            if (now - fetched_at) < self.cache_ttl_s:
+                return _dataset_modified_cache["value"]  # type: ignore[return-value]
+
+        try:
+            data = await self._run_query(_dataset_modified_query(), self.timeout_s)
+            bindings = data.get("results", {}).get("bindings", [])
+            if not bindings:
+                return None
+            value = bindings[0]["d"]["value"]
+        except Exception:
+            return None
+
+        _dataset_modified_cache["value"] = value
+        _dataset_modified_cache["fetched_at"] = now
+        return value
+
+
+# --- module-level shims ------------------------------------------------------
+
+
+# S4 shim: removed in S6 once CompanyLookup injects the client.
+async def find_by_uid(uid: str, *, budget_s: float) -> Company | None:
+    return await LindasClient().find_by_uid(uid, budget_s=budget_s)
+
+
+# S4 shim: removed in S6 once CompanyLookup injects the client.
+async def search_by_name(name: str, *, canton: str | None = None, limit: int = 10, budget_s: float) -> list[Company]:
+    return await LindasClient().search_by_name(name, canton=canton, limit=limit, budget_s=budget_s)
+
+
+# S4 shim: removed in S6 once CompanyLookup injects the client.
+async def dataset_modified() -> str | None:
+    return await LindasClient().dataset_modified()

@@ -14,6 +14,9 @@ parsing (configuration comes from `settings`), and the `rubric`/`sub_rubric`
 filter arguments on the public search entry point (`publications_for_uid` is
 UID-scoped only, per the PRD).
 
+Class wrapper: `GazetteClient` holds base URL and cache TTL; its methods keep
+the original module-function names, bodies and signatures.
+
 Three upstream quirks, guarded here as in register-mcp:
   Quirk 1 (Silent Ignore)  An unknown query parameter is dropped silently and
                             the call returns the *whole* ~2.8M-publication
@@ -170,7 +173,7 @@ class Publication:
     sub_rubric: str | None
     title: str | None  # meta.title[language], fallback de
     source_url: str  # public SPA route: https://amtsblattportal.ch/#!/search?publicationId={id}
-    api_url: str  # fallback machine-readable route: {gazette_base_url}/publications/{id}/xml
+    api_url: str  # fallback machine-readable route: {base_url}/publications/{id}/xml
 
 
 def is_deletion(pub: Publication) -> bool:
@@ -180,72 +183,6 @@ def is_deletion(pub: Publication) -> bool:
 # ---------------------------------------------------------------------------
 # HTTP core with retry (ARCH-014 in register-mcp; server.py L1398-1480)
 # ---------------------------------------------------------------------------
-
-
-async def _gazette_get_json(path: str, params: dict[str, Any] | None, *, budget_s: float) -> Any:
-    """GET a gazette JSON endpoint, retrying what is worth retrying.
-
-    Retried: transient 5xx (502/503/504), 429, and network errors/timeouts —
-    the case an actual outage produces. Not retried: any other 4xx, which is
-    a statement about the request and reads the same on a third try.
-    `Retry-After` is honoured, attempts are capped at `GAZETTE_MAX_RETRIES`,
-    and the whole call (every attempt, every wait) is bounded by `budget_s`.
-
-    Raises `SourceUnavailable(source="gazette", ...)` if no attempt succeeds
-    within the budget.
-    """
-    deadline = monotonic() + budget_s
-    last_exc: Exception | None = None
-    last_resp: httpx.Response | None = None
-
-    async with make_client(budget_s) as client:
-        for attempt in range(1, GAZETTE_MAX_RETRIES + 1):
-            remaining = deadline - monotonic()
-            if remaining <= 0:
-                break
-            try:
-                async with asyncio.timeout(remaining):
-                    resp = await client.get(
-                        f"{settings.gazette_base_url}{path}", params=params, timeout=remaining
-                    )
-            except TimeoutError as exc:
-                # The asyncio deadline fired, so the budget is spent by
-                # definition — no point retrying into a budget of zero.
-                raise SourceUnavailable("gazette", "timeout") from exc
-            except httpx.RequestError as exc:
-                last_exc = exc
-                if attempt >= GAZETTE_MAX_RETRIES:
-                    break
-                delay = gazette_retry_delay(attempt, None)
-                if delay >= deadline - monotonic():
-                    break
-                await asyncio.sleep(delay)
-                continue
-
-            if resp.status_code in _RETRYABLE_STATUS and attempt < GAZETTE_MAX_RETRIES:
-                last_resp = resp
-                delay = gazette_retry_delay(attempt, resp)
-                if delay < deadline - monotonic():
-                    await asyncio.sleep(delay)
-                    continue
-                break
-            try:
-                resp.raise_for_status()
-            except httpx.HTTPStatusError as exc:
-                last_exc = exc
-                last_resp = resp
-                break
-            return resp.json()
-
-    if last_exc is not None:
-        error_class, retry_after_s = classify_error(last_exc)
-        raise SourceUnavailable("gazette", error_class, retry_after_s=retry_after_s) from last_exc
-    error_class, retry_after_s = (
-        classify_error(httpx.HTTPStatusError("", request=None, response=last_resp))
-        if last_resp is not None
-        else ("timeout", None)
-    )
-    raise SourceUnavailable("gazette", error_class, retry_after_s=retry_after_s)
 
 
 def _build_gazette_params(raw: dict[str, Any]) -> dict[str, Any]:
@@ -260,43 +197,11 @@ def _build_gazette_params(raw: dict[str, Any]) -> dict[str, Any]:
     return params
 
 
-async def _gazette_search(raw_params: dict[str, Any], *, budget_s: float) -> dict:
-    """Run a /publications search and enforce the Quirk-1 plausibility check."""
-    params = _build_gazette_params(raw_params)
-    data = await _gazette_get_json("/publications", params, budget_s=budget_s)
-    if not isinstance(data, dict):
-        return {"content": [], "total": 0}
-    total = data.get("total")
-    if isinstance(total, int) and total > GAZETTE_IGNORED_FILTER_THRESHOLD:
-        raise GazetteFilterIgnored(
-            f"Filter was silently ignored upstream — result not trustworthy "
-            f"(total={total:,}, expected < {GAZETTE_IGNORED_FILTER_THRESHOLD:,}). "
-            "Cause: Silent Ignore of an unrecognised parameter (Quirk 1)."
-        )
-    return data
-
-
 # ---------------------------------------------------------------------------
-# Rubric taxonomy — cached settings.reference_cache_ttl_s (Quirk 2 guard)
+# Rubric taxonomy — cached `GazetteClient.cache_ttl_s` (Quirk 2 guard)
 # ---------------------------------------------------------------------------
 
 _rubrics_cache: tuple[float, list[dict]] | None = None
-
-
-async def _fetch_rubrics(*, budget_s: float = 10.0) -> tuple[list[dict], bool]:
-    """Fetch the rubric/subRubric taxonomy with a TTL cache.
-
-    Returns (data, from_cache).
-    """
-    global _rubrics_cache
-    now = monotonic()
-    if _rubrics_cache and now - _rubrics_cache[0] < settings.reference_cache_ttl_s:
-        return _rubrics_cache[1], True
-    data = await _gazette_get_json("/rubrics", None, budget_s=budget_s)
-    if not isinstance(data, list):
-        data = []
-    _rubrics_cache = (now, data)
-    return data, False
 
 
 def _extract_rubric_codes(rubrics_data: list[dict]) -> tuple[set[str], set[str]]:
@@ -315,38 +220,12 @@ def _extract_rubric_codes(rubrics_data: list[dict]) -> tuple[set[str], set[str]]
     return rubric_codes, sub_codes
 
 
-async def _validate_rubric_code(code: str, kind: str, *, budget_s: float = 10.0) -> None:
-    """Validate a rubric/subRubric code against the cached taxonomy (Quirk 2).
-
-    An invalid code returns HTTP 200 with an empty result upstream, which is
-    indistinguishable from a legitimate no-hit — so codes are validated
-    before any `/publications` call that filters on them.
-    """
-    rubrics_data, _ = await _fetch_rubrics(budget_s=budget_s)
-    rubric_codes, sub_codes = _extract_rubric_codes(rubrics_data)
-    valid = rubric_codes if kind == "rubric" else sub_codes
-    if code not in valid:
-        raise GazetteInvalidCode(f"Invalid {kind} code {code!r}.")
-
-
-async def rubrics() -> dict:
-    """The gazette rubric/subRubric taxonomy, cached `settings.reference_cache_ttl_s`."""
-    data, from_cache = await _fetch_rubrics()
-    rubric_codes, sub_codes = _extract_rubric_codes(data)
-    return {
-        "rubrics": data,
-        "rubric_codes": sorted(rubric_codes),
-        "sub_rubric_codes": sorted(sub_codes),
-        "from_cache": from_cache,
-    }
-
-
 # ---------------------------------------------------------------------------
 # Publication parsing (register-mcp `_gazette_meta_summary`, L1607-1628)
 # ---------------------------------------------------------------------------
 
 
-def _publication_from_item(item: dict, *, language: str) -> Publication:
+def _publication_from_item(item: dict, *, language: str, base_url: str) -> Publication:
     meta = item.get("meta") if isinstance(item, dict) else None
     meta = meta if isinstance(meta, dict) else {}
 
@@ -380,7 +259,7 @@ def _publication_from_item(item: dict, *, language: str) -> Publication:
         sub_rubric=meta.get("subRubric"),
         title=title,
         source_url=f"https://amtsblattportal.ch/#!/search?publicationId={pub_id}",
-        api_url=f"{settings.gazette_base_url}/publications/{pub_id}/xml",
+        api_url=f"{base_url}/publications/{pub_id}/xml",
     )
 
 
@@ -397,6 +276,181 @@ def _format_uid_for_query(uid: str) -> str:
     return uid
 
 
+# ---------------------------------------------------------------------------
+# Client
+# ---------------------------------------------------------------------------
+
+
+class GazetteClient:
+    """Amtsblattportal client. Config is fixed at construction; each argument
+    defaults to the matching `settings` field read when the client is built.
+    The rubric cache (`_rubrics_cache`) stays module-level and is shared by
+    every instance."""
+
+    def __init__(self, base_url: str | None = None, cache_ttl_s: float | None = None) -> None:
+        self.base_url = settings.gazette_base_url if base_url is None else base_url
+        self.cache_ttl_s = settings.reference_cache_ttl_s if cache_ttl_s is None else cache_ttl_s
+
+    async def _gazette_get_json(self, path: str, params: dict[str, Any] | None, *, budget_s: float) -> Any:
+        """GET a gazette JSON endpoint, retrying what is worth retrying.
+
+        Retried: transient 5xx (502/503/504), 429, and network errors/timeouts —
+        the case an actual outage produces. Not retried: any other 4xx, which is
+        a statement about the request and reads the same on a third try.
+        `Retry-After` is honoured, attempts are capped at `GAZETTE_MAX_RETRIES`,
+        and the whole call (every attempt, every wait) is bounded by `budget_s`.
+
+        Raises `SourceUnavailable(source="gazette", ...)` if no attempt succeeds
+        within the budget.
+        """
+        deadline = monotonic() + budget_s
+        last_exc: Exception | None = None
+        last_resp: httpx.Response | None = None
+
+        async with make_client(budget_s) as client:
+            for attempt in range(1, GAZETTE_MAX_RETRIES + 1):
+                remaining = deadline - monotonic()
+                if remaining <= 0:
+                    break
+                try:
+                    async with asyncio.timeout(remaining):
+                        resp = await client.get(
+                            f"{self.base_url}{path}", params=params, timeout=remaining
+                        )
+                except TimeoutError as exc:
+                    # The asyncio deadline fired, so the budget is spent by
+                    # definition — no point retrying into a budget of zero.
+                    raise SourceUnavailable("gazette", "timeout") from exc
+                except httpx.RequestError as exc:
+                    last_exc = exc
+                    if attempt >= GAZETTE_MAX_RETRIES:
+                        break
+                    delay = gazette_retry_delay(attempt, None)
+                    if delay >= deadline - monotonic():
+                        break
+                    await asyncio.sleep(delay)
+                    continue
+
+                if resp.status_code in _RETRYABLE_STATUS and attempt < GAZETTE_MAX_RETRIES:
+                    last_resp = resp
+                    delay = gazette_retry_delay(attempt, resp)
+                    if delay < deadline - monotonic():
+                        await asyncio.sleep(delay)
+                        continue
+                    break
+                try:
+                    resp.raise_for_status()
+                except httpx.HTTPStatusError as exc:
+                    last_exc = exc
+                    last_resp = resp
+                    break
+                return resp.json()
+
+        if last_exc is not None:
+            error_class, retry_after_s = classify_error(last_exc)
+            raise SourceUnavailable("gazette", error_class, retry_after_s=retry_after_s) from last_exc
+        error_class, retry_after_s = (
+            classify_error(httpx.HTTPStatusError("", request=None, response=last_resp))
+            if last_resp is not None
+            else ("timeout", None)
+        )
+        raise SourceUnavailable("gazette", error_class, retry_after_s=retry_after_s)
+
+    async def _gazette_search(self, raw_params: dict[str, Any], *, budget_s: float) -> dict:
+        """Run a /publications search and enforce the Quirk-1 plausibility check."""
+        params = _build_gazette_params(raw_params)
+        data = await self._gazette_get_json("/publications", params, budget_s=budget_s)
+        if not isinstance(data, dict):
+            return {"content": [], "total": 0}
+        total = data.get("total")
+        if isinstance(total, int) and total > GAZETTE_IGNORED_FILTER_THRESHOLD:
+            raise GazetteFilterIgnored(
+                f"Filter was silently ignored upstream — result not trustworthy "
+                f"(total={total:,}, expected < {GAZETTE_IGNORED_FILTER_THRESHOLD:,}). "
+                "Cause: Silent Ignore of an unrecognised parameter (Quirk 1)."
+            )
+        return data
+
+    async def _fetch_rubrics(self, *, budget_s: float = 10.0) -> tuple[list[dict], bool]:
+        """Fetch the rubric/subRubric taxonomy with a TTL cache.
+
+        Returns (data, from_cache).
+        """
+        global _rubrics_cache
+        now = monotonic()
+        if _rubrics_cache and now - _rubrics_cache[0] < self.cache_ttl_s:
+            return _rubrics_cache[1], True
+        data = await self._gazette_get_json("/rubrics", None, budget_s=budget_s)
+        if not isinstance(data, list):
+            data = []
+        _rubrics_cache = (now, data)
+        return data, False
+
+    async def _validate_rubric_code(self, code: str, kind: str, *, budget_s: float = 10.0) -> None:
+        """Validate a rubric/subRubric code against the cached taxonomy (Quirk 2).
+
+        An invalid code returns HTTP 200 with an empty result upstream, which is
+        indistinguishable from a legitimate no-hit — so codes are validated
+        before any `/publications` call that filters on them.
+        """
+        rubrics_data, _ = await self._fetch_rubrics(budget_s=budget_s)
+        rubric_codes, sub_codes = _extract_rubric_codes(rubrics_data)
+        valid = rubric_codes if kind == "rubric" else sub_codes
+        if code not in valid:
+            raise GazetteInvalidCode(f"Invalid {kind} code {code!r}.")
+
+    async def rubrics(self) -> dict:
+        """The gazette rubric/subRubric taxonomy, cached `self.cache_ttl_s`."""
+        data, from_cache = await self._fetch_rubrics()
+        rubric_codes, sub_codes = _extract_rubric_codes(data)
+        return {
+            "rubrics": data,
+            "rubric_codes": sorted(rubric_codes),
+            "sub_rubric_codes": sorted(sub_codes),
+            "from_cache": from_cache,
+        }
+
+    async def publications_for_uid(
+        self,
+        uid: str,
+        *,
+        limit: int,
+        budget_s: float,
+        language: str = "de",
+        rubrics: list[str] | None = None,
+    ) -> list[Publication]:
+        """Gazette publications naming the given company UID, newest first.
+
+        `uid` is the normalised, unformatted form ("CHE101654423"); it is
+        reformatted internally for the upstream `uids` filter. `rubrics` restricts
+        the result to gazette rubrics, e.g. ["HR"] for commercial-register
+        entries only. Only `publicationStates=PUBLISHED`, `uids`, `rubrics`, and
+        `pageRequest.size` are sent —
+        built exclusively from `ALLOWED_GAZETTE_PARAMS` (Quirk 1 guard). Raises
+        `GazetteFilterIgnored` if the plausibility guard trips, and
+        `SourceUnavailable(source="gazette", ...)` on timeout/network/HTTP
+        failure after retries.
+        """
+        data = await self._gazette_search(
+            {
+                "uids": _format_uid_for_query(uid),
+                "rubrics": ",".join(rubrics) if rubrics else None,
+                "pageRequest.size": min(limit, GAZETTE_MAX_LIMIT),
+            },
+            budget_s=budget_s,
+        )
+        content = data.get("content", []) or []
+        pubs = [_publication_from_item(item, language=language, base_url=self.base_url) for item in content]
+        pubs.sort(key=lambda p: p.date, reverse=True)
+        return pubs
+
+
+# ---------------------------------------------------------------------------
+# Module-level shims
+# ---------------------------------------------------------------------------
+
+
+# S4 shim: removed in S6 once CompanyLookup injects the client.
 async def publications_for_uid(
     uid: str,
     *,
@@ -405,27 +459,11 @@ async def publications_for_uid(
     language: str = "de",
     rubrics: list[str] | None = None,
 ) -> list[Publication]:
-    """Gazette publications naming the given company UID, newest first.
-
-    `uid` is the normalised, unformatted form ("CHE101654423"); it is
-    reformatted internally for the upstream `uids` filter. `rubrics` restricts
-    the result to gazette rubrics, e.g. ["HR"] for commercial-register
-    entries only. Only `publicationStates=PUBLISHED`, `uids`, `rubrics`, and
-    `pageRequest.size` are sent —
-    built exclusively from `ALLOWED_GAZETTE_PARAMS` (Quirk 1 guard). Raises
-    `GazetteFilterIgnored` if the plausibility guard trips, and
-    `SourceUnavailable(source="gazette", ...)` on timeout/network/HTTP
-    failure after retries.
-    """
-    data = await _gazette_search(
-        {
-            "uids": _format_uid_for_query(uid),
-            "rubrics": ",".join(rubrics) if rubrics else None,
-            "pageRequest.size": min(limit, GAZETTE_MAX_LIMIT),
-        },
-        budget_s=budget_s,
+    return await GazetteClient().publications_for_uid(
+        uid, limit=limit, budget_s=budget_s, language=language, rubrics=rubrics
     )
-    content = data.get("content", []) or []
-    pubs = [_publication_from_item(item, language=language) for item in content]
-    pubs.sort(key=lambda p: p.date, reverse=True)
-    return pubs
+
+
+# S4 shim: removed in S6 once CompanyLookup injects the client.
+async def rubrics() -> dict:
+    return await GazetteClient().rubrics()
