@@ -648,6 +648,7 @@ def build_database(output: Path, cache_dir: Path, offline: bool) -> dict[str, in
     checksum_path.write_text(
         f"{sha256(output)}  {output.name}\n",
         encoding="utf-8",
+        newline="\n",  # sha256sum -c rejects CRLF
     )
     return {
         "cantons": len(cantons),

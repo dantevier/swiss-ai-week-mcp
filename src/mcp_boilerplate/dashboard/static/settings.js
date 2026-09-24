@@ -2,7 +2,7 @@ let needsToken=false;
 async function load(){
   const d=await (await fetch('/api/status')).json();
   needsToken=d.needs_token;
-  [['CRAWLORA_API_KEY','s1'],['OPENAI_API_KEY','s2']].forEach(([k,id])=>{
+  [['CRAWLORA_API_KEY','s1'],['OPENAI_API_KEY','s2'],['ANTHROPIC_API_KEY','s3']].forEach(([k,id])=>{
     const v=d.keys[k];
     document.getElementById(id).innerHTML='<span class="dot'+(v.set?' on':'')+'"></span>'+(v.set?'set'+(v.hint?' ('+esc(v.hint)+')':''):'not set');
   });

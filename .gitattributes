@@ -1,0 +1,2 @@
+# Checksum files must keep LF endings or sha256sum -c fails
+*.sha256 text eol=lf

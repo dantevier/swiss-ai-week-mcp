@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     api_key: str | None = Field(default=None, description="API key for external services")
     crawlora_api_key: str | None = Field(default=None, description="Crawlora API key")
     openai_api_key: str | None = Field(default=None, description="OpenAI embeddings API key")
+    anthropic_api_key: str | None = Field(default=None, description="Anthropic API key (benchmark runs)")
     knowledge_db_path: str | None = Field(default=None, description="Writable SQLite knowledge base path")
 
 

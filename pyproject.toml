@@ -38,6 +38,10 @@ dev = [
     "mypy>=1.0.0",
     "coverage>=7.0.0",
 ]
+bench = [
+    "anthropic>=1.8.0",
+    "openai>=3.19.2",
+]
 
 [project.scripts]
 mcp-boilerplate = "mcp_boilerplate.main:main"

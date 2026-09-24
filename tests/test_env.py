@@ -58,7 +58,8 @@ def test_settings_lives_on_its_own_page():
 def test_settings_page_explains_where_to_get_keys():
     page = TestClient(dashboard.app, base_url="http://127.0.0.1", headers={"x-dashboard-token": ""}).get("/settings").text
     assert "https://crawlora.net" in page and "https://platform.openai.com/api-keys" in page
-    assert page.count('class="help"') == 2 and 'aria-expanded="false"' in page
+    assert "https://console.anthropic.com/settings/keys" in page
+    assert page.count('class="help"') == 3 and 'aria-expanded="false"' in page
 
 
 def test_dashboard_blocks_cross_site_writes_and_foreign_hosts(monkeypatch):
