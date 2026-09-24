@@ -97,6 +97,23 @@ def test_housing_info_ranks_expected_item_first(question, language, expected) ->
     assert swiss_housing_info(question, language)["results"][0]["item_key"] == expected
 
 
+@pytest.mark.parametrize(
+    ("question", "expected_prefix"),
+    [
+        ("How high can the rent deposit be?", "deposit:residential"),
+        ("How do I terminate my lease?", "termination:"),
+        ("Can I paint the walls of my flat?", "alterations:permission"),
+        ("How many days to contest a rent increase?", "rent_adjustment:contest_increase"),
+        ("Who pays when something breaks in my apartment?", "defects:notification"),
+    ],
+)
+def test_english_question_matches_through_keywords(question, expected_prefix) -> None:
+    # The calling model often translates the question into English; passages are not in English.
+    top = swiss_housing_info(question, "de")["results"][0]
+    assert top["item_key"].startswith(expected_prefix)
+    assert top["source"]["language"] == "de"
+
+
 def test_lexically_ambiguous_question_keeps_expected_item_in_top_two() -> None:
     # The tenant passage also says the lease "peut être résilié ... par le propriétaire".
     results = swiss_housing_info("Le propriétaire peut-il résilier mon bail ?", "fr", limit=2)["results"]

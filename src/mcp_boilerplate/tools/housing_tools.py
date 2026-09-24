@@ -18,17 +18,19 @@ DEFAULT_DATABASE = Path(__file__).resolve().parents[3] / "var" / "swissproject.s
 Language = Literal["it", "de", "fr", "rm"]
 LANGUAGES = {"it", "de", "fr", "rm"}
 CANONICAL_LANGUAGE = "it"
-# Multilingual keywords per topic: passages in one language cannot match a question in another.
+# Search keywords per topic in IT, DE, FR, RM and EN: passages are in the four national
+# languages, so a question in another language (often English, when the calling model
+# translates it) can only match through these keywords.
 TOPIC_ALIASES = {
-    "reference_rate": "tasso riferimento ipotecario guida referenzzinssatz hypothekarisch leitzins taux reference hypothecaire directeur",
-    "rent_adjustment": "affitto pigione canone aumento riduzione contestare mietzins erhohung senkung anfechten loyer hausse baisse contester tschains augment",
-    "jurisdiction": "cantone cantonale federale competenza kanton kantonal bund kompetenz canton cantonal federal competence",
-    "deposit": "cauzione deposito garanzia kaution depot mietkaution caution garantie cauziun deposit",
-    "handover": "consegna riconsegna verbale trasloco ubergabe protokoll einzug auszug etat lieux remise surdada protocol",
-    "utilities": "spese accessorie acconto conteggio nebenkosten akonto abrechnung charges acompte decompte custs accessorics aconto",
-    "defects": "difetti danni riparazione guasto schaden reparatur kaputt degats reparation dommages donns reparatura",
-    "alterations": "modifiche cambiare dipingere lavatrice verandern veranderung streichen waschmaschine changements repeindre midadas",
-    "termination": "disdetta disdire kundigung kundigen resiliation resilier disditga disdir",
+    "reference_rate": "tasso riferimento ipotecario guida referenzzinssatz hypothekarisch leitzins taux reference hypothecaire directeur mortgage interest",
+    "rent_adjustment": "affitto pigione canone aumento riduzione contestare mietzins erhohung senkung anfechten loyer hausse baisse contester tschains augment increase decrease reduction reduce contest challenge adjustment",
+    "jurisdiction": "cantone cantonale federale competenza kanton kantonal bund kompetenz canton cantonal federal competence jurisdiction",
+    "deposit": "cauzione deposito garanzia kaution depot mietkaution caution garantie cauziun deposit security guarantee",
+    "handover": "consegna riconsegna verbale trasloco ubergabe protokoll einzug auszug etat lieux remise surdada protocol handover move moving inspection report",
+    "utilities": "spese accessorie acconto conteggio nebenkosten akonto abrechnung charges acompte decompte custs accessorics aconto utilities ancillary heating statement",
+    "defects": "difetti danni riparazione guasto schaden reparatur kaputt degats reparation dommages donns reparatura defect damage damaged repair broken break breaks",
+    "alterations": "modifiche cambiare dipingere lavatrice verandern veranderung streichen waschmaschine changements repeindre midadas alteration paint painting renovate renovation modify",
+    "termination": "disdetta disdire kundigung kundigen resiliation resilier disditga disdir terminate termination cancel notice",
 }
 CONCILIATION_TERMS = ("concilia", "schlichtung", "mediaziun")
 # Address/location questions; whole words so "dov'è" matches and "ou" (or) does not.
