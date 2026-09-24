@@ -258,3 +258,4 @@ uv.lock
 .serena/
 .claude/
 CLAUDE.md
+.janito/session.json
