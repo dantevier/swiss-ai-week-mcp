@@ -38,7 +38,7 @@ uv run python scripts/import_driving_licence.py
 - `swiss_housing_info(question=None, language="it", topic=None, limit=5)` returns BWO renting guidance (rent adjustments, deposit, termination, defects and more) in Italian, German, French or Romansh. Romansh covers the eight guide topics only. Each result includes a verbatim passage, source URL, locator and conditions.
 - `get_driving_licence_exchange_info(canton="CH", fact_type="all")` returns documented fees, deadlines and requirements for exchanging a foreign licence. `CH` returns federal rules; a canton code adds cantonal facts. A missing fee or requirement means unknown, not free or waived.
 
-Architecture, data model and test questions: [docs/housing_and_driving_licence.md](docs/housing_and_driving_licence.md). Source data: `data/housing_knowledge.json` and `data/driving_licence/`. Run `uv run python scripts/import_housing.py --verify-sources` to refetch the BWO sources and check every housing passage. Set `HOUSING_DB_PATH` or `DRIVING_LICENCE_DB_PATH` when the database is elsewhere.
+Source data: `data/housing_knowledge.json` and `data/driving_licence/`. Run `uv run python scripts/import_housing.py --verify-sources` to refetch the BWO sources and check every housing passage. Set `HOUSING_DB_PATH` or `DRIVING_LICENCE_DB_PATH` when the database is elsewhere.
 
 Run `uv run pytest -q` for local checks. Credentials belong in local environment variables or `.env`, never in the repository.
 
