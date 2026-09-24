@@ -133,6 +133,31 @@ def print_table(title: str, rows, results, key) -> None:
         print(f"  {name:<24} {sum(values):>3}/{len(values):<3} {100 * sum(values) / len(values):5.0f}%")
 
 
+def print_cluster_score(rows, results) -> None:
+    """Count each fact once; a cluster passes only when all its framings pass."""
+    clusters: dict[tuple[int, str], list[bool]] = defaultdict(list)
+    by_area: dict[str, dict[tuple[int, str], list[bool]]] = defaultdict(lambda: defaultdict(list))
+    for row in rows:
+        cluster_id = str(row.get("fact_cluster_id") or row.get("source_item_id") or row["id"])
+        key = (int(row["topic_area"]), cluster_id)
+        passed = results[row["id"]]["passed"]
+        clusters[key].append(passed)
+        by_area[f"{key[0]:02d} {row['topic']}"][key].append(passed)
+
+    passed_clusters = sum(all(values) for values in clusters.values())
+    total_clusters = len(clusters)
+    if not total_clusters:
+        print("\nfact-cluster score: no questions to score")
+        return
+    print(f"\nfact-cluster score (all framings must pass): {passed_clusters}/{total_clusters} "
+          f"({100 * passed_clusters / total_clusters:.0f}%)")
+    print("  by topic area (passed clusters / distinct clusters)")
+    for area, area_clusters in sorted(by_area.items()):
+        values = [all(items) for items in area_clusters.values()]
+        passed = sum(values)
+        print(f"  {area:<32} {passed:>3}/{len(values):<3} {100 * passed / len(values):5.0f}%")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("answers", nargs="?", type=Path, help="JSONL with {\"id\", \"answer\"} per line")
@@ -159,7 +184,9 @@ def main() -> int:
         args.template.parent.mkdir(parents=True, exist_ok=True)
         with args.template.open("w", encoding="utf-8") as f:
             for row in questions:
-                f.write(json.dumps({"id": row["id"], "question": row["question"], "answer": ""},
+                f.write(json.dumps({"id": row["id"],
+                                    "fact_cluster_id": row.get("fact_cluster_id") or row.get("source_item_id") or row["id"],
+                                    "question": row["question"], "answer": ""},
                                    ensure_ascii=False) + "\n")
         print(f"wrote {len(questions)} questions to {args.template}")
         return 0
@@ -181,6 +208,7 @@ def main() -> int:
         problems = score_answer(row, answer)
         results[row["id"]] = {
             "id": row["id"],
+            "fact_cluster_id": row.get("fact_cluster_id") or row.get("source_item_id") or row["id"],
             "passed": not problems,
             "problems": problems,
             "cites_authority": cites_authority(row, answer),
@@ -192,6 +220,7 @@ def main() -> int:
     print_table("failure mode tested", rows, results, lambda r: r["failure_mode"])
     print_table("language", rows, results, lambda r: r["lang"])
     print_table("topic area (briefing numbering)", rows, results, lambda r: f"{r['topic_area']:>2} {r['topic']}")
+    print_cluster_score(rows, results)
 
     cited = [r["cites_authority"] for r in results.values() if r["cites_authority"] is not None and r["answer"]]
     if cited:
