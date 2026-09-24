@@ -58,10 +58,6 @@ def _display_name(company: lindas.Company, language: str) -> str | None:
     return company.names.get(language) or company.legal_name or next(iter(company.names.values()), None)
 
 
-def _candidate_dict(company: lindas.Company, language: str) -> dict[str, Any]:
-    return _candidate_dict_for_group([company], language)
-
-
 def _group_by_uid(companies: list[lindas.Company]) -> dict[str, list[lindas.Company]]:
     """Group Company rows by uid, preserving first-seen order of each uid.
 

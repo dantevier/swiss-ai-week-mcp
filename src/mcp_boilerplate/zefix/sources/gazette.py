@@ -201,7 +201,8 @@ def _build_gazette_params(raw: dict[str, Any]) -> dict[str, Any]:
 # Rubric taxonomy — cached `GazetteClient.cache_ttl_s` (Quirk 2 guard)
 # ---------------------------------------------------------------------------
 
-_rubrics_cache: tuple[float, list[dict]] | None = None
+# Keyed by base_url so two clients with different endpoints never share an entry.
+_rubrics_cache: dict[str, tuple[float, list[dict]]] = {}
 
 
 def _extract_rubric_codes(rubrics_data: list[dict]) -> tuple[set[str], set[str]]:
@@ -376,14 +377,14 @@ class GazetteClient:
 
         Returns (data, from_cache).
         """
-        global _rubrics_cache
         now = monotonic()
-        if _rubrics_cache and now - _rubrics_cache[0] < self.cache_ttl_s:
-            return _rubrics_cache[1], True
+        cached = _rubrics_cache.get(self.base_url)
+        if cached and now - cached[0] < self.cache_ttl_s:
+            return cached[1], True
         data = await self._gazette_get_json("/rubrics", None, budget_s=budget_s)
         if not isinstance(data, list):
             data = []
-        _rubrics_cache = (now, data)
+        _rubrics_cache[self.base_url] = (now, data)
         return data, False
 
     async def _validate_rubric_code(self, code: str, kind: str, *, budget_s: float = 10.0) -> None:

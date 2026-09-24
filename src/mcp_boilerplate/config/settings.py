@@ -74,7 +74,5 @@ class Settings(BaseSettings):
     reference_cache_ttl_s: int = Field(default=86400, description="TTL for legal forms, rubrics, dataset_modified")
 
 
-
-
 # Global settings instance
 settings = Settings()

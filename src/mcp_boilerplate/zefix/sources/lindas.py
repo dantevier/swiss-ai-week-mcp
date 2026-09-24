@@ -368,7 +368,6 @@ def _aggregate_company(company_uri: str, rows: list[dict], known_uid: str | None
     )
 
 
-
 def _companies_from_bindings(bindings: list[dict]) -> list[Company]:
     """Group flat result rows by company (preserving first-seen order) and
     fold each group into a Company via `_aggregate_company`."""
@@ -391,7 +390,8 @@ def _companies_from_bindings(bindings: list[dict]) -> list[Company]:
 _MIN_STAGE_BUDGET_S = 3.0
 
 
-_dataset_modified_cache: dict[str, object] = {"value": None, "fetched_at": None}
+# Keyed by endpoint so two clients with different endpoints never share an entry.
+_dataset_modified_cache: dict[str, tuple[str, float]] = {}
 
 
 # --- client ----------------------------------------------------------------
@@ -585,10 +585,9 @@ class LindasClient:
         freshness metadata is never worth failing a call over.
         """
         now = time.monotonic()
-        fetched_at = _dataset_modified_cache["fetched_at"]
-        if _dataset_modified_cache["value"] is not None and fetched_at is not None:
-            if (now - fetched_at) < self.cache_ttl_s:
-                return _dataset_modified_cache["value"]  # type: ignore[return-value]
+        cached = _dataset_modified_cache.get(self.endpoint)
+        if cached is not None and (now - cached[1]) < self.cache_ttl_s:
+            return cached[0]
 
         try:
             data = await self._run_query(_dataset_modified_query(), self.timeout_s)
@@ -599,6 +598,5 @@ class LindasClient:
         except Exception:
             return None
 
-        _dataset_modified_cache["value"] = value
-        _dataset_modified_cache["fetched_at"] = now
+        _dataset_modified_cache[self.endpoint] = (value, now)
         return value
