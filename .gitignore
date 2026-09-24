@@ -9,6 +9,9 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+!benchmark/build/
+!benchmark/build/**
+benchmark/build/__pycache__/
 develop-eggs/
 dist/
 downloads/
@@ -203,6 +206,7 @@ $RECYCLE.BIN/
 # Logs
 logs/
 *.log
+runs/
 
 # Temporary files
 tmp/
@@ -221,6 +225,7 @@ secrets.json
 *.db
 *.sqlite
 *.sqlite3
+!data/swiss_places_premiums_2026.sqlite
 !src/mcp_boilerplate/knowledge_seed.sqlite3
 
 # MCP specific
