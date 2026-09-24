@@ -1,0 +1,8 @@
+.env
+results/
+reports/
+__pycache__/
+.venv/
+.wizard-config.yaml
+.wizard-questions.jsonl
+questions.benchmark.jsonl

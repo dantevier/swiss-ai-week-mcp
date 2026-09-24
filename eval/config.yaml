@@ -1,0 +1,115 @@
+# Swiss Grounding MCP evaluation
+# ${VAR} values are read from environment variables (put them in eval/.env and load it, see README).
+
+questions: questions.jsonl   # used by run.py directly; start.py builds its own file from the chosen question set
+# Question sets offered by start.py. Set 1 = the Swiss benchmark (benchmark/data, converted on the fly).
+# Set 2 = your own questions: add lines to the file below (same format as questions.jsonl).
+question_sets:
+  - {id: 1, name: "Swiss benchmark (benchmark/, verified + generated)", source: benchmark}
+  - {id: 2, name: "Own questions (eval/questions.jsonl)", source: file, file: questions.jsonl}
+results: results/results.jsonl
+graded: results/graded.jsonl
+report_dir: reports
+
+concurrency: 4          # parallel questions per (model x MCP set)
+repeats: 1              # >1 to measure run-to-run variance
+max_tool_turns: 8       # tool-call rounds before giving up
+min_n_per_cell: 5       # cells with fewer questions are greyed out in the report
+
+system_prompt: |
+  You answer questions about Swiss public services and administration.
+  Use the available tools to ground factual claims in authoritative sources and cite the source URL.
+  Answer in the language of the question.
+  If the answer depends on information you do not have (for example which municipality), ask a short clarifying question instead of guessing.
+  If the question is not about Switzerland, say so instead of answering as if it were.
+
+# --- MCP servers -------------------------------------------------------------
+# Names: letters, digits, dashes only (no "__").
+mcp_servers:
+  # Pick the one that matches your server and select it with --mcp-sets. All run from eval/ (cwd is relative to it).
+  # 1) FastMCP (Python) over stdio: the server in this repo (src/mcp_boilerplate). Server deps must be importable by
+  #    `python` (`pip install -e ..`). The repo's .mcp.json starts it with `uv run --frozen python -m mcp_boilerplate.main`
+  #    from the repo root; use `command: uv`, `args: [run, --frozen, python, -m, mcp_boilerplate.main]`, `cwd: ..` if you have uv.
+  fastmcp:
+    transport: stdio
+    command: python
+    args: [-m, mcp_boilerplate.main]
+    env:
+      PYTHONPATH: ../src
+  # 2) TypeScript over stdio: not in this repo (BaseKnowledge/STATUS.md says the TS rehearsal is a separate project). Build first (`npm run build`) and adjust the entry point,
+  #    or use `command: npx`, `args: [tsx, src/index.ts]` to skip the build.
+  typescript:
+    transport: stdio
+    command: node
+    args: [dist/index.js]
+    cwd: ..
+  # 3) Any server already running over streamable HTTP (FastMCP or TypeScript).
+  http:
+    transport: http
+    url: ${SWISS_MCP_URL}
+    headers:
+      Authorization: Bearer ${SWISS_MCP_TOKEN}
+  # Generic web fetch baseline: needs `uvx` (not available on this machine, so disabled).
+  #   fetch:
+  #     transport: stdio
+  #     command: uvx
+  #     args: [mcp-server-fetch]
+
+# Each set = one experimental condition. Empty list = model knowledge only.
+# Run one condition: python run.py --mcp-sets typescript   (the set name shows up in the report)
+mcp_sets:
+  no-mcp: []
+  fastmcp: [fastmcp]
+  typescript: [typescript]
+  remote: [http]
+  # fetch-only: [fetch]
+
+# --- Models (LiteLLM model strings) ------------------------------------------
+# stage lets you run the Swisscom myAI models last: python run.py --stage 2
+models:
+  - id: claude-sonnet-5
+    model: anthropic/claude-sonnet-5
+    stage: 1
+  - id: claude-haiku-4-5
+    model: anthropic/claude-haiku-4-5-20251001
+    stage: 1
+  - id: gpt
+    model: openai/REPLACE_WITH_MODEL_NAME
+    stage: 1
+  - id: mistral-large
+    model: mistral/mistral-large-latest
+    stage: 1
+  # Swisscom myAI: assumes an OpenAI-compatible endpoint. Adjust if their API differs.
+  - id: myai-default
+    model: openai/REPLACE_WITH_MYAI_MODEL_NAME
+    stage: 2
+    params:
+      api_base: ${MYAI_API_BASE}
+      api_key: ${MYAI_API_KEY}
+
+# --- Judge -------------------------------------------------------------------
+# Keep it fixed across all runs, ideally not one of the models under test.
+judge:
+  model: anthropic/claude-opus-5-5
+  concurrency: 4
+
+# --- Labels ------------------------------------------------------------------
+languages: [de, fr, it, rm, en]
+topics:
+  0: Not about Switzerland
+  1: Health insurance
+  2: Taxes and fees
+  3: Law and regulations
+  4: Waste and recycling
+  5: Moving, residence, civil status
+  6: Permits and migration
+  7: Social insurance and pensions
+  8: Work and unemployment
+  9: Schools and education
+  10: Public transport
+  11: Road traffic and licences
+  12: Housing and renting
+  13: Voting and elections
+  14: Companies, register, VAT
+  15: Customs
+  16: Statistics, geodata, weather

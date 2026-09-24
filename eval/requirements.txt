@@ -1,0 +1,7 @@
+litellm
+mcp
+pyyaml
+pandas
+openpyxl
+matplotlib
+jinja2
