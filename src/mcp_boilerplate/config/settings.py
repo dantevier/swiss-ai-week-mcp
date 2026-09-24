@@ -2,6 +2,8 @@
 Configuration settings for the MCP server.
 """
 
+from pathlib import Path
+
 from pydantic import ConfigDict, Field
 from pydantic_settings import BaseSettings
 
@@ -10,7 +12,7 @@ class Settings(BaseSettings):
     """Application settings with environment variable support."""
 
     model_config = ConfigDict(
-        env_file=".env",
+        env_file=(Path(__file__).resolve().parents[3] / ".env", ".env"),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",

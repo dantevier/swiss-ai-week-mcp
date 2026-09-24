@@ -2,4 +2,4 @@
 
 [mcp_servers.mcp-swiss-info]
 command = "uv"
-args = ["run", "--frozen", "python", "-m", "mcp_boilerplate.main"]
+args = ["run", "python", "-m", "mcp_boilerplate.main"]
