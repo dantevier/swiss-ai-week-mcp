@@ -225,6 +225,7 @@ secrets.json
 *.db
 *.sqlite
 *.sqlite3
+!data/swiss_public_data.sqlite
 
 # MCP specific
 mcp_config.json
