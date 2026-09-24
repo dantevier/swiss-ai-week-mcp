@@ -168,15 +168,16 @@ These three tools fetch the selected authority page at query time and return its
 ## Data sources
 
 Two different things share the word "source" here, and they don't overlap:
-`src/mcp_boilerplate/zefix_sources/` is a **live API client** (SPARQL, REST,
-gazette) that `company_info` calls fresh on every request and stores
-nothing (renamed from `sources/` during development to avoid the name
-collision below); `src/mcp_boilerplate/sources.py` is a **curated registry**
-of the 13 human-reviewed authority URLs that the crawler and `get_source`
-are restricted to — nothing there is fetched until a `crawl_*_sources` call
+`src/mcp_boilerplate/zefix/sources/` holds the **live API clients**
+(`LindasClient`, `ZefixClient`, `GazetteClient`) that `company_info` calls
+fresh on every request and stores nothing; `src/mcp_boilerplate/sources.py`
+is the **registry of reviewed authorities** — pages the crawler and
+`get_source` are restricted to, in `SOURCES`, and the four API endpoints
+`company_info` is allowed to call, in `API_SOURCES` (used for the egress
+allow-list). Nothing in `SOURCES` is fetched until a `crawl_*_sources` call
 asks for it, and the result is saved, not proxied.
 
-### Commercial register (`zefix_sources/`)
+### Commercial register (`zefix/sources/`)
 
 | Source | Endpoint | Auth | Licence / terms | Contributes |
 |---|---|---|---|---|
@@ -352,10 +353,15 @@ uv run python scripts/record_fixtures.py lindas     # refresh LINDAS fixtures
 uv run python scripts/build_kvg_premiums.py --year 2027   # regenerate the premium CSV for a new year
 ```
 
-`test_company_info.py` / `test_zefix_sources_*.py` / `test_live.py` cover the
-commercial register; `test_crawler.py` covers the knowledge base offline,
-with fake fetchers and a fake embedder; `test_health_insurance_tool.py` and
-`test_kvg_export.py` cover the premium lookup and its CSV export.
+`test_company_info.py` (injected fakes from `conftest.py`) and
+`test_company_info_registration.py` cover the `company_info` state machine
+and MCP registration; `test_sources.py` covers the API-source registry and
+egress allow-list; `test_zefix_sources_lindas.py`,
+`test_zefix_sources_zefix.py`, and `test_zefix_sources_gazette.py` cover the
+`zefix/sources/` clients; `test_live.py` hits real upstream endpoints.
+`test_crawler.py` covers the knowledge base offline, with fake fetchers and a
+fake embedder; `test_health_insurance_tool.py` and `test_kvg_export.py` cover
+the premium lookup and its CSV export.
 
 ## Honesty and prompt-injection stance
 
@@ -377,9 +383,9 @@ Company data: Zefix, Federal Office of Justice / EHRA, via LINDAS
 extract is authoritative. Official notices: SHAB via amtsblattportal.ch; the
 signed PDF is the binding version.
 
-Parts of `src/mcp_boilerplate/zefix_sources` are vendored from
+Parts of `src/mcp_boilerplate/zefix/sources` are vendored from
 `malkreide/register-mcp`, MIT, Copyright (c) 2026 Hayal Oezkan; see
-`src/mcp_boilerplate/zefix_sources/LICENSE-register-mcp`.
+`src/mcp_boilerplate/zefix/sources/LICENSE-register-mcp`.
 
 Knowledge-base pages are attributed inline by every `search_knowledge` and
 `get_source` result (`authority`, `url`) — see the

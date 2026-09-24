@@ -187,10 +187,11 @@ If `question` is present and neither it nor the parameters contain anything comp
 
 ```
 MCP client ──stdio/SSE──▶ FastMCP server (this repo)
-                              └─ tools/company_info.py
-                                   ├─ zefix_sources/lindas.py   ──httpx POST──▶ lindas.admin.ch/query          (primary)
-                                   ├─ zefix_sources/zefix.py    ──httpx GET───▶ www.zefix.admin.ch/ZefixREST/api/v1  (enrichment, policy-gated)
-                                   └─ zefix_sources/gazette.py  ──httpx GET───▶ amtsblattportal.ch/api/v1      (publications)
+                              └─ tools/company_info.py  (MCP surface, delegates to CompanyLookup)
+                                   └─ zefix/lookup.py    CompanyLookup orchestrator
+                                        ├─ zefix/sources/lindas.py   LindasClient  ──httpx POST──▶ lindas.admin.ch/query          (primary)
+                                        ├─ zefix/sources/rest.py     ZefixClient   ──httpx GET───▶ www.zefix.admin.ch/ZefixREST/api/v1  (enrichment, policy-gated)
+                                        └─ zefix/sources/gazette.py  GazetteClient ──httpx GET───▶ amtsblattportal.ch/api/v1      (publications)
 ```
 
 Live proxy. Request-scoped `httpx.AsyncClient`, egress allow-list hook, no queue, no worker, no scheduler.
@@ -211,7 +212,7 @@ Live proxy. Request-scoped `httpx.AsyncClient`, egress allow-list hook, no queue
 | Latency | Measured 2026-09-24: UID lookup 0.2 s; exact-name lookup 0.1–0.3 s; `legalName` prefix 1.2–2 s on a hit, 6 s on a miss; `schema:name` prefix or contains 15–21 s on a miss. No full-text index (`bif:contains` returns zero rows silently). A `LIMIT` only helps when matches are plentiful. |
 | Timeout | 15 s for the whole staged search |
 
-Queries live in `zefix_sources/lindas.py` as string templates with parameter escaping. Input never reaches the query unescaped: UID is validated by regex, name is lower-cased and escaped for SPARQL string literals, canton is validated against the canton allow-list.
+Queries live in `zefix/sources/lindas.py` as string templates with parameter escaping. Input never reaches the query unescaped: UID is validated by regex, name is lower-cased and escaped for SPARQL string literals, canton is validated against the canton allow-list.
 
 Verified live 2026-09-24 with UID `CHE101654423` → Swisscom (Schweiz) AG, EHRAID 415941, Ittigen (BFS 362).
 
@@ -292,32 +293,44 @@ src/mcp_boilerplate/
   config/settings.py            + LINDAS_ENDPOINT, ZEFIX_BASE_URL, ZEFIX_USERNAME, ZEFIX_PASSWORD, GAZETTE_BASE_URL,
                                   RESPECT_ROBOTS_TXT, USER_AGENT, LINDAS_TIMEOUT_S, ZEFIX_TIMEOUT_S,
                                   CALL_BUDGET_S, REFERENCE_CACHE_TTL_S
-  zefix_sources/                (named to avoid colliding with the crawler's unrelated sources.py)
-    __init__.py
-    http.py                     make_client(), egress allow-list hook, EgressDenied          (vendored, register-mcp server.py L378-444)
-    lindas.py                   query(), find_by_uid(), search_by_name(), legal_form_labels(),
-                                dataset_modified(), SPARQL templates + escaping                (new)
-    zefix.py                    firm_detail(), uid normalisation, canton codes, error mapping  (vendored L419-537 + inlined GET at L908 extracted)
-    gazette.py                  get_json(), search_publications(), rubrics(), retry policy,
-                                param allow-list, quirk guards                                (vendored L153-264, L1398-1600)
-    LICENSE-register-mcp        MIT notice, Copyright 2026 Hayal Oezkan
-  envelope.py                   response models: answered, need_info, no_match, out_of_scope, source_unavailable;
-                                passage renderer per language
-  tools/company_info.py         the tool; resolution algorithm §5.2; registered via tools/__init__.py
+  sources.py                     `ApiSource`/`API_SOURCES` registry (zefix_lindas, zefix_web, gazette) plus `api_hosts()`;
+                                 also the crawler's unrelated `SOURCES` page registry
+  zefix/
+    __init__.py                 exports `CompanyLookup`
+    lookup.py                   `CompanyLookup` orchestrator: resolution algorithm §5.2, constructor-injected
+                                 `LindasClient`/`ZefixClient`/`GazetteClient`/`Settings`
+    gates.py                    step-0 gates (persons, jurisdiction, analytics, topic) behind `classify()`
+    envelope.py                 response models: answered, need_info, no_match, out_of_scope, source_unavailable;
+                                 passage renderer per language
+    sources/
+      __init__.py
+      http.py                   make_client(), allowed_hosts() (reads sources.api_hosts()), egress allow-list hook,
+                                 EgressDenied                                                  (vendored, register-mcp server.py L378-444)
+      lindas.py                 `LindasClient`: find_by_uid(), search_by_name(), legal_form_labels(),
+                                 dataset_modified(), SPARQL templates + escaping                (new)
+      rest.py                   `ZefixClient`: firm_detail(), uid normalisation, canton codes, error mapping
+                                                                (vendored L419-537 + inlined GET at L908 extracted)
+      gazette.py                `GazetteClient`: get_json(), search_publications(), rubrics(), retry policy,
+                                 param allow-list, quirk guards                                (vendored L153-264, L1398-1600)
+      LICENSE-register-mcp      MIT notice, Copyright 2026 Hayal Oezkan
+  tools/company_info.py         the MCP surface only: `@mcp.tool` signature and docstring, delegates to
+                                 `zefix.CompanyLookup`; registered via tools/__init__.py
 tests/
   fixtures/                     zefix_firm_detail, gazette_* copied verbatim from register-mcp incl. PROVENANCE.md;
                                 lindas_* recorded fresh with a provenance entry
+  conftest.py                   `FakeLindas`/`FakeZefix`/`FakeGazette` and a `lookup(**fakes)` helper
   test_zefix_sources_lindas.py  respx; UID hit, prefix search, zero hits, escaping, timeout
-  test_zefix_sources_zefix.py   respx; detail parse, 404, timeout → enrichment degraded
+  test_zefix_sources_zefix.py   respx; detail parse, 404, timeout → enrichment degraded (covers zefix/sources/rest.py)
   test_zefix_sources_gazette.py respx; quirks 1-3, retry, budget, deletion detection
-  test_egress.py                copied
-  test_company_info.py          state machine: each of the 5 states from fixtures; ambiguity; rm→de; persons; robots switch
+  test_sources.py               every `API_SOURCES` host is in `http.allowed_hosts()`; crawler/API registries stay separate
+  test_company_info.py          state machine: each of the 5 states from injected fakes; ambiguity; rm→de; persons; robots switch
+  test_company_info_registration.py  the tool is registered on the MCP server with the documented signature
   test_live.py                  @pytest.mark.live, excluded by default
 ```
 
 Dependencies added: `httpx>=0.27`, dev `respx`, `pytest-asyncio`. Vendored code is roughly 500 lines after dropping Zefix search and everything tied to the `mcp` SDK (`MCPServer`, cache hints, `logged_tool`, SSE middleware); FastMCP provides transport and this repo has its own logger.
 
-Vendoring rules: keep function names and the three upstream-quirk guards intact so future diffs against `register-mcp` stay readable; keep the MIT notice in `zefix_sources/LICENSE-register-mcp` and a one-line attribution at the top of each vendored module; do not re-add free-text gazette search.
+Vendoring rules: keep function names and the three upstream-quirk guards intact so future diffs against `register-mcp` stay readable; keep the MIT notice in `zefix/sources/LICENSE-register-mcp` and a one-line attribution at the top of each vendored module; do not re-add free-text gazette search.
 
 ## 9. Tests
 
@@ -371,8 +384,8 @@ Vendoring rules: keep function names and the three upstream-quirk guards intact 
 | Step | Work | Est. |
 |---|---|---|
 | S0 | Tests first, by an agent other than the implementer, from this PRD alone: `tests/test_company_info.py` with the five states from fixtures, the eight jury questions of §4, and the negative checks (`message`/`content` never serialised, `RESPECT_ROBOTS_TXT` defaults to `true`, egress denied for unknown hosts). Red until S4 lands. | 1 h |
-| S1 | Settings, deps (`httpx`, `respx`), `zefix_sources/http.py`, `zefix_sources/lindas.py` with the two queries from §6.2, legal-form labels, `dateModified`; record LINDAS fixtures (A7) | 2.5 h |
-| S2 | `zefix_sources/gazette.py` vendored; rubric cache; retry policy; deletion codes (A6). `zefix_sources/zefix.py` enrichment call | 1.5 h |
+| S1 | Settings, deps (`httpx`, `respx`), `zefix/sources/http.py`, `zefix/sources/lindas.py` with the two queries from §6.2, legal-form labels, `dateModified`; record LINDAS fixtures (A7) | 2.5 h |
+| S2 | `zefix/sources/gazette.py` vendored; rubric cache; retry policy; deletion codes (A6). `zefix/sources/rest.py` enrichment call | 1.5 h |
 | S3 | `envelope.py` with the five states and the passage renderer (de/fr/it/en) | 1 h |
 | S4 | `tools/company_info.py`: resolution algorithm, ambiguity rules, robots gate, person guard, budgets | 2 h |
 | S5 | Source-level tests (LINDAS, Zefix, gazette, egress) and the stdio contract check; make S0 green | 1.5 h |
