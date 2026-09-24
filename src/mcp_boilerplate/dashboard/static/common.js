@@ -12,6 +12,8 @@ function ago(t){
 const STATES={up_to_date:'Up to date',outdated:'Outdated',failed:'Failed',never_crawled:'Never crawled'};
 function badge(s){
   const recency=s.last_refresh?' - '+ago(s.last_refresh):'';
-  const text=(s.state==='up_to_date'?'Updated':STATES[s.state])+(s.state==='never_crawled'?'':recency);
+  const text=s.state==='never_crawled'?STATES[s.state]
+    :s.state==='failed'?'Refresh failed - saved copy '+ago(s.last_refresh).replace(' ago',' old')
+    :(s.state==='up_to_date'?'Updated':STATES[s.state])+recency;
   return '<span class="pill '+s.state+'" title="'+esc(STATES[s.state])+'">'+esc(text)+'</span>';
 }

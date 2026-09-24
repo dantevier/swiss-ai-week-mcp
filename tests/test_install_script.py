@@ -125,3 +125,14 @@ def test_interactive_prompts_take_typed_keys_and_choices(sandbox):
     assert (tmp_path / "claude.args").exists() and not (tmp_path / "codex.args").exists()
     assert "mcp-swiss-info" in json.loads((tmp_path / "opencode.json").read_text())["mcp"]
     assert "OPENAI_API_KEY: skipped" in done.stdout
+
+
+def test_prefers_the_real_launcher_over_npm_ps1_shims(sandbox):
+    """npm installs codex.ps1 next to codex.cmd; the .ps1 is blocked by a restrictive execution policy."""
+    tmp_path, bin_dir = sandbox
+    for cli in ("claude", "codex"):
+        (bin_dir / f"{cli}.ps1").write_text("Write-Output 'ps1 shim used'; exit 1")
+    result = run(sandbox)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "ps1 shim used" not in result.stdout + result.stderr
+    assert (tmp_path / "claude.args").exists() and (tmp_path / "codex.args").exists()

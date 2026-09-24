@@ -145,7 +145,8 @@ function Update-Opencode([bool]$Remove) {
 }
 
 function Register-Cli([string]$Cli, [string[]]$AddArgs, [string[]]$RemoveArgs, [bool]$Remove) {
-    $exe = (Get-Command $Cli -ErrorAction Stop).Source
+    # -CommandType Application skips npm's .ps1 shims, which a restrictive execution policy would block.
+    $exe = (Get-Command $Cli -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
     # Adding twice is an error in these CLIs, so drop any earlier entry first (this also makes reruns safe).
     $null = Invoke-Native $exe $RemoveArgs
     if ($Remove) { return 'removed' }
@@ -181,7 +182,7 @@ if (-not $Uninstall) {
 
 Write-Step $(if ($Uninstall) { 'Removing the MCP server' } else { '3/3 Registering the MCP server' })
 # opencode has no CLI we can script, so its config is only touched if opencode or its config exists.
-$found = @($Harnesses | Where-Object { (Get-Command $_.Id -ErrorAction SilentlyContinue) -or ($_.Id -eq 'opencode' -and (Test-Path $OpencodeConfig)) })
+$found = @($Harnesses | Where-Object { (Get-Command $_.Id -CommandType Application -ErrorAction SilentlyContinue) -or ($_.Id -eq 'opencode' -and (Test-Path $OpencodeConfig)) })
 if ($found.Count -eq 0) {
     Write-Host '  No claude, codex or opencode found on PATH.'
     Write-Host "  Run manually, e.g.: claude mcp add --scope user $Name -- $($Launch -join ' ')"
