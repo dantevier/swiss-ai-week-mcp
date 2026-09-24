@@ -8,11 +8,11 @@ PR #7 ships `company_info` as a 915-line module under `tools/`, a 539-line `enve
 
 | Code | Decision |
 |---|---|
-| D1 | `tools/company_info.py` keeps only the MCP surface: signature, docstring, `@mcp.tool`, one delegate call. Everything else moves to root domain modules. |
-| D2 | Orchestrator `CompanyLookup` in `company_lookup.py`, constructor-injected clients and config, mirroring `Crawler(web_fetcher, pdf_fetcher, database, embedder)`. |
-| D3 | The three source clients become classes (`LindasClient`, `ZefixClient`, `GazetteClient`) whose constructors take config with defaults from `settings`. Method names and pure helpers keep their vendored names. |
+| D1 | `tools/company_info.py` keeps only the MCP surface: signature, docstring, `@mcp.tool`, one delegate call. Everything else lives in one package, `mcp_boilerplate/zefix/`. |
+| D2 | Orchestrator `CompanyLookup` in `zefix/lookup.py`, constructor-injected clients and config, mirroring `Crawler(web_fetcher, pdf_fetcher, database, embedder)`. |
+| D3 | The three source clients live in `zefix/sources/` (moved from `zefix_sources/` with `git mv`) and become classes (`LindasClient`, `ZefixClient`, `GazetteClient`) whose constructors take config with defaults from `settings`. Method names and pure helpers keep their vendored names. |
 | D4 | `sources.py` gains `ApiSource` and `API_SOURCES` for Zefix/LINDAS and the gazette. The egress allow-list and the citation authority derive from it. Zefix is not added to `SOURCES` (F5). |
-| D5 | Step-0 gates (persons, jurisdiction, analytics, topic) move to `company_gates.py`, pure functions, one `classify()` entry point. |
+| D5 | Step-0 gates (persons, jurisdiction, analytics, topic) move to `zefix/gates.py`, pure functions, one `classify()` entry point. `envelope.py` moves to `zefix/envelope.py` unchanged. |
 | D6 | Behaviour freeze: every envelope produced from the existing fixtures is identical before and after. Tests move with the code; assertions do not change. |
 | D7 | `origin/main` is merged into `victor-dev` before the refactor starts (F9). |
 | D8 | Vendoring rule kept: function/method names and quirk guards unchanged; MIT notice and per-module attribution unchanged. |
@@ -32,14 +32,14 @@ PR #7 ships `company_info` as a 915-line module under `tools/`, a 539-line `enve
 | F9 | `victor-dev` is 4 commits behind `origin/main` (`2c1baa2` weather/bfs/geo/opendata tools and `_public_api.py`, README, logo). `tools/__init__.py` conflicts: 3 modules on `victor-dev`, 6 on `main`. PR #7 currently shows `tests/unit/` and `tests/integration/` as deletions against `main`. |
 | F10 | `envelope.py` is already the right shape: pure, no I/O, no imports from sources or tools. It stays as is; three translated tables still in `company_info.py` (`_ASK_NAME_QUESTION`, `_ROMANSH_ASSUMPTION`, `_TIMEOUT_SCAN_SENTENCES`) belong there. |
 | F11 | `_call_source` + `SourceUnavailable` is the company equivalent of `_public_api.unavailable`: exceptions never escape, each becomes a `source_unavailable` envelope. Keep, as a `CompanyLookup` method. |
-| F12 | `zefix_sources.zefix` stutters. The package was named to avoid colliding with `sources.py`. A rename touches 4 modules, 5 test files and `scripts/record_fixtures.py` for cosmetics; not done here (Q1). |
+| F12 | The company code is spread over three places: `tools/company_info.py`, root `envelope.py`, and the `zefix_sources/` package (named to avoid colliding with `sources.py`). `zefix_sources` is imported by 4 modules, 5 test files and `scripts/record_fixtures.py`, and named in README and the companion PRD. One package, `zefix/`, gives the feature one home and removes the naming workaround. |
 
 ## 3. Goals and non-goals
 
 Goals:
 
 - G1 `tools/company_info.py` is ≤ 100 lines: docstring, `@mcp.tool`, one call into `CompanyLookup`.
-- G2 All company logic sits in root domain modules and is testable with injected fakes, no `monkeypatch.setattr` on modules or settings.
+- G2 All company logic sits in the `zefix/` package and is testable with injected fakes, no `monkeypatch.setattr` on modules or settings.
 - G3 `sources.py` is the single registry of reviewed authorities, pages and APIs alike; the egress allow-list is derived from it.
 - G4 Zero behaviour change (D6). The 76 offline tests and 3 live tests pass; new tests cover registration and the registry.
 - G5 `victor-dev` contains `origin/main` (D7) and `tools/__init__.py` registers all seven tool modules.
@@ -48,7 +48,7 @@ Non-goals:
 
 - N1 No change to the five-state envelope, field names, or answer sentences.
 - N2 No rewrite of the vendored clients onto `urllib`/`_public_api.py`.
-- N3 No renaming of vendored functions or of `zefix_sources/`.
+- N3 No renaming of vendored functions, dataclasses or quirk guards. Paths move; names inside the modules do not.
 - N4 No alignment of `main`'s other tools to the contract vocabulary (F6).
 - N5 No new features, no new sources.
 
@@ -57,30 +57,44 @@ Non-goals:
 ```
 src/mcp_boilerplate/
   sources.py              SOURCES (unchanged) + ApiSource + API_SOURCES: zefix_lindas, zefix_web, gazette
-  company_gates.py        NEW  step-0 classification, pure: classify(question, uid, canton) -> reason | None
-  company_lookup.py       NEW  CompanyLookup orchestrator: resolution §5.2 steps 1-6, envelope assembly
-  envelope.py             unchanged + the three translated tables from company_info.py
-  zefix_sources/
-    http.py               allowed_hosts() reads API_SOURCES; make_client(), classify_error() unchanged
-    lindas.py             LindasClient(endpoint, timeout_s) + module-level SPARQL templates, escaping, Company
-    zefix.py              ZefixClient(base_url, username, password, timeout_s, respect_robots_txt)
+  zefix/                  NEW package: everything company_info needs except the MCP surface
+    __init__.py           exports CompanyLookup
+    gates.py              NEW  step-0 classification, pure: classify(question, uid, canton) -> reason | None
+    lookup.py             NEW  CompanyLookup orchestrator: resolution §5.2 steps 1-6, envelope assembly
+    envelope.py           moved from root, unchanged + the three translated tables from company_info.py
+    sources/              moved from zefix_sources/ with git mv
+      __init__.py
+      http.py             allowed_hosts() reads API_SOURCES; make_client(), classify_error() unchanged
+      lindas.py           LindasClient(endpoint, timeout_s) + module-level SPARQL templates, escaping, Company
+      zefix.py            ZefixClient(base_url, username, password, timeout_s, respect_robots_txt)
                           + module-level normalize_uid, format_uid, zefix_detail_url, CANTON_CODES, Enrichment
-    gazette.py            GazetteClient(base_url) + module-level retry policy, quirk guards, Publication, is_deletion
+      gazette.py          GazetteClient(base_url) + module-level retry policy, quirk guards, Publication, is_deletion
+      LICENSE-register-mcp
   tools/company_info.py   signature + docstring + @mcp.tool + `return await CompanyLookup().lookup(...)`
   tools/__init__.py       bfs, company_info, geo, health_insurance, opendata, source, weather
 ```
+
+Path moves (`git mv`, history preserved) and the files whose imports or text change:
+
+| From | To |
+|---|---|
+| `src/mcp_boilerplate/envelope.py` | `src/mcp_boilerplate/zefix/envelope.py` |
+| `src/mcp_boilerplate/zefix_sources/{__init__,http,lindas,zefix,gazette}.py`, `LICENSE-register-mcp` | `src/mcp_boilerplate/zefix/sources/` |
+| `tests/test_zefix_sources_{lindas,zefix,gazette}.py` | unchanged names; imports updated |
+
+Import rewrites: `mcp_boilerplate.zefix_sources` → `mcp_boilerplate.zefix.sources`, `mcp_boilerplate.envelope` → `mcp_boilerplate.zefix.envelope`, in `tools/company_info.py`, `scripts/record_fixtures.py`, `tests/conftest.py`, `tests/test_company_info.py`, `tests/test_live.py`, the three `tests/test_zefix_sources_*.py`. Text references in `README.md` (lines naming `zefix_sources/`) and `docs/prd-zefix-company-info.md` §8 are rewritten to the new paths. Inside the package, relative imports change depth: `..config.settings` becomes `...config.settings` in `zefix/sources/*`.
 
 Symbol map, `tools/company_info.py` today → destination:
 
 | Today | Destination |
 |---|---|
-| `_PERSON_TERMS`, `_ANALYTICS_TERMS`, `_TOPIC_HINTS`, `_LEGAL_FORM_SUFFIXES`, `_FOREIGN_REGISTER_IDS`, `_COUNTRY_NAMES`, `_SWISS_WORDS`, `_CANTON_NAMES`, `_FOREIGN_UID_PREFIX_RE` | `company_gates.py` constants |
-| `_uid_is_foreign`, `_has_swiss_anchor`, `_has_persons_terms`, `_is_jurisdiction_gate`, `_has_analytics_terms`, `_looks_company_like` | `company_gates.py`, behind `classify()`; individual predicates stay importable for the existing gate tests |
-| `_ASK_NAME_QUESTION`, `_ROMANSH_ASSUMPTION`, `_TIMEOUT_SCAN_SENTENCES` | `envelope.py` static content |
+| `_PERSON_TERMS`, `_ANALYTICS_TERMS`, `_TOPIC_HINTS`, `_LEGAL_FORM_SUFFIXES`, `_FOREIGN_REGISTER_IDS`, `_COUNTRY_NAMES`, `_SWISS_WORDS`, `_CANTON_NAMES`, `_FOREIGN_UID_PREFIX_RE` | `zefix/gates.py` constants |
+| `_uid_is_foreign`, `_has_swiss_anchor`, `_has_persons_terms`, `_is_jurisdiction_gate`, `_has_analytics_terms`, `_looks_company_like` | `zefix/gates.py`, behind `classify()`; individual predicates stay importable for the existing gate tests |
+| `_ASK_NAME_QUESTION`, `_ROMANSH_ASSUMPTION`, `_TIMEOUT_SCAN_SENTENCES` | `zefix/envelope.py` static content |
 | `AUTHORITY` | `API_SOURCES["zefix_lindas"].authority` |
-| `REGISTER_RUBRICS` | `company_lookup.py` constant |
+| `REGISTER_RUBRICS` | `zefix/lookup.py` constant |
 | `_call_source`, `_safe_dataset_modified`, `_run_enrichment`, `_resolve_company`, `_build_answered_envelope`, `_build_derived_deleted_envelope`, `_remaining` | `CompanyLookup` methods |
-| `_group_by_uid`, `_seats_of`, `_resolve_seat_group`, `_candidate_dict_for_group`, `_build_company_dict`, `_build_derived_company_dict`, `_publication_dict`, `_map_status`, `_legal_form_label`, `_display_name` | `company_lookup.py` module-level private functions (dataclass → envelope dict serializers) |
+| `_group_by_uid`, `_seats_of`, `_resolve_seat_group`, `_candidate_dict_for_group`, `_build_company_dict`, `_build_derived_company_dict`, `_publication_dict`, `_map_status`, `_legal_form_label`, `_display_name` | `zefix/lookup.py` module-level private functions (dataclass → envelope dict serializers) |
 | body of `company_info()` | `CompanyLookup.lookup()` |
 | `company_info_tool = mcp.tool(company_info, ...)` | `@mcp.tool` on `company_info` |
 
@@ -120,30 +134,30 @@ def api_hosts() -> frozenset[str]: ...   # union of API_SOURCES[*].hosts; http.a
 ```
 
 ```python
-# zefix_sources/lindas.py
+# zefix/sources/lindas.py
 class LindasClient:
     def __init__(self, endpoint: str = settings.lindas_endpoint, timeout_s: float = settings.lindas_timeout_s): ...
     async def find_by_uid(self, uid: str, *, budget_s: float) -> Company | None: ...
     async def search_by_name(self, name: str, *, canton: str | None = None, limit: int = 10, budget_s: float) -> list[Company]: ...
     async def dataset_modified(self) -> str | None: ...
 
-# zefix_sources/zefix.py
+# zefix/sources/zefix.py
 class ZefixClient:
     def __init__(self, base_url=..., username=..., password=..., timeout_s=..., respect_robots_txt=...): ...
     def enrichment_allowed(self) -> bool: ...
     async def firm_detail(self, ehraid: int, *, budget_s: float) -> Enrichment: ...
 
-# zefix_sources/gazette.py
+# zefix/sources/gazette.py
 class GazetteClient:
     def __init__(self, base_url: str = settings.gazette_base_url): ...
     async def publications_for_uid(self, uid: str, *, limit: int, budget_s: float, language: str, rubrics: list[str]) -> list[Publication]: ...
     async def rubrics(self) -> dict: ...
 
-# company_gates.py
+# zefix/gates.py
 Reason = Literal["persons", "jurisdiction", "analytics", "topic"]
 def classify(question: str | None, uid: str | None, canton: str | None, has_identifier: bool) -> Reason | None: ...
 
-# company_lookup.py
+# zefix/lookup.py
 class CompanyLookup:
     def __init__(self, lindas: LindasClient | None = None, zefix: ZefixClient | None = None,
                  gazette: GazetteClient | None = None, config: Settings | None = None): ...
@@ -172,8 +186,8 @@ Rules:
 | Code | Change |
 |---|---|
 | T1 | `tests/conftest.py`: `patch_sources` and `settings_override` replaced by `FakeLindas`, `FakeZefix`, `FakeGazette` (same method names, canned returns or raised `SourceUnavailable`) and a `lookup(**fakes)` helper that builds `CompanyLookup(lindas=..., zefix=..., gazette=..., config=Settings(...))`. |
-| T2 | `tests/test_company_info.py`: every test calls `CompanyLookup.lookup()` through T1; assertions unchanged. Gate tests import `company_gates`. |
-| T3 | `tests/test_zefix_sources_*.py`: instantiate the client class, respx routes unchanged. |
+| T2 | `tests/test_company_info.py`: every test calls `CompanyLookup.lookup()` through T1; assertions unchanged. Gate tests import `zefix.gates`. |
+| T3 | `tests/test_zefix_sources_*.py`: imports point at `zefix.sources`; instantiate the client class; respx routes unchanged. |
 | T4 | New `tests/test_company_info_registration.py`: `mcp.get_tool("company_info")` is registered, its input schema lists the seven parameters, one fixture-backed call through the tool wrapper returns `status="answered"`. Follows `test_public_data_tools_are_registered`. |
 | T5 | New `tests/test_sources.py`: every `API_SOURCES` host is in `http.allowed_hosts()`; `crawler.check_url("federal", API_SOURCES["zefix_lindas"].base_url)` still raises (registry kinds do not leak into the crawler). |
 | T6 | Acceptance: `uv run --frozen --extra dev pytest` green; `uv run --frozen --extra dev pytest -m live` green; opencode smoke (`opencode run --auto`, server `mcp-swiss-info`) answers Q1, Q3, Q5, Q7 of the companion PRD §4 with the same envelopes as before the refactor. |
@@ -192,7 +206,7 @@ Rules:
 
 | Code | Question | Default |
 |---|---|---|
-| Q1 | Rename `zefix_sources/` to remove the `zefix_sources.zefix` stutter? | Keep the name (N3). |
+| Q1 | Rename `zefix/sources/zefix.py` to `rest.py` to remove the `zefix.sources.zefix` stutter? File name only; vendored names inside stay (N3). | Yes, during S2, while paths move anyway. |
 | Q2 | Align `main`'s bfs/geo/opendata/weather/health tools to the contract's five states? | Separate PRD after submission. |
 | Q3 | Land the refactor before or after the Friday submission? | Before, gated by R1. |
 
@@ -201,13 +215,14 @@ Rules:
 | Step | Work | Est. |
 |---|---|---|
 | S1 | Merge `origin/main` into `victor-dev`; resolve `tools/__init__.py`, README, tests; suite green | 0.5 h |
-| S2 | `sources.py`: `ApiSource`, `API_SOURCES`, `api_hosts()`; `http.allowed_hosts()` reads it; settings defaults from it; drop `allowed_hosts` field; T5 | 0.5 h |
-| S3 | `LindasClient`, `ZefixClient`, `GazetteClient`; T3 | 1.5 h |
-| S4 | `company_gates.py` with `classify()`; move the three translated tables to `envelope.py` | 0.5 h |
-| S5 | `company_lookup.py`: `CompanyLookup` with the resolution and envelope assembly; T1, T2 | 1.5 h |
-| S6 | `tools/company_info.py` reduced to the wrapper; `@mcp.tool`; T4 | 0.25 h |
-| S7 | Rewrite `docs/prd-zefix-company-info.md` §8 and README "Data sources" to the new tree; live tests; opencode smoke (T6) | 0.75 h |
+| S2 | Create `zefix/`; move `envelope.py` and `zefix_sources/` into it with history; rewrite the imports listed in §4; no other edits; suite green; own commit | 0.5 h |
+| S3 | `sources.py`: `ApiSource`, `API_SOURCES`, `api_hosts()`; `zefix/sources/http.allowed_hosts()` reads it; settings defaults from it; drop `allowed_hosts` field; T5 | 0.5 h |
+| S4 | `LindasClient`, `ZefixClient`, `GazetteClient`; T3 | 1.5 h |
+| S5 | `zefix/gates.py` with `classify()`; move the three translated tables to `zefix/envelope.py` | 0.5 h |
+| S6 | `zefix/lookup.py`: `CompanyLookup` with the resolution and envelope assembly; T1, T2 | 1.5 h |
+| S7 | `tools/company_info.py` reduced to the wrapper; `@mcp.tool`; T4 | 0.25 h |
+| S8 | Rewrite `docs/prd-zefix-company-info.md` §8 and README "Data sources" to the new tree; live tests; opencode smoke (T6) | 0.75 h |
 
-Total ≈ 5.5 h. S2, S3, S4 are independent after S1; S5 depends on S2–S4; S6 on S5; S7 last.
+Total ≈ 6 h. S2 is a pure move and lands as its own commit. S3, S4, S5 are independent after S2; S6 depends on S3–S5; S7 on S6; S8 last.
 
 Verification rule: the implementer's report is a claim; the suite, the live run and the smoke envelopes are the evidence.
