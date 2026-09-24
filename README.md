@@ -23,12 +23,6 @@ Search uses OpenAI `text-embedding-3-small` for semantic ranking. Set `OPENAI_AP
 
 Set both `CRAWLORA_API_KEY` and `OPENAI_API_KEY` before refreshing. The three `crawl_*_sources(source=None)` MCP tools refresh one approved source by name or every source at that authority level. They accept no pasted URLs. HTML and JSON normally use Crawlora, with direct retrieval of an approved URL if Crawlora is unavailable; PDFs are downloaded and text-extracted locally. A refresh must return successful content, the expected approved URL, and a source-specific topic phrase. Only then are its page and passages replaced. A failure preserves the previous version and records its time.
 
-To rebuild the packaged seed from **fresh crawls of every approved URL**:
-
-```sh
-uv run python -m scripts.build_knowledge_base
-```
-
-The builder replaces the seed only after all 13 sources succeed. It does not import the older JSON snapshots. The `scuol_waste` entry uses the responsible regional authority linked by Scuol, since Scuol's own page blocks direct retrieval.
+The shipped seed contains all 13 sources. MCP crawl tools update the writable local database; they do not change the packaged seed or import the older JSON snapshots. The `scuol_waste` entry uses the responsible regional authority linked by Scuol, since Scuol's own page blocks direct retrieval.
 
 Run `uv run pytest -q` for local checks. Credentials belong in local environment variables or `.env`, never in the repository.
