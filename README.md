@@ -1,578 +1,226 @@
-# MCP Boilerplate
+# mcp-swiss-info
 
-A robust, production-ready boilerplate template for Model Context Protocol (MCP) servers built with Python and FastMCP v2.
+An MCP server that answers questions about Swiss companies, grounded in official
+federal sources: the Zefix commercial register index and the Swiss Official
+Gazette of Commerce (SHAB). It is a live proxy — every call hits the upstream
+sources directly, nothing is cached or persisted.
 
-## 🎯 **About This Template**
+Team: Roberto Cerrone, Edoardo Diana, Alberto Minetti, Vincent Van Loo, Victor
+Bonilla, Jesus Sebastian, Jiaqi Yu.
 
-This boilerplate provides everything you need to build professional MCP servers:
+## Scope
 
-- **🏗️ Robust Architecture**: Modular design with clear separation of concerns
-- **🔧 Comprehensive Tooling**: Math, text processing, and utility functions out of the box
-- **📊 Rich Resources**: System metrics, data stores, and sample data
-- **🤖 AI Prompts**: Ready-to-use prompt templates for various scenarios
-- **🛡️ Production Ready**: Error handling, logging, validation, and testing
-- **📋 Developer Experience**: Make commands, code quality tools, and comprehensive docs
-- **⚡ FastMCP v2**: Latest FastMCP version with improved API and multiple transport support
+Swiss companies in the federal commercial register index (Zefix) and their
+SHAB/cantonal gazette publications. Federal level, all 26 cantons. Languages:
+German, French, Italian, English; Romansh questions are answered in German
+with a note.
 
-## Features
+Not covered: natural persons (board members, signatories), VAT status,
+cantonal register extracts, statistics or lists over the register.
 
-🔧 **Example Tools Included**
-- Mathematical operations (add, subtract, multiply, divide, power, factorial)
-- Text processing (length, case conversion, word extraction, replacement)
-- Utility functions (UUID generation, hashing, JSON validation, base64 encoding)
+## Tool: `company_info`
 
-📊 **Example Resources**
-- System information and performance metrics
-- In-memory data store with statistics
-- Sample data in multiple formats (JSON, CSV, XML)
+One tool, no mandatory parameters. Omitting both `name` and `uid` returns
+`need_info` asking for a company name — a mandatory field would push that
+failure into client-side schema validation, where the calling LLM cannot see
+it.
 
-🤖 **Example Prompts**
-- Code review and explanation prompts
-- Data analysis and problem-solving templates
-- Comparative analysis frameworks
+| Parameter | Type | Default | Purpose |
+|---|---|---|---|
+| `question` | `str \| None` | `None` | The user's question verbatim; used to self-detect wrong-topic, person, jurisdiction, and analytics questions |
+| `name` | `str \| None` | `None` | Company name or name prefix |
+| `uid` | `str \| None` | `None` | `CHE-xxx.xxx.xxx`; dots and hyphens optional |
+| `canton` | `str \| None` | `None` | Two-letter canton code, narrows disambiguation |
+| `language` | `str` | `"de"` | `de \| fr \| it \| en`; `rm` maps to `de` |
+| `include_publications` | `bool` | `True` | Attach recent gazette publications for the resolved company |
+| `max_publications` | `int` | `5` | 1–20 |
 
-🛡️ **Production Features**
-- Comprehensive error handling and logging
-- Input validation and security measures
-- Health checks and monitoring
-- Extensive test coverage
-- Type safety with MyPy
+### Response states
 
-## Quick Start
+- `answered` — company resolved, with citation, authority, and effective date.
+- `need_info` — the name was ambiguous or missing; the tool asks for exactly one of UID, canton, or seat, with up to 5 candidates.
+- `no_match` — no company found at the primary source (and, when a UID was given, no deletion publication either).
+- `out_of_scope` — the question is about persons, a non-Swiss jurisdiction, register-wide analytics, or an unrelated topic.
+- `source_unavailable` — a source the answer depends on could not be reached; the tool never falls back to a cached or stale record.
 
-### Prerequisites
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/) package manager
+### Example (`answered`, abbreviated)
 
-### 1. Use This Template
-
-```bash
-# Clone the template
-git clone <your-repo-url> your-mcp-server
-cd your-mcp-server
-
-# Remove existing git history (optional)
-rm -rf .git
-git init
+```json
+{
+  "status": "answered",
+  "answer": "Swisscom (Schweiz) AG ist eine aktive Aktiengesellschaft mit Sitz in Ittigen (BE).",
+  "company": {
+    "name": "Swisscom (Schweiz) AG",
+    "uid": "CHE-101.654.423",
+    "legal_form": "Aktiengesellschaft",
+    "seat": "Ittigen",
+    "canton": "BE",
+    "address": {"street": "Alte Tiefenaustrasse 6", "zip": "3050", "city": "Bern"},
+    "status": "ACTIVE"
+  },
+  "publications": [
+    {"date": "2026-06-12", "registry_office": "Handelsregisteramt des Kantons Bern", "rubric": "HR", "source_url": "https://amtsblattportal.ch/..."}
+  ],
+  "citation": {
+    "authority": "Eidgenössisches Amt für das Handelsregister (EHRA), Bundesamt für Justiz",
+    "source_url": "https://register.ld.admin.ch/zefix/company/415941",
+    "cantonal_excerpt_url": "https://be.chregister.ch/cr-portal/auszug/...",
+    "effective_from": "2026-06-12",
+    "dataset_modified": "2026-09-23",
+    "source_status": "indicative"
+  },
+  "notes": "Zefix ist nicht rechtsverbindlich. Massgebend sind der beglaubigte Handelsregisterauszug des Kantons und die SHAB-Publikation."
+}
 ```
 
-#### Rename the Package
+The full field list, including `need_info`, `no_match`, `out_of_scope`, and
+`source_unavailable` shapes, is in `docs/prd-zefix-company-info.md` §5.3.
 
-**Option A: Manual Rename**
-1. Rename `src/mcp_boilerplate/` to `src/your_server_name/`
-2. Update imports in all Python files
-3. Update `pyproject.toml` package references
+## Data sources
 
-**Option B: Automated Rename (Recommended)**
+| Source | Endpoint | Auth | Licence / terms | Contributes |
+|---|---|---|---|---|
+| LINDAS (primary) | `lindas.admin.ch/query` | none | "Open use. Must provide the source." (`dcterms:rights` on the FOJ Zefix dataset) | Identity, legal form, seat, address, purpose. Updated daily. |
+| Zefix web endpoint | `www.zefix.admin.ch/ZefixREST/api/v1` | none | Undocumented, no published terms | Enrichment only: status, SHAB date, cantonal excerpt link. Off by default. |
+| Zefix PublicREST | `www.zefix.admin.ch/ZefixPublicREST/api/v1` | Basic Auth, free registration via `zefix@bj.admin.ch` | Documented (OpenAPI) | Same enrichment fields, used automatically once credentials are set. |
+| Amtsblattportal | `amtsblattportal.ch/api/v1` | none | Portal GTC | UID-scoped SHAB/cantonal gazette publications. |
+
+LINDAS is always used and is the only source required for an `answered`
+result. The two Zefix backends and the gazette are enrichment: their failure
+degrades fields, it never removes the answer (except branch 3b, where a UID
+resolves nowhere on LINDAS and the gazette is the only source that can settle
+existence — see the PRD).
+
+## Compliance
+
+`RESPECT_ROBOTS_TXT` defaults to `true`. This is a configuration setting, not
+hardcoded behavior, so it can be switched for testing.
+
+- `true` (default): the undocumented Zefix web endpoint is not called;
+  `enrichment_status` is `"policy_robots"` and the answer loses live `status`,
+  `shabDate`, and the cantonal excerpt link. LINDAS and the gazette API are
+  used regardless — a published SPARQL endpoint and an API with its own GTC
+  are not crawl targets.
+- `false`: the Zefix web endpoint is also called for enrichment.
+- Setting `ZEFIX_USERNAME`/`ZEFIX_PASSWORD` switches enrichment to the
+  documented PublicREST API under either setting — the credential grant is
+  the ToS acceptance.
+
+`zefix.admin.ch` and `amtsblattportal.ch` publish `robots.txt` with
+`Disallow: /` for crawlers. This server does not crawl either site: it makes
+one individual, user-triggered request per tool call against a published API
+endpoint, in response to a specific question, never an unattended traversal
+of pages.
+
+Outbound requests are further restricted by `ALLOWED_HOSTS`, an egress
+allow-list enforced on every request (including redirects). Default:
+`lindas.admin.ch`, `register.ld.admin.ch`, `www.zefix.admin.ch`,
+`amtsblattportal.ch`.
+
+## Credentials
+
+None required. LINDAS, the Zefix web endpoint, and the Amtsblattportal API
+are all keyless.
+
+Optional: `ZEFIX_USERNAME` / `ZEFIX_PASSWORD` for the documented
+ZefixPublicREST API. Register for free by emailing `zefix@bj.admin.ch`.
+Without them, enrichment falls back to the undocumented web endpoint (gated
+by `RESPECT_ROBOTS_TXT`, see above).
+
+Zero secrets are committed to this repository. Put credentials in a local
+`.env` file, which is gitignored (`git check-ignore .env` confirms this).
+
+## Run locally
+
 ```bash
-# Test what changes would be made (dry run)
-python scripts/rename_project.py --dry-run your_server_name
-
-# Rename everything at once
-python scripts/rename_project.py your_server_name
+uv sync
+uv run python -m mcp_boilerplate.main            # stdio transport (default)
 ```
 
-### 2. Install Dependencies
+SSE transport, for web/HTTP integration:
 
 ```bash
-# Install development dependencies
-uv sync --all-extras
-
-# Copy environment configuration
-cp .env.example .env
-```
-
-### 3. Customize Your Server
-
-1. **Update Project Info** in `pyproject.toml`:
-   ```toml
-   [project]
-   name = "your-mcp-server"
-   description = "Your custom MCP server description"
-   authors = [
-       {name = "Your Name", email = "your.email@example.com"}
-   ]
-   keywords = ["mcp", "your", "keywords"]
-   
-   [project.urls]
-   Homepage = "https://github.com/yourusername/your-mcp-server"
-   Repository = "https://github.com/yourusername/your-mcp-server"
-   Issues = "https://github.com/yourusername/your-mcp-server/issues"
-   
-   [project.scripts]
-   your-mcp-server = "your_server_name.main:main"
-   
-   [tool.hatch.build.targets.wheel]
-   packages = ["src/your_server_name"]
-   ```
-
-2. **Modify Server Name** in `src/your_server_name/config/settings.py`:
-   ```python
-   server_name: str = Field(default="your-server-name", description="Name of the MCP server")
-   ```
-
-3. **Update Environment Variables** in `.env`:
-   ```bash
-   SERVER_NAME=your-server-name
-   # Add your custom variables
-   YOUR_API_KEY=your-api-key
-   YOUR_DATABASE_URL=postgresql://...
-   ```
-
-4. **Add Your Tools** in `src/your_server_name/tools/`:
-   - Create new tool files
-   - Register them in `tools/__init__.py`
-
-5. **Add Your Resources** in `src/your_server_name/resources/`:
-   - Create new resource files  
-   - Register them in `resources/__init__.py`
-
-### 4. Run Your Server
-
-```bash
-# Run with STDIO transport (default)
-make run
-
-# Or run directly
-uv run python -m mcp_boilerplate.main
-
-# Debug mode
-make run-debug
-
-# Run with SSE transport for web integration
 make run-sse
-
-# Or run SSE directly
+# equivalent to:
 uv run --extra sse python -m mcp_boilerplate.main --transport sse --port 8000
 ```
 
-### 5. Test Your Server
+### Client configuration
 
-```bash
-# Run tests
-make test
-
-# Run with coverage
-make test-cov
-
-# Code quality checks
-make lint
-make type-check
-```
-
-## Using with Claude Desktop
-
-Add to your Claude Desktop MCP configuration:
+Claude Desktop / Claude Code (`.mcp.json`):
 
 ```json
 {
   "mcpServers": {
-    "your-server-name": {
+    "mcp-swiss-info": {
       "command": "uv",
-      "args": ["run", "python", "-m", "mcp_boilerplate.main"],
-      "cwd": "/path/to/your-mcp-server"
+      "args": ["run", "--frozen", "python", "-m", "mcp_boilerplate.main"]
     }
   }
 }
 ```
 
-## Project Structure
-
-```
-src/mcp_boilerplate/
-├── __init__.py
-├── main.py              # CLI entry point
-├── server.py            # Core server implementation
-├── config/
-│   ├── __init__.py
-│   └── settings.py      # Configuration management
-├── tools/               # MCP tools
-│   ├── __init__.py
-│   ├── math_tools.py
-│   ├── text_tools.py
-│   └── utility_tools.py
-├── resources/           # MCP resources
-│   ├── __init__.py
-│   ├── system_resources.py
-│   └── data_resources.py
-├── prompts/             # MCP prompts
-│   ├── __init__.py
-│   ├── assistant_prompts.py
-│   └── analysis_prompts.py
-├── handlers/            # Error handling
-│   ├── __init__.py
-│   └── error_handler.py
-└── utils/               # Utilities
-    ├── __init__.py
-    ├── logger.py
-    └── validation.py
-```
-
-## Customization Guide
-
-### Remove Example Components
-
-The boilerplate includes example tools, resources, and prompts. Remove what you don't need:
-
-```bash
-# Remove example tools (keep only what you want)
-rm src/your_server_name/tools/math_tools.py
-rm src/your_server_name/tools/text_tools.py
-# Keep utility_tools.py or customize it
-
-# Remove example resources
-rm src/your_server_name/resources/data_resources.py
-# Keep system_resources.py for monitoring
-
-# Remove example prompts (if you don't need them)
-rm -rf src/your_server_name/prompts/
-```
-
-**Important**: Update the `__init__.py` files to remove references to deleted modules.
-
-### Adding New Tools
-
-1. Create a new file in `src/your_server_name/tools/`:
-   ```python
-   # src/your_server_name/tools/your_tools.py
-   from ..server import mcp
-   
-   @mcp.tool
-   def your_tool(param: str) -> str:
-       """Your tool description."""
-       return f"Result: {param}"
-   ```
-
-2. Register in `src/your_server_name/tools/__init__.py`:
-   ```python
-   # Import to register the tools
-   from . import your_tools
-   ```
-
-### Adding New Resources
-
-1. Create a new file in `src/your_server_name/resources/`:
-   ```python
-   # src/your_server_name/resources/your_resources.py
-   from ..server import mcp
-   import json
-   
-   @mcp.resource("your-domain://data/{id}")
-   def get_your_data(id: str) -> str:
-       """Get your domain-specific data."""
-       return json.dumps({"id": id, "data": "your_data"})
-   ```
-
-2. Register in `src/your_server_name/resources/__init__.py`:
-   ```python
-   # Import to register the resources
-   from . import your_resources
-   ```
-
-### Adding New Prompts
-
-1. Create a new file in `src/your_server_name/prompts/`:
-   ```python
-   # src/your_server_name/prompts/your_prompts.py
-   from ..server import mcp
-   
-   @mcp.prompt
-   def your_prompt(task: str, style: str = "professional") -> str:
-       """Generate a custom prompt."""
-       return f"Task: {task}\nStyle: {style}"
-   ```
-
-2. Register in `src/your_server_name/prompts/__init__.py`:
-   ```python
-   # Import to register the prompts
-   from . import your_prompts
-   ```
-
-## Common Integration Patterns
-
-### Database Integration
-
-```python
-# Add to pyproject.toml dependencies
-dependencies = [
-    # ... existing dependencies
-    "sqlalchemy>=2.0.0",
-    "asyncpg>=0.28.0",  # for PostgreSQL
-]
-
-# Create database tools
-@mcp.tool
-def query_database(sql: str) -> str:
-    """Execute a database query."""
-    # Your database implementation with proper validation
-    pass
-```
-
-### API Integration
-
-```python
-# Add HTTP client dependency
-dependencies = [
-    # ... existing dependencies
-    "httpx>=0.24.0",
-]
-
-# Create API tools
-@mcp.tool
-async def call_external_api(endpoint: str) -> str:
-    """Call an external API."""
-    # Your API implementation with error handling
-    pass
-```
-
-### File System Operations
-
-```python
-@mcp.tool
-def read_file(file_path: str) -> str:
-    """Read a file from the filesystem."""
-    # Implement with proper security checks and path validation
-    pass
-
-@mcp.resource("file://{path}")
-def get_file_content(path: str) -> str:
-    """Get file content as a resource."""
-    # Your implementation with security validation
-    pass
-```
-
-## Development Commands
-
-```bash
-# Setup development environment
-make install-dev
-
-# Run server
-make run              # Production mode
-make run-debug        # Debug mode
-
-# Testing
-make test             # Run tests
-make test-cov         # Run with coverage
-
-# Code quality
-make lint             # Linting
-make format           # Code formatting
-make type-check       # Type checking
-
-# All quality checks
-make ci
-
-# Build package
-make build
-```
-
-## Configuration
-
-### Environment Variables
-
-Copy `.env.example` to `.env` and customize:
-
-```bash
-# Server Configuration
-SERVER_NAME=your-server-name
-LOG_LEVEL=INFO
-ENABLE_DEBUG=false
-ENABLE_METRICS=true
-MAX_REQUEST_SIZE=1048576
-REQUEST_TIMEOUT=30
-
-# Your Custom Variables
-YOUR_API_KEY=your-api-key
-YOUR_DATABASE_URL=postgresql://user:pass@localhost/db
-YOUR_CUSTOM_SETTING=value
-```
-
-### Dependencies
-
-Update `pyproject.toml` with your specific dependencies:
+Codex (`.codex/config.toml`):
 
 ```toml
-dependencies = [
-    "fastmcp>=2.0.0",
-    "pydantic>=2.0.0",
-    "pydantic-settings>=2.0.0",
-    # Add your dependencies here
-    "your-required-library>=1.0.0",
-]
-
-# SSE transport support (optional)
-[project.optional-dependencies]
-sse = [
-    "uvicorn>=0.24.0",
-    "starlette>=0.32.0",
-]
+[mcp_servers.mcp-swiss-info]
+command = "uv"
+args = ["run", "--frozen", "python", "-m", "mcp_boilerplate.main"]
 ```
 
-## Example Tools Included
+OpenCode (`opencode.json`):
 
-### Math Tools
-- `add(a, b)` - Add two numbers
-- `subtract(a, b)` - Subtract two numbers
-- `multiply(a, b)` - Multiply two numbers
-- `divide(a, b)` - Divide two numbers
-- `power(base, exponent)` - Raise to power
-- `factorial(n)` - Calculate factorial
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "mcp-boilerplate": {
+      "type": "local",
+      "command": ["uv", "run", "--frozen", "python", "-m", "mcp_boilerplate.main"],
+      "enabled": true
+    }
+  }
+}
+```
 
-### Text Tools
-- `text_length(text)` - Get text length
-- `text_uppercase(text)` - Convert to uppercase
-- `text_lowercase(text)` - Convert to lowercase
-- `text_reverse(text)` - Reverse text
-- `word_count(text)` - Count words
-- `extract_words(text, min_length)` - Extract words
-- `text_replace(text, old, new)` - Replace text
-
-### Utility Tools
-- `generate_uuid()` - Generate UUID4
-- `current_timestamp()` - Get current timestamp
-- `hash_text(text, algorithm)` - Hash text
-- `validate_json(text)` - Validate JSON
-- `format_json(text)` - Format JSON
-- `encode_base64(text)` - Base64 encode
-- `decode_base64(text)` - Base64 decode
-
-## Example Resources Included
-
-### System Resources
-- `system://info` - System information
-- `system://performance` - Performance metrics
-- `system://config` - Server configuration
-
-### Data Resources
-- `data://store/{key}` - Get stored data by key
-- `data://store` - List all stored data
-- `data://statistics` - Data store statistics
-- `data://sample/{format}` - Sample data (json/csv/xml)
-
-## Example Prompts Included
-
-### Assistant Prompts
-- `helpful_assistant(task, style)` - General assistance
-- `code_reviewer(code, language, focus)` - Code review
-- `explain_concept(concept, audience, depth)` - Concept explanation
-
-### Analysis Prompts
-- `data_analyst(data_description, analysis_type)` - Data analysis
-- `problem_solver(problem, approach)` - Problem solving
-- `comparative_analysis(item_a, item_b, criteria)` - Comparison
-
-## Testing Your Changes
+## Tests
 
 ```bash
-# Test with MCP Inspector
-npx @modelcontextprotocol/inspector uv run python -m mcp_boilerplate.main
-
-# Or if installed globally
-mcp-inspector uv run python -m mcp_boilerplate.main
+uv run pytest -q                          # offline, runs against recorded fixtures
+uv run pytest -m live                     # hits real upstream endpoints, run manually before submission
+uv run python scripts/record_fixtures.py lindas   # refresh LINDAS fixtures
 ```
 
-## Security & Best Practices
+## Honesty and prompt-injection stance
 
-### Security Considerations
+Every string returned by an upstream source is treated as data, never as
+instructions. The tool forwards only company name, purpose, and address as
+free text in its answer. Gazette full text (`content`) and SHAB message
+bodies (`shabPub[].message`) are read by no code path in this server and are
+never returned. The server never answers from a cache: every result reflects
+a live call made during that request, or an explicit `source_unavailable`.
 
-- **Input Validation**: Review and update validation in `utils/validation.py`
-- **Sensitive Data**: Ensure no secrets are logged or exposed in error messages
-- **Rate Limiting**: Add rate limiting for production deployments
-- **Path Validation**: Validate file paths to prevent directory traversal
-- **Environment Variables**: Never commit secrets to the repository
+## Attribution
 
-### Development Best Practices
+Company data: Zefix, Federal Office of Justice / EHRA, via LINDAS
+(lindas.admin.ch). Not legally binding; the cantonal commercial register
+extract is authoritative. Official notices: SHAB via amtsblattportal.ch; the
+signed PDF is the binding version.
 
-1. **Follow the established patterns** for tools, resources, and prompts
-2. **Add comprehensive error handling** for all new components
-3. **Include input validation** for security
-4. **Write tests** for new functionality
-5. **Update documentation** when adding features
-6. **Use type hints** for better code quality
-7. **Test with MCP Inspector** before deploying
+Parts of `src/mcp_boilerplate/sources` are vendored from
+`malkreide/register-mcp`, MIT, Copyright (c) 2026 Hayal Oezkan; see
+`src/mcp_boilerplate/sources/LICENSE-register-mcp`.
 
-### Testing Your Changes
+## Limitations
 
-```bash
-# Update tests to match your changes
-make test
-
-# Test with MCP Inspector
-npx @modelcontextprotocol/inspector uv run python -m your_server_name.main
-
-# Or if installed globally
-mcp-inspector uv run python -m your_server_name.main
-```
-
-## Contributing
-
-1. Fork this repository
-2. Create your feature branch
-3. Add your tools, resources, or prompts
-4. Write tests for new functionality
-5. Run quality checks: `make ci`
-6. Submit a pull request
-
-## Team
-
-- Roberto Cerrone
-- Edoardo Diana
-- Alberto Minetti
-- Vincent Van Loo
-- Victor Bonilla
-- Jesus Sebastian
-- Jiaqi Yu
-
-## License
-
-MIT License - see LICENSE file for details.
-
-## Automation Script
-
-Create `scripts/rename_project.sh` for automated setup:
-
-```bash
-#!/bin/bash
-# Usage: ./scripts/rename_project.sh new_name "New Description"
-
-OLD_NAME="mcp_boilerplate"
-NEW_NAME="$1"
-NEW_DESC="$2"
-
-if [ -z "$NEW_NAME" ]; then
-    echo "Usage: $0 new_name \"New Description\""
-    exit 1
-fi
-
-# Rename source directory
-mv "src/${OLD_NAME}" "src/${NEW_NAME}"
-
-# Update all Python files
-find . -name "*.py" -exec sed -i "s/${OLD_NAME}/${NEW_NAME}/g" {} +
-
-# Update pyproject.toml
-sed -i "s/mcp-boilerplate/${NEW_NAME//_/-}/g" pyproject.toml
-sed -i "s/mcp_boilerplate/${NEW_NAME}/g" pyproject.toml
-
-if [ -n "$NEW_DESC" ]; then
-    sed -i "s/A robust boilerplate template.*/${NEW_DESC}/g" pyproject.toml
-fi
-
-echo "Project renamed to ${NEW_NAME}"
-echo "Don't forget to update README.md and other documentation!"
-```
-
-## Additional Resources
-
-- 📖 [MCP Specification](https://modelcontextprotocol.io/)
-- 🚀 [FastMCP Documentation](https://github.com/modelcontextprotocol/python-sdk)
-- 🖥️ [Claude Desktop Configuration](https://docs.anthropic.com/claude/docs/mcp)
-- 🔍 [MCP Inspector](https://github.com/modelcontextprotocol/inspector)
-- 📖 [Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/yourusername/mcp-boilerplate/issues)
-- 💬 [Discussions](https://github.com/yourusername/mcp-boilerplate/discussions)
-
----
-
-**🚀 Start building your MCP server now!** This boilerplate gives you everything you need to create production-ready MCP servers quickly and efficiently.
+- LINDAS is updated daily and can lag the register by up to one day.
+- Dissolved companies are absent from the LINDAS graph; when a UID is known,
+  the tool infers `DELETED` from a matching gazette deletion publication.
+  Without a UID, a dissolved company simply returns `no_match`.
+- Name search is exact, then prefix, then substring matching, not fuzzy. An
+  exact registered name or a UID answers in well under a second. A name that
+  matches nothing exhausts the 15 second LINDAS budget and returns
+  `source_unavailable` with `error_class: "timeout_scan"` and a sentence asking
+  for the UID, because LINDAS has no full-text index.
+- One UID can have several registered seats (UBS AG: Basel and Zürich). The
+  tool shows one seat and lists the others in `assumptions`.

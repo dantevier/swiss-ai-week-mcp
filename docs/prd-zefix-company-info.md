@@ -1,6 +1,6 @@
 # PRD: `company_info` — Swiss commercial register grounding tool
 
-Status: approved design, not yet implemented. Owner: Victor Bonilla. Target: Swisscom "Swiss Grounding MCP" challenge submission, Fri 2026-09-25 12:00.
+Status: implemented on `victor-dev` (62 offline tests, 3 live tests). Owner: Victor Bonilla. Target: Swisscom "Swiss Grounding MCP" challenge submission, Fri 2026-09-25 12:00.
 
 ## 1. Summary
 
@@ -88,17 +88,22 @@ No lookup parameter is mandatory. If both `name` and `uid` are missing the tool 
 1. Normalise `uid` to `CHE` + 9 digits.
 2. Primary lookup on LINDAS:
    - `uid` given → exact triple-pattern query (80 ms measured). One hit → step 4. Zero → step 3b.
-   - else `name` → `STRSTARTS(LCASE(name), prefix)` over `schema:name` and `schema:legalName`, `LIMIT 10`, optional canton filter on address region (1.5 s measured). Zero hits → retry with `CONTAINS` (1.7 s measured). Still zero → `no_match`. Both queries share one 10 s LINDAS budget; the retry gets whatever remains.
+   - else `name`, staged, stopping at the first stage with hits, all stages sharing one 15 s LINDAS budget, optional canton filter on address region:
+     - stage 0: exact literal match of the name as given (whitespace collapsed, case preserved) against `schema:legalName` and `schema:name` in de/fr/it/en via `VALUES`. Index lookup, 0.1–0.3 s measured, hit or miss. Catches full registered names such as "Swisscom (Schweiz) AG" or "UBS AG".
+     - stage 1: `STRSTARTS(LCASE(schema:legalName), prefix)`, `LIMIT 10`. 1.2–2 s on a hit, about 6 s on a miss.
+     - stage 2: same over `schema:name` (fr/it/en trade names), only if more than 3 s of budget remain. Up to 15 s on a miss.
+     - stage 3: `CONTAINS` over `schema:legalName`, same gate.
+     - all stages empty → `no_match`; a stage 1–3 timeout → `source_unavailable` with `error_class: "timeout_scan"`.
 3. Disambiguate:
    - one hit → step 4
    - several hits, exactly one whose `legalName` equals the input case-insensitively → step 4 with `assumptions: ["selected the exact-name match among N prefix matches"]`
    - otherwise → `need_info` listing up to 5 candidates (name, legal form, seat, UID) and asking for one of: UID, canton, or seat. One question only.
    - (3b) UID given, zero LINDAS hits → always query the gazette for that UID, regardless of `include_publications` (that flag only controls whether the list is attached). Publications whose sub-rubric is a deletion code → `answered` with `status: "DELETED"`, `derived: true`, rule "absent from the active-entity index and a deletion publication exists", `effective_from` = that publication's date. Publications without a deletion code, or none → `no_match` with `gazette_checked: true`. Gazette unreachable → `source_unavailable(source: "gazette")`, because in this branch the gazette is the only source that can settle the question.
 4. Enrichment, run when `RESPECT_ROBOTS_TXT=false`, or when `ZEFIX_USERNAME`/`ZEFIX_PASSWORD` are set (the documented API is credentialed and not a crawl target, so it runs under either setting): `GET {ZEFIX_BASE_URL}/firm/{ehraid}.json`. Adds `status`, `shabDate`, `deleteDate`, `cantonalExcerptWeb`, `oldNames`. Any failure or a 5 s timeout leaves the fields null and sets `enrichment_status: "skipped" | "source_unavailable" | "policy_robots"`. Enrichment never changes the state.
-5. Gazette: `GET publications?uid=…`, `PUBLISHED`, newest first, cap `max_publications`. Failure sets `publications_status: "source_unavailable"`, answer still returned.
+5. Gazette: `GET publications?uids=CHE-xxx.xxx.xxx&rubrics=HR`, `PUBLISHED`, newest first, cap `max_publications`. Only the commercial-register rubric `HR` is requested; other rubrics (building permits, debt enforcement) also cite company UIDs but are not register entries. Failure sets `publications_status: "source_unavailable"`, answer still returned.
 6. Build the envelope.
 
-Total budget per call: 20 s wall clock. LINDAS phase 10 s across both queries, enrichment 5 s, gazette the remainder (minimum 5 s). Each phase's deadline is the minimum of its own cap and the remaining call budget.
+Total budget per call: 25 s wall clock. LINDAS phase 15 s across all stages, enrichment 5 s, gazette the remainder (minimum 5 s). Each phase's deadline is the minimum of its own cap and the remaining call budget. A query with few matches cannot stop at `LIMIT`, so LINDAS scans every name literal, measured 15–21 s for the multilingual `schema:name` set; that is why stage 0 exists and why a true miss ends as `timeout_scan` with the sentence "provide the UID or the exact registered name and canton".
 
 ### 5.3 Envelope
 
@@ -203,8 +208,8 @@ Live proxy. Request-scoped `httpx.AsyncClient`, egress allow-list hook, no queue
 | Absent | status, SHAB date, capital, links to zefix.ch or cantonal excerpt. Dissolved companies are removed from the graph. |
 | Freshness | `schema:dateModified` on the dataset node, `accrualPeriodicity` DAILY. Read once per process and refreshed with the 24 h reference cache. |
 | Licence | `dcterms:rights` → `ld.admin.ch/vocabulary/TermsOfUse/Provide-the-Source`: "Open use. Must provide the source." |
-| Latency | Measured 2026-09-24: UID lookup 80 ms; prefix name search 1.5 s; `CONTAINS` 1.7 s. No full-text index (`bif:contains` returns zero rows silently). |
-| Timeout | 10 s |
+| Latency | Measured 2026-09-24: UID lookup 0.2 s; exact-name lookup 0.1–0.3 s; `legalName` prefix 1.2–2 s on a hit, 6 s on a miss; `schema:name` prefix or contains 15–21 s on a miss. No full-text index (`bif:contains` returns zero rows silently). A `LIMIT` only helps when matches are plentiful. |
+| Timeout | 15 s for the whole staged search |
 
 Queries live in `sources/lindas.py` as string templates with parameter escaping. Input never reaches the query unescaped: UID is validated by regex, name is lower-cased and escaped for SPARQL string literals, canton is validated against the canton allow-list.
 
@@ -230,13 +235,13 @@ Verified live 2026-09-24: detail HTTP 200 without auth. The API root answers 403
 |---|---|
 | Base URL | `https://amtsblattportal.ch/api/v1` (setting `GAZETTE_BASE_URL`) |
 | Auth | none |
-| List | `GET publications?publicationStates=PUBLISHED&uid={uid}&pageRequest.size={n}` plus optional `rubrics`, `subRubrics`, `publicationDate.start/end`. Query built only from an allow-list of parameter names; unknown parameters are silently ignored upstream and would return the whole corpus. |
+| List | `GET publications?publicationStates=PUBLISHED&uids={CHE-xxx.xxx.xxx}&rubrics=HR&pageRequest.size={n}`; the UID must be the formatted form and the key is `uids` (the unformatted form silently returns nothing). Optional `subRubrics`, `publicationDate.start/end`. Query built only from an allow-list of parameter names; unknown parameters are silently ignored upstream and would return the whole corpus. |
 | Detail | `GET publications/{id}/xml`, not called by `company_info` (N3, N5) |
 | Rubrics | `GET rubrics`, TTL cache 24 h, used to validate any rubric filter before calling upstream because an invalid code returns an empty 200 |
 | Retry | on 429, 502, 503, 504 and network errors; honours `Retry-After`; max 3 attempts; total budget bounded by the remaining call budget |
 | Plausibility | if `total` exceeds 95 % of the known corpus size the filter was ignored; raise, do not return |
 
-Fields read: `meta.id, meta.publicationDate, meta.registrationOffice.{id, displayName, cantons[]}, meta.rubric, meta.subRubric, meta.title.{de,fr,it}`. `content` is never read. `publications[].registry_canton` is `registrationOffice.cantons[0]` when present, else null; `publications[].mutation_types` is the list of `subRubric` codes of that publication (the gazette has no separate mutation-type field; Zefix's `shabPub[].mutationTypes` is used only to fill `enrichment.mutation_types` when enrichment runs). The exact shape of `registrationOffice` is confirmed from the recorded fixture in A7. Deletion detection for step 3b uses `subRubric` codes for "Löschung"; the exact codes are taken from the cached rubric taxonomy at build time (A6).
+Fields read: `meta.id, meta.publicationDate, meta.registrationOffice.displayName, meta.cantons[], meta.rubric, meta.subRubric, meta.title.{de,fr,it}`. `content` is never read. `publications[].registry_canton` is `meta.cantons[0]` when present, else null; `publications[].mutation_types` is the `subRubric` code of that publication (`HR01` new entry, `HR02` mutation, `HR03` deletion). Deletion detection uses `HR03`. Deletion detection for step 3b uses `subRubric` codes for "Löschung"; the exact codes are taken from the cached rubric taxonomy at build time (A6).
 
 ### 6.5 Compliance switch
 
@@ -328,7 +333,7 @@ Vendoring rules: keep function names and the three upstream-quirk guards intact 
 - `RESPECT_ROBOTS_TXT`: default `true`, meaning, which fields the Zefix web endpoint adds when set to `false`, and that setting credentials enables the documented API under either value, in one paragraph.
 - Attribution: "Company data: Zefix, Federal Office of Justice / EHRA, via LINDAS (lindas.admin.ch, terms: open use, provide the source). Not legally binding; the cantonal commercial register extract is authoritative. Official notices: SHAB via amtsblattportal.ch; the signed PDF is the binding version." Plus MIT attribution for `register-mcp`.
 - Prompt-injection stance: every upstream string is data. The tool forwards only company names, purpose, and address as free text, and the README says so.
-- Local run: `uv sync && uv run python -m mcp_boilerplate.main`. No build step, no index download.
+- Local run: `uv sync && uv run python -m mcp_boilerplate.main`. No build step, no index download. `uv.lock` is tracked because every client config runs `uv run --frozen`.
 
 ## 11. Risks
 
@@ -337,7 +342,8 @@ Vendoring rules: keep function names and the three upstream-quirk guards intact 
 | R1 | Jury keeps the default `RESPECT_ROBOTS_TXT=true` without credentials; enrichment fields are absent | high | low | LINDAS still answers; degradation is explicit in `enrichment_status` and `assumptions` |
 | R2 | LINDAS lags one day; a company deleted yesterday still shows as active | certain | low | `dataset_modified` in every citation; enrichment supplies live `status` when allowed |
 | R3 | Ambiguity rule picks the wrong entity | medium | high | prefer `need_info` whenever more than one prefix match exists and no exact `legalName` match; log candidates |
-| R4 | Name search misses because LINDAS has no fuzzy or full-text search | medium | medium | prefix then `CONTAINS` fallback; `need_info` asks for UID; README states "exact or prefix name" |
+| R4 | Name search misses because LINDAS has no fuzzy or full-text search; a name matching nothing times out at the phase budget | medium | medium | exact-literal stage first, then prefix and `CONTAINS`; `timeout_scan` answer asks for the UID; README states "exact or prefix name" and the timeout |
+| R11 | One UID with several registered seats (UBS AG: Basel and Zürich) appears as two LINDAS entities | certain for a few large companies | low | hits are grouped by UID before disambiguation; the answer states the seats and which one is shown |
 | R5 | LINDAS endpoint slow or down during the jury run | low | high | 10 s timeout; `source_unavailable` is a correct answer; `LINDAS_ENDPOINT` can point at the `register.ld.admin.ch` mirror |
 | R6 | Zefix web endpoint changes or blocks non-browser clients | low | low | enrichment degrades; `ZEFIX_BASE_URL` switch to the documented API |
 | R7 | Gazette total > cap because a parameter was silently ignored | low | medium | allow-list plus plausibility guard, vendored |
@@ -359,8 +365,6 @@ Vendoring rules: keep function names and the three upstream-quirk guards intact 
 | A3 | Open `https://www.zefix.admin.ch/de/search/entity/list/firm/415941` in a browser and confirm it renders Swisscom (Schweiz) AG; adjust the `zefix_url` pattern if not | any | Thu |
 | A4 | Confirm the public amtsblattportal.ch URL pattern for a single publication id | any | Thu |
 | A5 | Read Zefix "Rechtliches" and Amtsblattportal GTC in a real browser; paste the binding-source sentence verbatim into README | any | Thu |
-| A6 | Pull the gazette rubric taxonomy and record the sub-rubric codes that mean deletion (HR "Löschung") for step 3b | implementer | S2 |
-| A7 | Record LINDAS fixtures (UID hit, prefix search, empty) and one gazette list for a deleted company with `scripts/record_fixtures.py` adapted from register-mcp; confirm the `registrationOffice` shape; add provenance entries | implementer | S1 |
 
 ## 14. Implementation plan
 
