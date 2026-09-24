@@ -1,0 +1,21 @@
+<div class="card settings">
+<h2>API keys</h2>
+<div class="sub">Saved to this project's git-ignored <code>.env</code> and never shown again. Leave a field empty to keep its current value.</div>
+<form id="settings" autocomplete="off">
+<div class="field"><label for="k1">Crawlora API key<button type="button" class="help" data-tip="t1" aria-expanded="false" aria-label="How to get a Crawlora API key">?</button><span class="sub" id="s1"></span></label>
+<input id="k1" type="password" name="CRAWLORA_API_KEY" placeholder="Paste key" autocomplete="off">
+<div class="tip" id="t1" hidden>
+<p><b>Free.</b> Crawlora fetches the official Swiss pages for the Refresh buttons. Its free plan gives 2,000 credits a month, no card needed.</p>
+<ol><li>Go to <a href="https://crawlora.net" target="_blank" rel="noopener">crawlora.net</a> and create a free account.</li>
+<li>Open your dashboard and copy your API key.</li>
+<li>Paste it here and press Save.</li></ol></div></div>
+<div class="field"><label for="k2">OpenAI API key<button type="button" class="help" data-tip="t2" aria-expanded="false" aria-label="How to get an OpenAI API key">?</button><span class="sub" id="s2"></span></label>
+<input id="k2" type="password" name="OPENAI_API_KEY" placeholder="Paste key" autocomplete="off">
+<div class="tip" id="t2" hidden>
+<p><b>Not free, but very cheap.</b> OpenAI has no free API plan; you add a few dollars of prepaid credit. The key powers semantic search (embeddings), which costs a tiny fraction of a cent per query. It is also needed to refresh sources. Without it, search still works with keyword matching.</p>
+<ol><li>Sign in at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>.</li>
+<li>Add credit under Billing if your account has none.</li>
+<li>Click "Create new secret key", copy it (it is shown only once), paste it here and press Save.</li></ol></div></div>
+<div class="field"><span></span><span><button type="submit">Save keys</button></span></div>
+<div class="msg" id="smsg"></div>
+</form></div>

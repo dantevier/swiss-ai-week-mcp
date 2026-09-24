@@ -2,6 +2,8 @@
 Configuration settings for the MCP server.
 """
 
+from pathlib import Path
+
 from pydantic import ConfigDict, Field
 from pydantic_settings import BaseSettings
 
@@ -10,7 +12,7 @@ class Settings(BaseSettings):
     """Application settings with environment variable support."""
 
     model_config = ConfigDict(
-        env_file=".env",
+        env_file=(Path(__file__).resolve().parents[3] / ".env", ".env"),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -42,6 +44,14 @@ class Settings(BaseSettings):
     crawlora_api_key: str | None = Field(default=None, description="Crawlora API key")
     openai_api_key: str | None = Field(default=None, description="OpenAI embeddings API key")
     knowledge_db_path: str | None = Field(default=None, description="Writable SQLite knowledge base path")
+    driving_licence_db_path: str | None = Field(
+        default=None,
+        description="SQLite database populated by scripts/import_driving_licence.py",
+    )
+    housing_db_path: str | None = Field(
+        default=None,
+        description="SQLite database populated by scripts/import_housing.py",
+    )
 
 
 
