@@ -1,0 +1,23 @@
+{
+  "source": "st_gallen_school_holidays",
+  "authority_level": "municipal",
+  "authority": "City of St. Gallen",
+  "url": "https://www.stadt.sg.ch/home/schule-bildung/Schulferien.html",
+  "crawled_at": "2026-09-24T14:50:04.947577+00:00",
+  "markdown": "## Accesskeys\n\n- [Direkt zum Inhalt](#content \"[Alt+2] Direkt zum Inhalt\")\n- [Direkt zur Startseite](https://www.stadt.sg.ch/home.html \"Interner Link: [Alt+0] Direkt zur Startseite\")\n- [Direkt zur Navigation](#content-navigation \"[Alt+1] Direkt zur Navigation\")\n- [Direkt zur Suche](#searchfield \"[Alt+5] Direkt zur Suche\")\n\n[](#site-menu)\n\n![Logo Stadt St.Gallen](https://www.stadt.sg.ch/apps/core/docroot/images/design/stsg/bg-head-stsg-print-img.gif)\n\n## Schuljahr 2026/2027\n\n  Spalte 1Spalte 2Schulbeginn 10. August 2026 Herbstferien 27. September bis 18. Oktober 2026 Weihnachtsferien 20. Dezember 2026 bis 3. Januar 2027 Winterferien 31. Januar bis 7. Februar 2027 Frühlingsferien 11. April bis 25. April 2027 Sommerferien 11. Juli bis 15. August 2027\n\n## Schulfreie Tage\n\nFreitag, 26. März 2027 (Karfreitag)\n\nMontag, 29. März 2027 (Ostermontag)\n\nDonnerstag, 6. Mai 2027 (Auffahrt)\n\nFreitag, 7. Mai 2027 (Freitag nach Auffahrt)\n\nMontag, 17. Mai 2027 (Pfingstmontag)\n\n## Schulschluss vor den Ferien\n\nSommerferien: Freitag, 11.40 Uhr\n\nÜbrige Ferien: nach Stundenplan, spätestens um 16.00 Uhr\n\nMittelschulen: gemäss Terminplan\n\n### Weitere Informationen\n\n- [Ferienplan 2026-2030 (171 kB, PDF)](https://www.stadt.sg.ch/home/schule-bildung/Schulferien/_jcr_content/TeaserPar1/stsg_teaser_download/DownloadListPar/stsg_download.ocFile/SUM%20Ferienplan%202026_2030.pdf \"Download: Es öffnet sich ein neues Fenster: SUM Ferienplan 2026_2030.pdf\")\n- [Ferienkalender als iCalendar (4 kB, ICS)](https://www.stadt.sg.ch/home/schule-bildung/Schulferien/_jcr_content/TeaserPar1/stsg_teaser_download/DownloadListPar/download.ocFile/sg.de.ics \"Download: Es öffnet sich ein neues Fenster: sg.de.ics\")\n\n### Weiterführende Links\n\n- [www.sg.ch – Ferienplan Kanton St.Gallen neues Fenster](https://www.sg.ch/bildung-sport/volksschule/aus-dem-amt/ferienplan.html \"Externer Link: Es öffnet sich ein neues Fenster: https://www.sg.ch/bildung-sport/volksschule/aus-dem-amt/ferienplan.html\")",
+  "metadata": {
+    "canonical_url": "https://www.stadt.sg.ch/home/schule-bildung/Schulferien.html",
+    "content_type": "text/html",
+    "description": "Ferienpläne der Schulen der Stadt St.Gallen.",
+    "language": "de",
+    "site_name": "stadt.sg.ch",
+    "source_url": "https://www.stadt.sg.ch/home/schule-bildung/Schulferien.html",
+    "status_code": 200,
+    "title": "Schulferien und Feiertage | stadt.sg.ch"
+  },
+  "scrape": {
+    "cache_state": "miss",
+    "escalated": false,
+    "method": "http"
+  }
+}
