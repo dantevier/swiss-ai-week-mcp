@@ -7,7 +7,8 @@ from pathlib import Path
 ENV_PATH = Path(__file__).resolve().parents[3] / ".env"
 KEYS = {
     "CRAWLORA_API_KEY": "Crawlora key (fetches the official pages)",
-    "OPENAI_API_KEY": "OpenAI key (semantic search embeddings)",
+    "OPENAI_API_KEY": "OpenAI key (semantic search embeddings, benchmark runs)",
+    "ANTHROPIC_API_KEY": "Anthropic key (benchmark runs with Claude)",
 }
 _SAFE_VALUE = re.compile(r"[^\s\"'#\\]+")
 

@@ -12,10 +12,17 @@
 <div class="field"><label for="k2">OpenAI API key<button type="button" class="help" data-tip="t2" aria-expanded="false" aria-label="How to get an OpenAI API key">?</button><span class="sub" id="s2"></span></label>
 <input id="k2" type="password" name="OPENAI_API_KEY" placeholder="Paste key" autocomplete="off">
 <div class="tip" id="t2" hidden>
-<p><b>Not free, but very cheap.</b> OpenAI has no free API plan; you add a few dollars of prepaid credit. The key powers semantic search (embeddings), which costs a tiny fraction of a cent per query. It is also needed to refresh sources. Without it, search still works with keyword matching.</p>
+<p><b>Not free, but very cheap.</b> OpenAI has no free API plan; you add a few dollars of prepaid credit. The key powers semantic search (embeddings), which costs a tiny fraction of a cent per query. It is also needed to refresh sources, and <code>benchmark/run_mcp.py</code> uses it to test OpenAI models (<code>--model gpt-5</code>). Without it, search still works with keyword matching.</p>
 <ol><li>Sign in at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>.</li>
 <li>Add credit under Billing if your account has none.</li>
 <li>Click "Create new secret key", copy it (it is shown only once), paste it here and press Save.</li></ol></div></div>
+<div class="field"><label for="k3">Anthropic API key<button type="button" class="help" data-tip="t3" aria-expanded="false" aria-label="How to get an Anthropic API key">?</button><span class="sub" id="s3"></span></label>
+<input id="k3" type="password" name="ANTHROPIC_API_KEY" placeholder="Paste key" autocomplete="off">
+<div class="tip" id="t3" hidden>
+<p><b>Optional, prepaid.</b> Only used by <code>benchmark/run_mcp.py</code> to test Claude models against the MCP. The benchmark needs this key or the OpenAI key; with both set it uses Claude unless you pass <code>--model</code>.</p>
+<ol><li>Sign in at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com/settings/keys</a>.</li>
+<li>Add credit under Billing if your account has none.</li>
+<li>Click "Create Key", copy it (it is shown only once), paste it here and press Save.</li></ol></div></div>
 <div class="field"><span></span><span><button type="submit">Save keys</button></span></div>
 <div class="msg" id="smsg"></div>
 </form></div>
