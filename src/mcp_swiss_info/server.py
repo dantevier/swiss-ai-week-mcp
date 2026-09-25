@@ -28,13 +28,21 @@ mcp = FastMCP(
     name=settings.server_name,
     instructions=(
         "Answers Swiss public-service questions grounded in official sources. "
-        "Use company_info for companies in the federal commercial register (Zefix) "
-        "and their SHAB publications. Use swiss_health_insurance_premiums for 2026 "
-        "KVG minimum premiums by age, municipality and deductible. Use "
-        "search_knowledge and get_source for the reviewed authority pages on health "
-        "insurance, the reference interest rate, foreign driving licences, school "
-        "holidays, waste and arrival registration. Every tool asks back when input "
-        "is ambiguous and says when a source is unavailable."
+        "Choose the most specific tool for the question first: company_info for Zefix "
+        "companies and SHAB publications; swiss_health_insurance_premiums for 2026 "
+        "KVG premiums; swiss_geo_search and swiss_geo_context for places and municipality "
+        "codes; swiss_reference_interest_rate and swiss_housing_info for renting; "
+        "get_driving_licence_exchange_info for foreign licence exchange; "
+        "swiss_school_holidays for school holidays; swiss_residence_permit_guidance "
+        "for migration; swiss_federal_political_rights for federal political rules; "
+        "swiss_import_parcel_vat for parcel import VAT; bfs_population for population; "
+        "opendata_search_datasets and opendata_dataset for open-data catalogues; "
+        "swiss_weather_forecast and swiss_weather_observations for weather. "
+        "Use search_knowledge only as a last resort when no specific tool covers the "
+        "question or the relevant specific tools return no applicable result. Use "
+        "get_source only to inspect a saved source when more context is needed. "
+        "Check tool results for dates, scope and conditions; ask for missing details "
+        "rather than guessing, and say when reliable source data is unavailable."
     ),
     lifespan=lifespan,
 )
