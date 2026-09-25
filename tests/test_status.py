@@ -5,9 +5,9 @@ from datetime import UTC, datetime, timedelta
 from starlette.testclient import TestClient
 
 from mcp_boilerplate.dashboard import server as dashboard
+from mcp_boilerplate.dashboard.status import get_status
 from mcp_boilerplate.knowledge import KnowledgeBase
 from mcp_boilerplate.sources import SOURCES
-from mcp_boilerplate.dashboard.status import get_status
 
 NOW = datetime(2026, 9, 24, tzinfo=UTC)
 

@@ -1,0 +1,18 @@
+{
+  "head" : {
+    "vars" : [
+      "d"
+    ]
+  },
+  "results" : {
+    "bindings" : [
+      {
+        "d" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#date",
+          "type" : "literal",
+          "value" : "2026-09-23"
+        }
+      }
+    ]
+  }
+}

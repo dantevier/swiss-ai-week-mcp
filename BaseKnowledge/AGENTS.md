@@ -47,6 +47,7 @@ Every response is a JSON envelope with exactly one of five states (CONTRACT.md �
 | `CHALLENGE.md` | what Swisscom asks, hard requirements, sample questions. **Source of truth for requirements** |
 | `CONTRACT.md` | tool surface, descriptions, envelope, measurements (§8), decisions and rejected alternatives (§9) |
 | `SOURCES.md` | the research: which authority decides what, traps, every source opened and verified |
+| `PORTFOLIO-EVAL.md` | evaluation of `malkreide/swiss-public-data-mcp`: source × availability matrix, findings and risks per source, what to port |
 | `coverage/*.toml` | coverage manifest: one row per theme × jurisdiction × subtopic, most-specific-wins |
 | `manifest.py` | validates the manifest; `--json` writes `data/coverage.json`; `--readme` prints the README coverage block |
 | `scripts/build_*.py` | build-time data: `places.json` (BFS + swisstopo + premium regions), `premiums_2026.json` (BAG) |

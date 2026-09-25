@@ -1,0 +1,108 @@
+{
+  "content": [
+    {
+      "meta": {
+        "id": "f814f790-f0d9-441f-8ebe-8850f8ab8040",
+        "creationDate": "2026-08-12T09:48:15.928Z",
+        "updateDate": "2026-08-13T22:36:36.144Z",
+        "rubric": "HR",
+        "subRubric": "HR03",
+        "language": "fr",
+        "registrationOffice": {
+          "id": "e15a629a-a08d-11e8-aa11-0050569d3c43",
+          "displayName": "Bundesamt für Justiz (BJ), Eidgenössisches Amt für das Handelsregister",
+          "street": "Bundesrain",
+          "streetNumber": "20",
+          "swissZipCode": "3003",
+          "town": "Bern",
+          "containsPostOfficeBox": false,
+          "postOfficeBox": null,
+          "municipalityId": null,
+          "uid": null
+        },
+        "publicationOriginator": null,
+        "publicationNumber": "HR03-1006731894",
+        "publicationState": "PUBLISHED",
+        "publicationDate": "2026-08-14T00:00:00.000Z",
+        "expirationDate": null,
+        "primaryTenantCode": "shab",
+        "onBehalfOf": null,
+        "invoiceAddressId": null,
+        "legalRemedy": null,
+        "cantons": [
+          "NE"
+        ],
+        "secondaryTenants": null,
+        "repeatedPublications": null,
+        "customsStampImages": [],
+        "title": {
+          "de": "[redigiert — siehe PROVENANCE.md]",
+          "en": "[redigiert — siehe PROVENANCE.md]",
+          "it": "[redigiert — siehe PROVENANCE.md]",
+          "fr": "[redigiert — siehe PROVENANCE.md]"
+        },
+        "dossierReference": null,
+        "copyDeadline": null
+      },
+      "links": [],
+      "attachments": [],
+      "content": null,
+      "commented": false
+    },
+    {
+      "meta": {
+        "id": "566da172-2075-4f84-b436-d5da63cb897c",
+        "creationDate": "2026-08-12T09:44:38.250Z",
+        "updateDate": "2026-08-13T22:36:36.416Z",
+        "rubric": "HR",
+        "subRubric": "HR03",
+        "language": "de",
+        "registrationOffice": {
+          "id": "e15a629a-a08d-11e8-aa11-0050569d3c43",
+          "displayName": "Bundesamt für Justiz (BJ), Eidgenössisches Amt für das Handelsregister",
+          "street": "Bundesrain",
+          "streetNumber": "20",
+          "swissZipCode": "3003",
+          "town": "Bern",
+          "containsPostOfficeBox": false,
+          "postOfficeBox": null,
+          "municipalityId": null,
+          "uid": null
+        },
+        "publicationOriginator": null,
+        "publicationNumber": "HR03-1006731743",
+        "publicationState": "PUBLISHED",
+        "publicationDate": "2026-08-14T00:00:00.000Z",
+        "expirationDate": null,
+        "primaryTenantCode": "shab",
+        "onBehalfOf": null,
+        "invoiceAddressId": null,
+        "legalRemedy": null,
+        "cantons": [
+          "TG"
+        ],
+        "secondaryTenants": null,
+        "repeatedPublications": null,
+        "customsStampImages": [],
+        "title": {
+          "de": "[redigiert — siehe PROVENANCE.md]",
+          "en": "[redigiert — siehe PROVENANCE.md]",
+          "it": "[redigiert — siehe PROVENANCE.md]",
+          "fr": "[redigiert — siehe PROVENANCE.md]"
+        },
+        "dossierReference": null,
+        "copyDeadline": null
+      },
+      "links": [],
+      "attachments": [],
+      "content": null,
+      "commented": false
+    }
+  ],
+  "total": 2284463,
+  "pageRequest": {
+    "sortOrders": [],
+    "page": 0,
+    "size": 2
+  }
+}

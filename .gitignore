@@ -255,7 +255,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # UV specific
-uv.lock
 
 # AI Tools
 .serena/

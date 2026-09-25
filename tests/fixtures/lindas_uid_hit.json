@@ -1,0 +1,1122 @@
+{
+  "head" : {
+    "vars" : [
+      "company",
+      "name",
+      "legalName",
+      "idType",
+      "idValue",
+      "lfCode",
+      "lfLabel",
+      "seat",
+      "bfs",
+      "street",
+      "zip",
+      "city",
+      "canton",
+      "purpose"
+    ]
+  },
+  "results" : {
+    "bindings" : [
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Swisscom (Suisse) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyUID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CHE101654423"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "de",
+          "type" : "literal",
+          "value" : "Aktiengesellschaft"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Swisscom (Suisse) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyUID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CHE101654423"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Société anonyme"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Swisscom (Suisse) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyCHID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CH03530169309"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "de",
+          "type" : "literal",
+          "value" : "Aktiengesellschaft"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Swisscom (Suisse) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyCHID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CH03530169309"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Société anonyme"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Swisscom (Suisse) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyEHRAID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "415941"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "de",
+          "type" : "literal",
+          "value" : "Aktiengesellschaft"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Swisscom (Suisse) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyEHRAID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "415941"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Société anonyme"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "it",
+          "type" : "literal",
+          "value" : "Swisscom (Svizzera) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyUID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CHE101654423"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "de",
+          "type" : "literal",
+          "value" : "Aktiengesellschaft"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "it",
+          "type" : "literal",
+          "value" : "Swisscom (Svizzera) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyUID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CHE101654423"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Société anonyme"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "it",
+          "type" : "literal",
+          "value" : "Swisscom (Svizzera) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyCHID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CH03530169309"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "de",
+          "type" : "literal",
+          "value" : "Aktiengesellschaft"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "it",
+          "type" : "literal",
+          "value" : "Swisscom (Svizzera) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyCHID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CH03530169309"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Société anonyme"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "it",
+          "type" : "literal",
+          "value" : "Swisscom (Svizzera) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyEHRAID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "415941"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "de",
+          "type" : "literal",
+          "value" : "Aktiengesellschaft"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "it",
+          "type" : "literal",
+          "value" : "Swisscom (Svizzera) SA"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyEHRAID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "415941"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Société anonyme"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "en",
+          "type" : "literal",
+          "value" : "Swisscom (Switzerland) Ltd"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyUID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CHE101654423"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "de",
+          "type" : "literal",
+          "value" : "Aktiengesellschaft"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "en",
+          "type" : "literal",
+          "value" : "Swisscom (Switzerland) Ltd"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyUID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CHE101654423"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Société anonyme"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "en",
+          "type" : "literal",
+          "value" : "Swisscom (Switzerland) Ltd"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyCHID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CH03530169309"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "de",
+          "type" : "literal",
+          "value" : "Aktiengesellschaft"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "en",
+          "type" : "literal",
+          "value" : "Swisscom (Switzerland) Ltd"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyCHID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "CH03530169309"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Société anonyme"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "en",
+          "type" : "literal",
+          "value" : "Swisscom (Switzerland) Ltd"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyEHRAID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "415941"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "de",
+          "type" : "literal",
+          "value" : "Aktiengesellschaft"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      },
+      {
+        "company" : {
+          "type" : "uri",
+          "value" : "https://register.ld.admin.ch/zefix/company/415941"
+        },
+        "name" : {
+          "xml:lang" : "en",
+          "type" : "literal",
+          "value" : "Swisscom (Switzerland) Ltd"
+        },
+        "legalName" : {
+          "type" : "literal",
+          "value" : "Swisscom (Schweiz) AG"
+        },
+        "idType" : {
+          "type" : "literal",
+          "value" : "CompanyEHRAID"
+        },
+        "idValue" : {
+          "type" : "literal",
+          "value" : "415941"
+        },
+        "lfCode" : {
+          "type" : "literal",
+          "value" : "0106"
+        },
+        "lfLabel" : {
+          "xml:lang" : "fr",
+          "type" : "literal",
+          "value" : "Société anonyme"
+        },
+        "seat" : {
+          "type" : "literal",
+          "value" : "Ittigen"
+        },
+        "bfs" : {
+          "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+          "type" : "literal",
+          "value" : "362"
+        },
+        "street" : {
+          "type" : "literal",
+          "value" : "Alte Tiefenaustrasse 6"
+        },
+        "zip" : {
+          "type" : "literal",
+          "value" : "3050"
+        },
+        "city" : {
+          "type" : "literal",
+          "value" : "Bern"
+        },
+        "canton" : {
+          "type" : "literal",
+          "value" : "BE"
+        },
+        "purpose" : {
+          "type" : "literal",
+          "value" : "Die Gesellschaft bezweckt die Erbringung von Fernmelde- und Rundfunkdiensten, Informatikdienstleistungen, wie insbesondere den Betrieb ausgelagerter Geschäftsprozesse und den Einsatz von Informationstechnologien, und von Beratungsleistungen sowie den Vertrieb von Produkten für Informationssysteme von verwandte Technologien, einschliesslich des Designs, der Entwicklung und der Lizenzierung von Software, Dienstleistungen im Personalbereich sowie das Anbieten von damit zusammenhängenden Produkten und Dienstleistungen. Sie kann alle Rechtsgeschäfte tätigen, die der Gesellschaftszweck mit sich bringt, namentlich Grundstücke erwerben, halten und veräussern, Mittel am Geld- und Kapitalmarkt aufnehmen und anlegen sowie Gesellschaften gründen, sich an Gesellschaften beteiligen oder auf andere Weise mit Dritten zusammenarbeiten. Sie kann ihren direkten oder indirekten Aktionären oder anderen Konzerngesellschaften Kredite gewähren, mit ihnen Cash Pooling Verträge abschliessen und für deren Verbindlichkeiten gegenüber Dritten Sicherheiten aller Art bestellen, auch wenn diese Kredite oder Sicherheiten im ausschliesslichen Interesse ihrer direkten oder indirekten Aktionäre oder anderer Konzerngesellschaften liegen und unentgeltlich gewährt wurden."
+        }
+      }
+    ]
+  }
+}
