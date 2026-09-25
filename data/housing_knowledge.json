@@ -1,0 +1,1368 @@
+{
+  "_meta": {
+    "note": "P0/P1 BWO/UFAB housing records. source_passage segments are verbatim excerpts; each segment must be found in the fetched source. fetched_at is written only by 'python scripts/import_housing.py --verify-sources' after every passage of that source matched.",
+    "parser_version": "manual-seed-1"
+  },
+  "sources": {
+    "S01": {
+      "url": "https://www.bwo.admin.ch/it/tasso-di-riferimento",
+      "format": "html",
+      "source_kind": "official_explanation",
+      "source_version_date": "2026-09-01",
+      "published_on": null,
+      "refresh_interval_seconds": 604800,
+      "fetched_at": "2026-09-24T17:27:29Z",
+      "language": "it"
+    },
+    "S02": {
+      "url": "https://www.bwo.admin.ch/it/newnsb/Ozmbl-Ca5Ee4",
+      "format": "html",
+      "source_kind": "official_publication",
+      "source_version_date": "2026-09-01",
+      "published_on": "2026-09-01",
+      "refresh_interval_seconds": 7776000,
+      "fetched_at": "2026-09-24T17:27:29Z",
+      "language": "it"
+    },
+    "S05": {
+      "url": "https://www.bwo.admin.ch/it/basi-giuridiche-diritto-di-locazione",
+      "format": "html",
+      "source_kind": "official_explanation",
+      "source_version_date": "2026-08-28",
+      "published_on": null,
+      "refresh_interval_seconds": 2592000,
+      "fetched_at": "2026-09-24T17:27:29Z",
+      "language": "it"
+    },
+    "S09": {
+      "url": "https://www.bwo.admin.ch/dam/it/sd-web/fvlvq2Ka5cEj/italienisch.pdf",
+      "format": "pdf",
+      "source_kind": "official_guide",
+      "source_version_date": "2022-09-01",
+      "published_on": null,
+      "refresh_interval_seconds": 2592000,
+      "fetched_at": "2026-09-24T17:27:30Z",
+      "language": "it"
+    },
+    "S11": {
+      "language": "de",
+      "url": "https://www.bwo.admin.ch/de/referenzzinssatz",
+      "format": "html",
+      "source_kind": "official_explanation",
+      "source_version_date": "2026-09-01",
+      "published_on": null,
+      "refresh_interval_seconds": 604800,
+      "fetched_at": "2026-09-24T17:27:32Z"
+    },
+    "S12": {
+      "language": "fr",
+      "url": "https://www.bwo.admin.ch/fr/taux-de-reference",
+      "format": "html",
+      "source_kind": "official_explanation",
+      "source_version_date": "2026-09-01",
+      "published_on": null,
+      "refresh_interval_seconds": 604800,
+      "fetched_at": "2026-09-24T17:27:32Z"
+    },
+    "S02-de": {
+      "language": "de",
+      "url": "https://www.bwo.admin.ch/de/newnsb/Ozmbl-Ca5Ee4",
+      "format": "html",
+      "source_kind": "official_publication",
+      "source_version_date": "2026-09-01",
+      "published_on": "2026-09-01",
+      "refresh_interval_seconds": 7776000,
+      "fetched_at": "2026-09-24T17:27:33Z"
+    },
+    "S02-fr": {
+      "language": "fr",
+      "url": "https://www.bwo.admin.ch/fr/newnsb/Ozmbl-Ca5Ee4",
+      "format": "html",
+      "source_kind": "official_publication",
+      "source_version_date": "2026-09-01",
+      "published_on": "2026-09-01",
+      "refresh_interval_seconds": 7776000,
+      "fetched_at": "2026-09-24T17:27:33Z"
+    },
+    "S05-de": {
+      "language": "de",
+      "url": "https://www.bwo.admin.ch/de/rechtsgebiet-mietrecht",
+      "format": "html",
+      "source_kind": "official_explanation",
+      "source_version_date": "2026-08-28",
+      "published_on": null,
+      "refresh_interval_seconds": 2592000,
+      "fetched_at": "2026-09-24T17:27:33Z"
+    },
+    "S05-fr": {
+      "language": "fr",
+      "url": "https://www.bwo.admin.ch/fr/base-juridique-droit-du-bail",
+      "format": "html",
+      "source_kind": "official_explanation",
+      "source_version_date": "2026-08-28",
+      "published_on": null,
+      "refresh_interval_seconds": 2592000,
+      "fetched_at": "2026-09-24T17:27:34Z"
+    },
+    "S09-de": {
+      "language": "de",
+      "url": "https://www.bwo.admin.ch/dam/de/sd-web/gDp2o24J3ojd/A5_wohnen_d_220825_web_DE.pdf",
+      "format": "pdf",
+      "source_kind": "official_guide",
+      "source_version_date": "2026-01-29",
+      "published_on": null,
+      "refresh_interval_seconds": 2592000,
+      "fetched_at": "2026-09-24T17:27:35Z"
+    },
+    "S09-fr": {
+      "language": "fr",
+      "url": "https://www.bwo.admin.ch/dam/fr/sd-web/91P4EJuLuPSK/franzoesisch.pdf",
+      "format": "pdf",
+      "source_kind": "official_guide",
+      "source_version_date": "2022-09-01",
+      "published_on": null,
+      "refresh_interval_seconds": 2592000,
+      "fetched_at": "2026-09-24T17:27:38Z"
+    },
+    "S10": {
+      "language": "rm",
+      "url": "https://www.bwo.admin.ch/dam/it/sd-web/6d0VmCMACg0i/raetoromanisch.pdf",
+      "format": "pdf",
+      "source_kind": "official_guide",
+      "source_version_date": "2021-03-10",
+      "published_on": null,
+      "refresh_interval_seconds": 2592000,
+      "fetched_at": "2026-09-24T17:27:41Z"
+    }
+  },
+  "records": [
+    {
+      "item_key": "reference_rate:2026-09-01",
+      "record_kind": "rate_publication",
+      "topic": "reference_rate",
+      "source": "S02",
+      "source_locator": "Comunicato stampa del 1 settembre 2026, corpo del testo",
+      "title": "Tasso ipotecario di riferimento: pubblicazione del 1 settembre 2026",
+      "summary": "Il tasso di riferimento resta all'1,25 % e si applica dal 2 settembre 2026; tasso medio 1,31 % al 30 giugno 2026. Valore invariato dal 2 settembre 2025. Prossimo comunicato previsto il 1 dicembre 2026.",
+      "source_passage": [
+        "Rispetto al trimestre precedente, il tasso d’interesse medio, calcolato al 30 giugno 2026, è rimasto identico e si attesta ancora all’1,31 %. Con l’arrotondamento commerciale, il tasso ipotecario di riferimento, determinante per stabilire gli affitti, continua quindi ad essere dell’1,25 % e si applica a partire dal 2 settembre 2026.",
+        "Dal 2 settembre 2025 il tasso ipotecario di riferimento è dell’1,25 % ed è rimasto invariato rispetto al trimestre precedente: perciò dall’ultima pubblicazione non sussiste il diritto ad aumenti o a diminuzioni della pigione.",
+        "Il tasso ipotecario di riferimento e il tasso d’interesse medio in base al quale viene calcolato sono pubblicati trimestralmente dall’Ufficio federale delle abitazioni (UFAB) sul sito www.tassodiriferimento.admin.ch. Inoltre il pubblico viene informato mediante comunicati stampa; il prossimo è previsto il 1° dicembre 2026."
+      ],
+      "data": {
+        "reference_rate_bp": 125,
+        "average_rate_bp": 131,
+        "average_rate_as_of": "2026-06-30",
+        "value_unchanged_since": "2025-09-02",
+        "next_publication_on": "2026-12-01",
+        "official_publication_frequency": "quarterly"
+      },
+      "conditions": {
+        "scope": "Tasso nazionale unico per gli adeguamenti delle pigioni; nessun contesto cantonale richiesto.",
+        "not_a_forecast": "next_publication_on è una data annunciata, non un valore previsto.",
+        "history": "Il record attesta solo questa pubblicazione e value_unchanged_since; non costituisce uno storico trimestrale completo."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": "2026-09-02",
+      "applicability_verified": true,
+      "language": "it"
+    },
+    {
+      "item_key": "reference_rate:method",
+      "record_kind": "guidance",
+      "topic": "reference_rate",
+      "source": "S01",
+      "source_locator": "Introduzione; sezione 'Che importanza ha il tasso guida per il tasso di interesse di riferimento?'",
+      "title": "Come si determina il tasso ipotecario di riferimento",
+      "summary": "Il tasso di riferimento è il tasso ipotecario medio delle banche, arrotondato al quarto di punto percentuale più vicino. Per le pigioni conta il tasso di riferimento, non il tasso guida della BNS, che incide solo indirettamente e con ritardo.",
+      "source_passage": [
+        "Per gli adeguamenti delle pigioni in base ai cambiamenti del tasso ipotecario, da settembre del 2008 è in vigore il tasso di riferimento ipotecario, che corrisponde alla media dei tassi ipotecari praticati dalle banche ed è ogni volta calcolato arrotondando il tasso ipotecario medio al quarto di punto percentuale più vicino.",
+        "Il fattore determinante per un adeguamento dei canoni di locazione in Svizzera non è il tasso guida, bensì il tasso ipotecario di riferimento. Questo tasso viene calcolato dalla BNS in base al volume delle ipoteche in essere che le banche svizzere, soggette all’obbligo di notifica, le comunicano a cadenza trimestrale. Si può così determinare il tasso d’interesse medio che – arrotondato per difetto o per eccesso a un quarto di punto percentuale – dà il tasso ipotecario di riferimento. Dal momento che nel calcolo confluiscono anche i tassi fissi dei mutui a lungo termine, il tasso ipotecario di riferimento oscilla lentamente, e questo sia al rialzo che al ribasso. Sui canoni di locazione, quindi, la variazione del tasso guida si ripercuoterà soltanto indirettamente e con ritardo."
+      ],
+      "data": {
+        "in_force_since": "2008-09",
+        "rounding_step_bp": 25,
+        "basis": "average_mortgage_rate_of_banks",
+        "data_reporting_frequency": "quarterly",
+        "distinct_from": "snb_policy_rate"
+      },
+      "conditions": {
+        "not_a_forecast": "Non ricavare previsioni del tasso di riferimento da variazioni del tasso guida BNS."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "rent_adjustment:quarter_point",
+      "record_kind": "faq",
+      "topic": "rent_adjustment",
+      "source": "S01",
+      "source_locator": "Domande e risposte, domanda 1",
+      "title": "Variazione del tasso di riferimento di 0,25 punti",
+      "summary": "Con +0,25 punti l'affitto può essere aumentato del 3 %; con -0,25 punti il locatario ha in linea di principio diritto a una riduzione del 2,91 %. Solo l'affitto netto è interessato; il calcolo dipende dal singolo contratto.",
+      "source_passage": [
+        "In caso di variazione del tasso d’interesse di riferimento di 0,25 punti percentuali, l’affitto può essere adeguato. Se il tasso d’interesse di riferimento aumenta di 0,25 punti percentuali, l’affitto può essere aumentato del 3% (cfr. art. 13 cpv. 1 lett. c OLAL). Se il tasso d’interesse di riferimento diminuisce di 0,25 punti percentuali, i locatari hanno in linea di principio diritto a una riduzione dell’affitto del 2,91%. In caso di variazioni superiori a 0,25 punti percentuali si applicano altre aliquote, cfr. domanda 2. Inoltre, è bene sapere che ci sono fattori di costo aggiuntivi che influenzano l’importo dell’affitto (cfr. anche domande 3 e 6). Pertanto eventuali adeguamenti dell’affitto possono essere calcolati solo in base al singolo rapporto contrattuale. A causa dell’andamento del tasso d’interesse di riferimento, solo l’affitto (netto) può essere adeguato. Ciò non tange le spese di riscaldamento né le spese accessorie, concordate separatamente."
+      ],
+      "data": {
+        "rate_change_bp": 25,
+        "rent_increase_up_to_bp": 300,
+        "rent_reduction_in_principle_bp": 291,
+        "legal_basis": "SR 221.213.11 art. 13 para. 1 let. c"
+      },
+      "conditions": {
+        "applies_to": "Solo affitto netto; escluse spese di riscaldamento e accessorie concordate separatamente.",
+        "individual_calculation": "L'adeguamento effettivo si calcola solo sul singolo rapporto contrattuale; altri fattori di costo possono incidere (domande 3 e 6).",
+        "larger_changes": "Per variazioni superiori a 0,25 punti valgono altre aliquote (domanda 2).",
+        "exceptions": "Non applicabile ai regimi esclusi della domanda 9."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "rent_adjustment:large_change",
+      "record_kind": "faq",
+      "topic": "rent_adjustment",
+      "source": "S01",
+      "source_locator": "Domande e risposte, domanda 2",
+      "title": "Differenza di oltre 0,25 punti rispetto al tasso corrente",
+      "summary": "Se l'affitto si basa su un tasso che differisce di 0,5 punti o più da quello in vigore, l'adeguamento può essere maggiore secondo aliquote pubblicate; contano anche altri fattori di costo.",
+      "source_passage": [
+        "È possibile che l’affitto si basi su un tasso d’interesse di riferimento che differisce di 0,5 punti percentuali o più dal tasso di riferimento attualmente in vigore. Ad esempio, se il tasso d’interesse di riferimento attuale è dell’1,5%, ma l’affitto si basa sul 2%. In tal caso è possibile adeguare l’affitto in misura maggiore. Le aliquote corrispondenti sono pubblicate qui o qui. Inoltre, ci sono altri fattori di costo che influenzano l’importo dell’affitto (cfr. anche domande 1, 3 e 6)."
+      ],
+      "data": {
+        "min_difference_bp": 50
+      },
+      "conditions": {
+        "rates_not_imported": "Le aliquote per differenze maggiori sono in documenti collegati non ancora acquisiti; non calcolarle per estrapolazione.",
+        "individual_calculation": "Altri fattori di costo incidono sull'importo (domande 1, 3 e 6)."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "rent_adjustment:contract_basis",
+      "record_kind": "faq",
+      "topic": "rent_adjustment",
+      "source": "S01",
+      "source_locator": "Domande e risposte, domanda 3",
+      "title": "Su quale tasso di riferimento si basa l'affitto attuale",
+      "summary": "Di norma è il tasso indicato nel contratto, in vigore alla sua conclusione; se l'affitto è stato poi adeguato per variazioni del tasso senza contestazione, vale il tasso di quell'adeguamento.",
+      "source_passage": [
+        "Solitamente il valore del tasso ipotecario di riferimento preso come base per stabilire l’affitto è indicato nel contratto. Viene applicato il tasso in vigore al momento della conclusione del contratto. Se però l’affitto è stato adeguato nel tempo a causa di un aumento o di una diminuzione del tasso ipotecario di riferimento, e questo adeguamento non è stato contestato, va adattato al valore attuale del tasso di riferimento."
+      ],
+      "data": {
+        "default_basis": "rate_stated_in_contract_at_conclusion",
+        "override_basis": "last_uncontested_rate_based_adjustment"
+      },
+      "conditions": {
+        "override_requires": "Adeguamento dovuto al tasso di riferimento e non contestato."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "rent_adjustment:request_reduction",
+      "record_kind": "faq",
+      "topic": "rent_adjustment",
+      "source": "S01",
+      "source_locator": "Domande e risposte, domanda 4",
+      "title": "Come richiedere una riduzione dell'affitto",
+      "summary": "La richiesta va al proprietario, preferibilmente per raccomandata; il proprietario risponde entro 30 giorni. In caso di rifiuto, compensazione o mancata risposta ci si può rivolgere all'autorità di conciliazione entro 30 giorni.",
+      "source_passage": [
+        "Se sono soddisfatte le condizioni per una riduzione dell'affitto, è possibile presentare la richiesta al proprietario, preferibilmente tramite raccomandata. Dopo l'invio della lettera, il proprietario deve rispondere alla richiesta entro 30 giorni. Può approvare la richiesta e ridurre l'affitto. Può anche respingere la richiesta o compensare la riduzione con altri fattori (cfr. domanda 6). Se il proprietario respinge la richiesta o la compensa, deve spiegarne il motivo. Se non siete d'accordo con la risposta – o se non ricevete alcuna risposta entro 30 giorni – potete rivolgervi all'autorità di conciliazione competente (cfr. domanda 7). È importante farlo entro 30 giorni, altrimenti dovrete ricominciare da capo e inviare una nuova richiesta al proprietario. In altre parole, dovete presentare la vostra richiesta di riduzione dell'affitto all'autorità di conciliazione entro e non oltre 60 giorni dall'invio della richiesta iniziale al proprietario."
+      ],
+      "data": {
+        "steps": [
+          {
+            "days": 30,
+            "trigger": "request_sent_to_landlord",
+            "procedure": "landlord_response"
+          },
+          {
+            "days": 30,
+            "trigger": "response_disputed_or_missing",
+            "procedure": "file_with_conciliation_authority"
+          }
+        ],
+        "stated_outer_limit_days_from_request": 60,
+        "on_missed_deadline": "send_new_request_to_landlord"
+      },
+      "conditions": {
+        "prerequisite": "Devono essere soddisfatte le condizioni per una riduzione.",
+        "not_a_calculator": "Il computo dei termini dipende dal caso procedurale; non derivare una scadenza generale di 60 giorni dall'invio.",
+        "local_authority": "L'autorità di conciliazione è competente localmente; indirizzi non importati."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "rent_adjustment:increase_form",
+      "record_kind": "faq",
+      "topic": "rent_adjustment",
+      "source": "S01",
+      "source_locator": "Domande e risposte, domanda 5",
+      "title": "Requisiti formali per l'aumento dell'affitto",
+      "summary": "L'aumento per incremento del tasso va comunicato e motivato con un modulo approvato dal Cantone almeno dieci giorni prima dell'inizio del termine di disdetta, e non può valere prima del termine di disdetta successivo.",
+      "source_passage": [
+        "Quando il proprietario decide di aumentare l’affitto in virtù dell’incremento del tasso ipotecario di riferimento, deve tenere conto di alcuni aspetti formali (cfr. art. 269d e 266c CO): il proprietario deve comunicare e motivare all’inquilino l’aumento dell’affitto almeno dieci giorni prima dell’inizio del termine di disdetta (come minimo 3 mesi) tramite un modulo approvato dal Cantone (quindi in totale come minimo 3 mesi e 10 giorni prima); il canone non può essere aumentato prima del termine di disdetta successivo."
+      ],
+      "data": {
+        "days": 10,
+        "trigger": "start_of_notice_period",
+        "direction": "before",
+        "min_notice_period_months_as_stated": 3,
+        "procedure": "reasoned_notice_on_canton_approved_form",
+        "earliest_effect": "next_termination_date",
+        "legal_basis": "SR 220 art. 269d, 266c"
+      },
+      "conditions": {
+        "notice_period": "Il termine di disdetta dipende dal contratto; la pagina indica 'come minimo 3 mesi' citando art. 266c CO.",
+        "tenancy_type": "La pagina non distingue qui tra locali abitativi e commerciali; non estendere il minimo di 3 mesi ad altri tipi di locazione senza verifica.",
+        "form": "Il modulo è approvato dal Cantone; il modello cantonale non è importato."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "rent_adjustment:other_factors",
+      "record_kind": "faq",
+      "topic": "rent_adjustment",
+      "source": "S01",
+      "source_locator": "Domande e risposte, domande 5 e 6",
+      "title": "Altri fattori di costo nell'adeguamento dell'affitto",
+      "summary": "Oltre al tasso, il proprietario può far valere altri costi e il rincaro fino al 40 % dell'aumento dell'indice dei prezzi al consumo; l'inquilino può invocare vizi di forma, calcoli errati, reddito eccessivo o riduzioni di costi.",
+      "source_passage": [
+        "Il proprietario ha inoltre il diritto di aggiungere altri fattori di costo (p.es. tasse) o altri costi derivati dall’andamento dell’inflazione (fino a un massimo del 40% dell’aumento dell’indice nazionale dei prezzi al consumo).",
+        "Dipende dal singolo contratto se e come l’inquilino può opporsi. Di seguito sono elencate alcune possibili ragioni: l’aumento non è stato indicato correttamente a livello formale perché, ad esempio, non è stato utilizzato un modulo approvato dal Cantone o perché esso non conteneva la giustificazione (cfr. anche domanda 5); l’aumento non è stato calcolato correttamente perché ci si è basati su un valore errato del tasso ipotecario di riferimento o della percentuale che è possibile aggiungere al canone (quota trasferibile) (cfr. anche domande 1, 2 e 5); l’aumento porta a un reddito (netto) eccessivo o il nuovo affitto non è più in linea con la prassi locale e della zona circostante; determinati costi, anche legati all’inflazione, sono diminuiti (fino a un massimo del 40% della riduzione dell’indice nazionale dei prezzi al consumo)."
+      ],
+      "data": {
+        "inflation_pass_through_max_bp_of_cpi_change": 4000,
+        "tenant_objection_grounds": [
+          "formal_defect",
+          "calculation_error",
+          "excessive_return_or_above_local_rent",
+          "offsetting_cost_reductions"
+        ]
+      },
+      "conditions": {
+        "individual_contract": "Se e come opporsi dipende dal singolo contratto; l'elenco è esemplificativo ('alcune possibili ragioni')."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "rent_adjustment:contest_increase",
+      "record_kind": "faq",
+      "topic": "rent_adjustment",
+      "source": "S01",
+      "source_locator": "Domande e risposte, domanda 7",
+      "title": "Termine per contestare un aumento dell'affitto",
+      "summary": "L'inquilino può contestare l'aumento presso l'autorità di conciliazione competente localmente entro 30 giorni dalla ricezione della notifica.",
+      "source_passage": [
+        "In Svizzera non c’è un controllo generalizzato dei canoni di affitto da parte dello Stato, e le parti del contratto di locazione devono quindi agire in prima persona. L’inquilino può pertanto contestare l’aumento presso l’autorità di conciliazione competente a livello locale entro 30 giorni da quando riceve la notifica dell’aumento (cfr. art. 270b CO)"
+      ],
+      "data": {
+        "days": 30,
+        "trigger": "increase_notification",
+        "procedure": "contest_at_local_conciliation_authority",
+        "legal_basis": "SR 220 art. 270b"
+      },
+      "conditions": {
+        "local_authority": "L'autorità competente dipende dal luogo; indirizzi non importati (P2).",
+        "no_state_control": "Nessun controllo statale generalizzato: le parti devono agire in prima persona."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "rent_adjustment:exceptions",
+      "record_kind": "faq",
+      "topic": "rent_adjustment",
+      "source": "S01",
+      "source_locator": "Domande e risposte, domanda 9",
+      "title": "Contratti a cui il tasso di riferimento non si applica",
+      "summary": "Il tasso di riferimento non si applica ad affitti indicizzati, scalari, sussidiati e agli alloggi di lusso (appartamenti e case unifamiliari con almeno sei stanze esclusa la cucina).",
+      "source_passage": [
+        "Il tasso di interesse di riferimento è determinante per gli adeguamenti dell'affitto di contratti esistenti. Tuttavia esso non è applicabile a tutti i contratti di locazione, essendo esclusi affitti indicizzati, affitti scalari, affitti sussidiati e unifamiliari di lusso. Affitto indicizzato: Nel caso dell’affitto indicizzato, le parti concordano che l’affitto debba seguire l’andamento dell’indice nazionale dei prezzi al consumo. Durante una durata contrattuale fissa di almeno cinque anni, tutte le altre opzioni di adeguamento dell’affitto sono generalmente escluse. Affitto scalare: in caso di affitto scalare, l'affitto aumenta automaticamente nelle proporzioni concordate nel contratto di affitto, alle date indicate. Appartamenti di lusso e case unifamiliari con almeno sei stanze (esclusa la cucina): Gli affitti degli appartamenti di lusso possono essere concordati liberamente. Affitto sussidiati: Quando un alloggio è sussidiato dal settore pubblico, è soggetto a controlli ufficiali durante il periodo del sussidio, secondo sue regole. L'affitto è spesso calcolato sulla base dei costi."
+      ],
+      "data": {
+        "excluded_regimes": [
+          {
+            "regime": "indexed",
+            "min_fixed_term_years": 5
+          },
+          {
+            "regime": "graduated"
+          },
+          {
+            "regime": "luxury",
+            "min_rooms_excluding_kitchen": 6
+          },
+          {
+            "regime": "subsidised"
+          }
+        ]
+      },
+      "conditions": {
+        "scope": "Riguarda gli adeguamenti dell'affitto di contratti esistenti.",
+        "hedged": "Per l'affitto indicizzato l'esclusione delle altre opzioni è 'generalmente'; per il sussidiato il calcolo sui costi è 'spesso'."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "jurisdiction:tenancy",
+      "record_kind": "jurisdiction",
+      "topic": "jurisdiction",
+      "source": "S05",
+      "source_locator": "Diritto di locazione come competenza della Confederazione; Intervenire tramite il diritto pubblico",
+      "title": "Competenze federali e cantonali nel diritto di locazione",
+      "summary": "La Confederazione disciplina la locazione in modo esaustivo nel CO; i Cantoni possono emanare norme civili solo dove il CO lo riserva (es. forma delle garanzie, modulo della pigione iniziale) e possono intervenire indirettamente tramite il diritto pubblico.",
+      "source_passage": [
+        "La locazione è contemplata all’interno del CO ed è stata quindi a sua volta già disciplinata in modo esaustivo da parte della Confederazione (art. 253 segg. CO). Ne consegue che il rilascio di disposizioni cantonali sulla locazione è consentito solo se il CO lo prevede espressamente, ovvero se esiste una corrispondente riserva legislativa che conferisce ai Cantoni una propria competenza normativa. Ad oggi, esistono solo poche riserve di questo tipo; i Cantoni possono ad esempio emanare disposizioni complementari relative alla forma delle garanzie concesse ai locatori (art. 257e cpv. 4 CO) e introdurre un modulo per l’indicazione della pigione iniziale (art. 270 cpv. 2 CO).",
+        "Al contrario, è concesso ai Cantoni di servirsi del diritto pubblico per intervenire in questioni legate alla locazione e avere quindi un’influenza, seppur indiretta, sull’applicabilità delle disposizioni all’interno del CO (art. 6 CC)."
+      ],
+      "data": {
+        "federal_basis": "SR 220 art. 253 ff.",
+        "cantonal_civil_reserves_examples": [
+          "SR 220 art. 257e para. 4",
+          "SR 220 art. 270 para. 2"
+        ],
+        "cantonal_public_law": "SR 210 art. 6"
+      },
+      "conditions": {
+        "publisher_vs_jurisdiction": "BWO/UFAB è l'editore federale; non implica che ogni regola sia esclusivamente federale.",
+        "reserves_list": "Le riserve citate sono esempi ('ad esempio'), non un elenco completo."
+      },
+      "jurisdiction_level": "mixed",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "deposit:residential",
+      "record_kind": "guidance",
+      "topic": "deposit",
+      "source": "S09",
+      "source_locator": "Opuscolo 'Abitare in Svizzera' (it), pagina PDF 12 (stampata 10), paragrafo 'Cauzione'",
+      "title": "Cauzione per l'appartamento",
+      "summary": "Di norma l'inquilino versa una garanzia di al massimo tre canoni mensili su un conto deposito a suo nome, restituita con gli interessi dopo la riconsegna. Nelle cooperative si acquistano di regola quote invece del deposito.",
+      "source_passage": [
+        "Chi ha stipulato un contratto di locazione è di norma tenuto a pagare un determinato importo come garanzia. Questo importo viene chiamato cauzione o deposito in alcune regioni, può ammontare a un massimo di tre canoni mensili e viene versato su uno speciale conto bancario (un conto deposito di garanzia), che è a nome dell’inquilino. Una volta riconsegnato l’appartamento, all’inquilino viene restituito il deposito compresi gli interessi. Nelle cooperative d’abitazione, l’inquilino di regola non paga un deposito ma acquista certificati azionari."
+      ],
+      "data": {
+        "max_monthly_rents": 3,
+        "account_holder": "tenant",
+        "account_type": "rent_deposit_account",
+        "refund": "after_move_out_with_interest",
+        "cooperative_alternative": "membership_shares"
+      },
+      "conditions": {
+        "tenancy_type": "Guida per l'abitazione; non applicare automaticamente il limite ai locali commerciali.",
+        "hedged": "'di norma' e 'di regola' nel testo; guida divulgativa, non estratto di legge.",
+        "cantonal_reserve": "I Cantoni possono emanare disposizioni complementari sulla forma delle garanzie (vedi jurisdiction:tenancy)."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "handover:incoming",
+      "record_kind": "guidance",
+      "topic": "handover",
+      "source": "S09",
+      "source_locator": "Opuscolo 'Abitare in Svizzera' (it), pagina PDF 12 (stampata 10), paragrafo 'Trasferirsi nel nuovo appartamento'",
+      "title": "Presa in consegna dell'appartamento",
+      "summary": "Prima del trasferimento proprietario e inquilino controllano insieme l'appartamento e annotano in un verbale scritto tutti i difetti, anche piccoli.",
+      "source_passage": [
+        "L’inquilino ha il diritto di trasferirsi in un appartamento pulito e abitabile. Prima del trasferimento avviene la presa in consegna. Il proprietario e l’inquilino controllano assieme lo stato dell’appartamento e annotano per iscritto, in un verbale, gli eventuali difetti. Ciò vale anche per piccoli danni, come una presa della corrente difettosa o uno specchio del bagno danneggiato."
+      ],
+      "data": {
+        "document": "written_handover_report",
+        "includes_minor_damage": true
+      },
+      "conditions": {
+        "nature": "Guida divulgativa; gli esempi di danni non sono un elenco esaustivo."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "utilities:advance_settlement",
+      "record_kind": "guidance",
+      "topic": "utilities",
+      "source": "S09",
+      "source_locator": "Opuscolo 'Abitare in Svizzera' (it), pagina PDF 13 (stampata 11), paragrafo 'Pigione e spese accessorie'",
+      "title": "Spese accessorie fatturate in acconto",
+      "summary": "Se le spese accessorie sono fatturate in acconto, il proprietario deve redigere un conteggio dettagliato almeno una volta all'anno; ne può derivare un conguaglio o un rimborso.",
+      "source_passage": [
+        "Quando vengono fatturate in acconto, il proprietario ha l’obbligo di redigere un conteggio particolareggiato almeno una volta all’anno. È possibile che l’inquilino debba pagare una somma supplementare o che gli venga restituito il denaro pagato in eccesso. Il conteggio delle spese accessorie deve essere sempre controllato scrupolosamente."
+      ],
+      "data": {
+        "billing_mode": "advance_payments",
+        "statement_frequency": "at_least_yearly",
+        "outcomes": [
+          "additional_payment",
+          "refund"
+        ]
+      },
+      "conditions": {
+        "billing_mode_only": "Vale per spese fatturate in acconto; il proprietario può fatturarle in diversi modi."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "defects:notification",
+      "record_kind": "guidance",
+      "topic": "defects",
+      "source": "S09",
+      "source_locator": "Opuscolo 'Abitare in Svizzera' (it), pagina PDF 16 (stampata 14), paragrafo 'Quando si rompe qualcosa'",
+      "title": "Guasti e danni nell'appartamento",
+      "summary": "Piccole riparazioni e pulizie sono a carico dell'inquilino; i danni maggiori vanno segnalati subito al portinaio o al proprietario, per iscritto e preferibilmente per raccomandata se non intervengono.",
+      "source_passage": [
+        "Riparazioni o pulizie semplici, come la sostituzione del filtro della cappa aspirante, di una teglia o del tubo della doccia devono essere effettuate e pagate dall’inquilino. In caso di danni maggiori bisogna informare immediatamente il portinaio o il proprietario. Se questi non intervengono, è consigliabile comunicare i danni per iscritto e preferibilmente con una raccomandata. Se è l’inquilino ad aver causato un danno, deve almeno in parte contribuire ai costi. Se non ne è responsabile, i costi vengono assunti dal proprietario."
+      ],
+      "data": {
+        "minor_repairs_by": "tenant",
+        "major_damage_notification": "immediate_to_caretaker_or_landlord",
+        "escalation": "written_preferably_registered_mail"
+      },
+      "conditions": {
+        "examples_only": "Gli esempi di piccola manutenzione non sono una regola universale sulla ripartizione dei costi.",
+        "cost_allocation": "Dipende dalla responsabilità dell'inquilino per il danno."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "alterations:permission",
+      "record_kind": "guidance",
+      "topic": "alterations",
+      "source": "S09",
+      "source_locator": "Opuscolo 'Abitare in Svizzera' (it), pagina PDF 15 (stampata 13), capitolo 'Abitare'",
+      "title": "Modifiche all'appartamento",
+      "summary": "Per modificare l'appartamento (es. dipingere, cambiare tappeti, installare una lavatrice) serve l'autorizzazione scritta del proprietario.",
+      "source_passage": [
+        "Chi vuole cambiare qualcosa nell’appartamento, ad esempio dipingere le pareti, sostituire i tappeti o montare una lavatrice, necessita dell’autorizzazione scritta del proprietario."
+      ],
+      "data": {
+        "requirement": "landlord_written_consent"
+      },
+      "conditions": {
+        "examples_only": "Gli interventi citati sono esempi."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "termination:tenant",
+      "record_kind": "guidance",
+      "topic": "termination",
+      "source": "S09",
+      "source_locator": "Opuscolo 'Abitare in Svizzera' (it), pagina PDF 19 (stampata 17), capitolo 'Disdetta e trasloco'",
+      "title": "Disdetta da parte dell'inquilino",
+      "summary": "La disdetta dell'inquilino va data per iscritto, preferibilmente per raccomandata; per coppie sposate firmano entrambi i coniugi. Per lasciare fuori scadenza si può proporre un nuovo inquilino idoneo, altrimenti si paga fino alla scadenza.",
+      "source_passage": [
+        "Il contratto può essere disdetto sia dall’inquilino che dal proprietario. Le scadenze da rispettare sono riportate nel contratto. Se è l’inquilino a disdire, deve comunicarlo per iscritto e preferibilmente con una raccomandata. Nel caso di coppie sposate la disdetta è valida solo se entrambi i coniugi firmano l’apposita lettera. Chi vuole lasciare l’appartamento al di fuori delle scadenze convenute nel contratto può proporre al proprietario un nuovo inquilino, disposto a subentrare nel contratto di locazione. Il proprietario ha circa un mese di tempo per verificare se i candidati soddisfano le condizioni per una cessione del contratto. Se non le soddisfano, l’inquilino deve pagare il canone fino alla scadenza pattuita nel contratto."
+      ],
+      "data": {
+        "form": "written_preferably_registered_mail",
+        "married_couples": "both_spouses_sign",
+        "early_exit": "propose_replacement_tenant",
+        "landlord_review_period_as_stated": "about_one_month"
+      },
+      "conditions": {
+        "deadlines": "Le scadenze sono quelle del contratto; nessun termine generale importato.",
+        "early_exit_condition": "Se i candidati non soddisfano le condizioni, il canone è dovuto fino alla scadenza pattuita.",
+        "approximate": "'circa un mese' è indicativo, non un termine fisso."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "termination:landlord",
+      "record_kind": "guidance",
+      "topic": "termination",
+      "source": "S09",
+      "source_locator": "Opuscolo 'Abitare in Svizzera' (it), pagina PDF 19 (stampata 17), capitolo 'Disdetta e trasloco'",
+      "title": "Disdetta da parte del proprietario",
+      "summary": "Il proprietario deve disdire con modulo ufficiale (per coppie sposate, due buste separate). Chi riceve la disdetta ha 30 giorni per contestarla per iscritto presso l'autorità di conciliazione.",
+      "source_passage": [
+        "Se è il proprietario a disdire, deve utilizzare un modulo ufficiale. Nel caso di coppie sposate, entrambi i coniugi ricevono un modulo in buste separate. Chi riceve la disdetta, ha 30 giorni di tempo per contestarla per iscritto presso l’autorità di conciliazione."
+      ],
+      "data": {
+        "form": "official_form",
+        "married_couples": "separate_form_per_spouse",
+        "days": 30,
+        "trigger": "termination_received",
+        "procedure": "contest_in_writing_at_conciliation_authority"
+      },
+      "conditions": {
+        "local_authority": "Autorità di conciliazione competente localmente; indirizzi non importati (P2).",
+        "nature": "Guida divulgativa, non estratto di legge."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "handover:outgoing",
+      "record_kind": "guidance",
+      "topic": "handover",
+      "source": "S09",
+      "source_locator": "Opuscolo 'Abitare in Svizzera' (it), pagina PDF 19 (stampata 17), paragrafo 'Restituire l'appartamento'",
+      "title": "Riconsegna dell'appartamento",
+      "summary": "Alla riconsegna proprietario e inquilino controllano insieme l'appartamento e annotano i difetti, anche piccoli, nel verbale; firmando, l'inquilino accetta il contenuto e gli eventuali costi.",
+      "source_passage": [
+        "Al momento della riconsegna, i proprietari e gli inquilini controllano insieme lo stato dell’appartamento e annotano per iscritto gli eventuali difetti nel verbale (compresi i piccoli danni!) Assieme si accordano su chi dovrà pagare eventuali riparazioni. Le associazioni di inquilini informano sui danni per i quali sono ritenuti responsabili gli inquilini. È importante che questi ultimi comprendano bene ogni singolo punto del verbale perché, firmando, danno il proprio consenso e devono poi assumersi eventuali costi."
+      ],
+      "data": {
+        "document": "written_handover_report",
+        "includes_minor_damage": true,
+        "signature_effect": "consent_and_acceptance_of_costs"
+      },
+      "conditions": {
+        "damage_liability": "La responsabilità per i danni non è definita qui; la guida rinvia alle associazioni di inquilini."
+      },
+      "jurisdiction_level": "federal",
+      "effective_from": null,
+      "applicability_verified": false,
+      "language": "it"
+    },
+    {
+      "item_key": "reference_rate:2026-09-01",
+      "language": "de",
+      "source": "S02-de",
+      "source_locator": "Medienmitteilung vom 1. September 2026, Haupttext",
+      "title": "Hypothekarischer Referenzzinssatz: Publikation vom 1. September 2026",
+      "summary": "Der Referenzzinssatz bleibt bei 1,25 Prozent und gilt ab dem 2. September 2026; Durchschnittszinssatz 1,31 Prozent per 30. Juni 2026. Unverändert seit 2. September 2025. Nächste Medienmitteilung am 1. Dezember 2026 vorgesehen.",
+      "source_passage": [
+        "Der mit Stichtag 30. Juni 2026 ermittelte Durchschnittszinssatz ist gegenüber dem Vorquartal gleichgeblieben und beträgt nach wie vor 1,31 Prozent. Der mietrechtlich massgebende Referenzzinssatz wird kaufmännisch gerundet und beträgt ab dem 2. September 2026 weiterhin 1,25 Prozent.",
+        "Der Referenzzinssatz liegt seit 2. September 2025 bei 1,25 Prozent. Da er sich im Vergleich zum Vorquartal nicht verändert hat, ergibt sich seit der letzten Bekanntgabe kein neuer Senkungs- oder Erhöhungsanspruch.",
+        "Der hypothekarische Referenzzinssatz sowie der zugrunde liegende Durchschnittszinssatz werden vierteljährlich durch das BWO unter www.referenzzinssatz.admin.ch bekannt gegeben. Die Öffentlichkeit wird jeweils mit einer Medienmitteilung informiert, die nächste ist für den 1. Dezember 2026 vorgesehen."
+      ],
+      "conditions": {
+        "scope": "Ein einziger nationaler Satz für Mietzinsanpassungen; kein Kanton nötig.",
+        "not_a_forecast": "next_publication_on ist ein angekündigtes Datum, kein Wert.",
+        "history": "Belegt nur diese Publikation und value_unchanged_since; keine vollständige Quartalsreihe."
+      }
+    },
+    {
+      "item_key": "reference_rate:method",
+      "language": "de",
+      "source": "S11",
+      "source_locator": "Einleitung; Abschnitt «Welche Bedeutung hat der Leitzins für den Referenzzinssatz?»",
+      "title": "Wie der hypothekarische Referenzzinssatz bestimmt wird",
+      "summary": "Der Referenzzinssatz stützt sich auf den Durchschnittszinssatz der Banken, gerundet auf den nächsten Viertelprozentwert. Massgebend für Mieten ist er, nicht der SNB-Leitzins, der nur indirekt und verzögert wirkt.",
+      "source_passage": [
+        "Für Mietzinsanpassungen aufgrund von Änderungen des Hypothekarzinssatzes gilt seit September 2008 der hypothekarische Referenzzinssatz. Dieser stützt sich auf den hypothekarischen Durchschnittszinssatz der Banken und wird jeweils auf den nächsten Viertelprozentwert gerundet.",
+        "Massgebend für die Anpassung der Mieten in einem laufenden Mietverhältnis in der Schweiz ist nicht der Leitzinssatz, sondern der hypothekarische Referenzzinssatz. Dieser wird errechnet, indem die meldepflichtigen Banken in der Schweiz alle drei Monate ihre laufenden Hypothekarkredite der SNB melden. Daraus wird der Durchschnittszinssatz errechnet, der, auf ein Viertelprozent gerundet, den Referenzzinssatz ergibt. Da auch langjährige Festhypotheken in die Berechnung einfliessen, verändert sich der Referenzzinssatz nur langsam – sowohl nach oben wie nach unten. Eine Änderung des Leitzinses hat somit nur eine indirekte und verzögerte Auswirkung auf die Mieten."
+      ],
+      "conditions": {
+        "not_a_forecast": "Keine Prognose des Referenzzinssatzes aus Leitzinsänderungen ableiten."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:quarter_point",
+      "language": "de",
+      "source": "S11",
+      "source_locator": "Referenzzinssatz – Fragen und Antworten, Frage 1",
+      "title": "Veränderung des Referenzzinssatzes um 0,25 Prozentpunkte",
+      "summary": "Steigt der Satz um 0,25 Punkte, kann der Mietzins um 3 Prozent erhöht werden; sinkt er, besteht im Grundsatz ein Senkungsanspruch von 2,91 Prozent. Nur der Nettomietzins ist betroffen; Berechnung pro Vertragsverhältnis.",
+      "source_passage": [
+        "Bei einer Veränderung des Referenzzinssatzes um 0,25 Prozentpunkte kann der Mietzins angepasst werden. Falls der Referenzzinssatz um 0,25 Prozentpunkte steigt, kann der Mietzins um 3 Prozent erhöht werden (vgl. Art. 13 Abs. 1 lit. c VMWG). Falls der Referenzzinssatz um 0,25 Prozentpunkte sinkt, ergibt sich für die Mietenden im Grundsatz ein Senkungsanspruch des Mietzinses im Umfang von 2,91 Prozent. Bei einer grösseren Veränderung als 0,25 Prozentpunkte gelten andere Überwälzungssätze, vgl. dazu Frage 2. Wichtig ist in diesem Zusammenhang ausserdem: Es gibt zusätzliche Kostenfaktoren, welche die Höhe des Mietzinses beeinflussen (vgl. auch Frage 3 und 5). Deswegen können allfällige Mietzinsanpassungen nur auf das einzelne Vertragsverhältnis berechnet werden. Aufgrund der Referenzzinssatzentwicklung kann nur der (Netto) Mietzins eine Anpassung erfahren. Die separat vereinbarten Heiz- und Nebenkosten sind davon nicht betroffen."
+      ],
+      "conditions": {
+        "applies_to": "Nur Nettomietzins; separat vereinbarte Heiz- und Nebenkosten nicht betroffen.",
+        "individual_calculation": "Anpassungen nur für das einzelne Vertragsverhältnis berechenbar; weitere Kostenfaktoren (Fragen 3 und 5).",
+        "larger_changes": "Bei grösseren Veränderungen andere Überwälzungssätze (Frage 2).",
+        "exceptions": "Nicht für die in Frage 9 ausgenommenen Mietverhältnisse."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:large_change",
+      "language": "de",
+      "source": "S11",
+      "source_locator": "Referenzzinssatz – Fragen und Antworten, Frage 2",
+      "title": "Abweichung von mehr als 0,25 Prozentpunkten vom aktuellen Satz",
+      "summary": "Beruht der Mietzins auf einem Satz, der 0,5 Prozentpunkte oder mehr abweicht, ist eine grössere Anpassung nach publizierten Überwälzungssätzen möglich; weitere Kostenfaktoren spielen mit.",
+      "source_passage": [
+        "Es kann sein, dass der Mietzins auf einem Referenzzinssatz beruht, der 0,5 Prozentpunkte oder mehr vom aktuell geltenden Referenzzinssatz abweicht. So beispielsweise, wenn der aktuelle Referenzzinssatz 1,5 Prozent beträgt, der Mietzins aber auf 2 Prozent basiert. In diesem Fall besteht die Möglichkeit, den Mietzins in einem grösseren Ausmass anzupassen. Die entsprechenden Überwälzungssätze können Sie diesem Link oder diesem Link entnehmen. Ausserdem gibt es zusätzliche Kostenfaktoren, welche die Höhe des Mietzinses beeinflussen (vgl. auch Frage 1, 3 und 6)."
+      ],
+      "conditions": {
+        "rates_not_imported": "Die Überwälzungssätze stehen in verlinkten, nicht importierten Dokumenten; nicht extrapolieren.",
+        "individual_calculation": "Weitere Kostenfaktoren beeinflussen die Höhe (Fragen 1, 3 und 6)."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:contract_basis",
+      "language": "de",
+      "source": "S11",
+      "source_locator": "Referenzzinssatz – Fragen und Antworten, Frage 3",
+      "title": "Auf welchem Referenzzinssatz der aktuelle Mietzins beruht",
+      "summary": "Massgebend ist oft der im Mietvertrag ausgewiesene Satz bei Vertragsabschluss; wurde der Mietzins später wegen des Referenzzinssatzes angepasst und nicht angefochten, gilt dieser Stand.",
+      "source_passage": [
+        "Der massgebende Stand des Referenzzinssatzes wird oft im Mietvertrag explizit ausgewiesen. Es gelangt derjenige Zinssatz zur Anwendung, der im Zeitpunkt des Vertragsabschlusses massgebend war. Wurde der Mietzins seit Vertragsabschluss allerdings wegen eines Anstiegs oder einer Senkung des Referenzzinssatzes angepasst und nicht angefochten, so ist auf diesen Stand des Zinssatzes abzustellen."
+      ],
+      "conditions": {
+        "override_requires": "Anpassung wegen Referenzzinssatz und nicht angefochten."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:request_reduction",
+      "language": "de",
+      "source": "S11",
+      "source_locator": "Referenzzinssatz – Fragen und Antworten, Frage 4",
+      "title": "Wie eine Mietzinssenkung eingefordert wird",
+      "summary": "Antrag an die Vermieterschaft, am besten per Einschreiben; diese muss innerhalb von 30 Tagen reagieren. Bei Ablehnung, Verrechnung oder ohne Antwort kann man sich innert 30 Tagen an die Schlichtungsbehörde wenden.",
+      "source_passage": [
+        "Wenn die Voraussetzungen für eine Mietzinssenkung erfüllt sind, können Sie einen entsprechenden Antrag bei Ihrer Vermieterschaft stellen, am besten per Einschreiben. Nach Absendung des Briefes muss Ihre Vermieterschaft innerhalb von 30 Tagen auf den Antrag reagieren. Sie kann das Gesuch gutheissen und den Mietzins senken. Sie kann das Gesuch aber auch ablehnen oder die Senkung mit anderen Faktoren verrechnen (vgl. Frage 6). Wenn die Vermieterschaft ablehnt oder verrechnet, muss sie erklären, warum sie das tut. Wenn Sie mit der Antwort nicht einverstanden sind – oder wenn Sie innerhalb der 30 Tage gar keine Antwort erhalten – können Sie sich an die zuständigen Schlichtungsbehörde wenden (vgl. Frage 7). Wichtig ist, dass dies wiederum innert 30 Tagen geschieht, sonst müssen Sie wieder von vorne beginnen und erneut die Vermieterschaft anfragen. Mit anderen Worten: Sie müssen den Antrag auf Mietzinssenkung an die Schlichtungsbehörde spätestens 60 Tage nach dem ursprünglichen Antrag an Ihre Vermieterschaft einreichen."
+      ],
+      "conditions": {
+        "prerequisite": "Die Voraussetzungen für eine Senkung müssen erfüllt sein.",
+        "not_a_calculator": "Fristberechnung hängt vom Verfahrensfall ab; keine allgemeine 60-Tage-Frist ab Versand ableiten.",
+        "local_authority": "Schlichtungsbehörde örtlich zuständig; Adressen nicht importiert."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:increase_form",
+      "language": "de",
+      "source": "S11",
+      "source_locator": "Referenzzinssatz – Fragen und Antworten, Frage 5",
+      "title": "Formvorschriften bei einer Mietzinserhöhung",
+      "summary": "Die Erhöhung wegen des Referenzzinssatzes muss mindestens 10 Tage vor Beginn der Kündigungsfrist auf einem vom Kanton genehmigten Formular mitgeteilt und begründet werden und gilt frühestens auf den nächstmöglichen Kündigungstermin.",
+      "source_passage": [
+        "Wenn die Vermieterschaft den Mietzins aufgrund des Referenzzinssatzanstieges erhöhen will, sind bestimmte formelle Aspekte (Art. 269d und 266c OR) zu beachten: die Mietzinserhöhung muss der Mietpartei mindestens 10 Tage vor Beginn der Kündigungsfrist und auf einem vom Kanton genehmigten Formular mitgeteilt und begründet werden, wobei die Kündigungsfrist für Mietwohnungen mindestens drei Monate beträgt. die Mietzinserhöhung kann frühestens auf den nächstmöglichen Kündigungstermin erfolgen."
+      ],
+      "conditions": {
+        "notice_period": "Die Seite nennt eine Kündigungsfrist von mindestens drei Monaten ausdrücklich für Mietwohnungen.",
+        "tenancy_type": "Für andere Mietobjekte nennt diese Frage keine Mindestfrist; nicht übertragen.",
+        "form": "Kantonal genehmigtes Formular; Vorlagen nicht importiert."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:other_factors",
+      "language": "de",
+      "source": "S11",
+      "source_locator": "Referenzzinssatz – Fragen und Antworten, Frage 5 und 6",
+      "title": "Weitere Kostenfaktoren bei der Mietzinsanpassung",
+      "summary": "Die Vermieterschaft kann andere Kostensteigerungen und die Teuerung bis höchstens 40 % der LIK-Steigerung kumulieren; Mietende können u. a. Formfehler, Rechenfehler, übersetzten Ertrag oder Kostensenkungen einwenden.",
+      "source_passage": [
+        "Der Vermieterschaft steht es ausserdem zu, die Erhöhung zufolge des Referenzzinssatzanstiegs mit anderen Kostensteigerungen (z.B. Gebühren) oder der Teuerungsentwicklung (im Umfang von höchstens 40 % der Steigerung des Landesindexes für Konsumentenpreise) zu kumulieren.",
+        "Ob und was allenfalls gegen eine Mietzinserhöhung aufgrund des angestiegenen Referenzzinssatzes eingewendet werden kann, ist individuell für das einzelne Mietverhältnis zu eruieren. Ein möglicher Einwand kann sein, dass die Erhöhung: formell nicht korrekt angezeigt wurde, weil beispielsweise nicht ein vom Kanton genehmigtes Formular verwendet wurde oder die Begründung im Formular fehlt (vgl. auch Frage 5); nicht korrekt berechnet wurde, weil sie auf einem falschen Stand des Referenzzinssatzes bzw. auf einem falschen Überwälzungssatz beruht (vgl. auch Fragen 1, 2 und 5); zu einem übersetzten Ertrag (Nettorendite) führt oder der angepasste Mietzins nicht mehr im Rahmen der Orts- und Quartierüblichkeit liegt; mit bestimmten Kostensenkungen oder der Teuerungsentwicklung (im Umfang von höchstens 40 % einer allfälligen Senkung des Landesindexes der Konsumentenpreise) zu verrechnen ist."
+      ],
+      "conditions": {
+        "individual_contract": "Ob und was eingewendet werden kann, ist für das einzelne Mietverhältnis zu eruieren; Liste beispielhaft."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:contest_increase",
+      "language": "de",
+      "source": "S11",
+      "source_locator": "Referenzzinssatz – Fragen und Antworten, Frage 7",
+      "title": "Frist zur Anfechtung einer Mietzinserhöhung",
+      "summary": "Eine angezeigte Erhöhung kann innerhalb von 30 Tagen, nachdem sie mitgeteilt worden ist, bei der örtlich zuständigen Schlichtungsbehörde angefochten werden.",
+      "source_passage": [
+        "Es gibt keine generelle staatliche Mietzinskontrolle in der Schweiz. Die Mietparteien müssen darum selbst tätig werden. Eine angezeigte Mietzinserhöhung aufgrund des Referenzzinssatzanstiegs kann innerhalb von 30 Tagen, nachdem sie mitgeteilt worden ist, bei der örtlich zuständigen Schlichtungsbehörde angefochten werden (vgl. Art. 270b OR)."
+      ],
+      "conditions": {
+        "trigger_wording": "Die deutsche Seite formuliert den Fristbeginn als «nachdem sie mitgeteilt worden ist».",
+        "local_authority": "Zuständige Behörde hängt vom Ort ab; Adressen nicht importiert.",
+        "no_state_control": "Keine generelle staatliche Mietzinskontrolle; die Parteien müssen selbst handeln."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:exceptions",
+      "language": "de",
+      "source": "S11",
+      "source_locator": "Referenzzinssatz – Fragen und Antworten, Frage 9",
+      "title": "Mietverhältnisse ohne Anwendung des Referenzzinssatzes",
+      "summary": "Ausgenommen sind Indexmieten, Staffelmieten sowie geförderte und luxuriöse Wohnungen (inkl. Einfamilienhäuser mit sechs oder mehr Wohnräumen ohne Küche).",
+      "source_passage": [
+        "Der Referenzzinssatz ist entscheidend für Mietanpassungen in bestehenden Mietverhältnissen, gilt aber nicht für alle Mietverhältnisse. Davon ausgenommen sind Indexmieten, Staffelmieten sowie geförderte und luxuriöse Wohnungen. Indexmiete: Bei der Indexmiete vereinbaren die Parteien, dass die Miete der Entwicklung des Landesindexes der Konsumentenpreise folgen soll. Während einer festen Vertragslaufzeit von mindestens fünf Jahren sind alle anderen Möglichkeiten zur Anpassung der Miete grundsätzlich ausgeschlossen. Staffelmiete: Bei der Staffelmiete erhöht sich die Miete automatisch zu den im Mietvertrag vereinbarten Umfang zu den genannten Terminen. Luxuriöse Wohnungen und Einfamilienhäusern mit sechs oder mehr Wohnräumen (ohne Anrechnung der Küche): Die Mietzinse für luxuriöse Wohnungen können frei vereinbart werden. Subventionierte Wohnungen: Wenn eine Wohnung von der öffentlichen Hand unterstützt wird, unterliegt sie während des Subventionszeitraums der behördlichen Kontrolle – nach deren Regeln. Der Mietzins wird dabei häufig nach der Kostenmiete berechnet."
+      ],
+      "conditions": {
+        "scope": "Betrifft Anpassungen in bestehenden Mietverhältnissen.",
+        "hedged": "Bei Indexmieten sind andere Anpassungen «grundsätzlich» ausgeschlossen; Kostenmiete bei Subventionen «häufig»."
+      }
+    },
+    {
+      "item_key": "jurisdiction:tenancy",
+      "language": "de",
+      "source": "S05-de",
+      "source_locator": "Abschnitte «Mietrecht als Bundesaufgabe» und «Einwirkung durch öffentliches Recht»",
+      "title": "Bundes- und Kantonskompetenzen im Mietrecht",
+      "summary": "Der Bund regelt die Miete im OR abschliessend; kantonales Mietrecht nur bei ausdrücklichem Vorbehalt (z. B. Form der Sicherheitsleistungen, Formular Anfangsmietzins). Kantone können über öffentliches Recht indirekt einwirken.",
+      "source_passage": [
+        "Die Miete ist Teil des Obligationenrechts und wurde ebenfalls vom Bund abschliessend geregelt (Art. 253 ff. OR). Insofern ist der Erlass von kantonalen Mietbestimmungen nur zulässig, wenn es das OR ausdrücklich vorsieht, also wenn ein entsprechender gesetzlicher Vorbehalt besteht, der den Kantonen eine eigene Regelungskompetenz einräumt. Bis anhin bestehen nur wenige derartige Vorbehalte. So können die Kantone beispielsweise ergänzende Vorschriften über die Form der Sicherheitsleistungen des Mieters erlassen (Art. 257e Abs. 4 OR) und über die Einführung des Formulars für die Anzeige des Anfangsmietzinses bestimmen (Art. 270 Abs. 2 OR).",
+        "Demgegenüber ist es für die Kantone zulässig, mittels öffentlichen Rechts auf Vermietungsmöglichkeiten einzuwirken und so indirekt die Anwendbarkeit der obligationenrechtlichen Bestimmungen zur Miete zu beeinflussen (Art. 6 ZGB)."
+      ],
+      "conditions": {
+        "publisher_vs_jurisdiction": "Das BWO ist Herausgeber; das heisst nicht, dass jede Regel ausschliesslich bundesrechtlich ist.",
+        "reserves_list": "Die genannten Vorbehalte sind Beispiele, keine vollständige Liste."
+      }
+    },
+    {
+      "item_key": "deposit:residential",
+      "language": "de",
+      "source": "S09-de",
+      "source_locator": "Broschüre «Wohnen in der Schweiz» (de, Ausgabe 29.01.2026), PDF-Seite 7, Abschnitt «Eine Kaution bezahlen»",
+      "title": "Mietkaution",
+      "summary": "Meist ist eine Kaution von höchstens drei Monatsmieten auf ein Mietkautionskonto auf den Namen der Mieterschaft zu leisten; nach dem Auszug wird sie samt Zinsen zurückbezahlt. Bei Genossenschaften normalerweise Anteilsscheine statt Kaution.",
+      "source_passage": [
+        "Wer einen Mietvertrag abgeschlossen hat, muss meistens einen fixen Betrag als Sicherheit überweisen. Dies wird Kaution oder in gewissen Regionen auch Depot genannt. Dieser Betrag beträgt maximal drei Monatsmieten und wird auf ein spezielles Bankkonto einbezahlt, das sogenannte Mietkautionskonto. Dieses Konto lautet auf den Namen der Mieterschaft. Die Kaution dient der Vermieterin/dem Vermieter als Sicherheit. Nach dem Auszug erhält die Mieterin/der Mieter die Kaution samt Zinsen zurück. Bei Wohnbaugenossenschaften bezahlt die Mieterschaft normalerweise keine Kaution, sondern kauft Anteilsscheine."
+      ],
+      "conditions": {
+        "tenancy_type": "Ratgeber für Wohnungen; Limite nicht automatisch auf Geschäftsräume anwenden.",
+        "hedged": "«meistens», «normalerweise»; Ratgeber, kein Gesetzesauszug.",
+        "cantonal_reserve": "Kantone können ergänzende Vorschriften zur Form der Sicherheitsleistung erlassen (siehe jurisdiction:tenancy)."
+      }
+    },
+    {
+      "item_key": "handover:incoming",
+      "language": "de",
+      "source": "S09-de",
+      "source_locator": "Broschüre «Wohnen in der Schweiz» (de, Ausgabe 29.01.2026), PDF-Seite 7, Abschnitt «In die Wohnung einziehen»",
+      "title": "Wohnungsübergabe beim Einzug",
+      "summary": "Vor dem Bezug prüfen Vermieter- und Mieterschaft gemeinsam die Wohnung und halten alle Mängel, auch kleine, schriftlich in einem Protokoll fest.",
+      "source_passage": [
+        "Die Mieterin/der Mieter hat das Recht, in eine saubere und benutzbare Wohnung zu ziehen. Vor dem Bezug der neuen Wohnung findet die Wohnungsübergabe statt. Die Vermieterschaft und die Mieterschaft prüfen gemeinsam den Zustand der Wohnung und halten allfällige Mängel schriftlich in einem Protokoll fest. Dies gilt auch für kleine Schäden wie eine defekte Steckdose oder ein beschädigter Badezimmerspiegel."
+      ],
+      "conditions": {
+        "nature": "Ratgeber; Schadensbeispiele nicht abschliessend."
+      }
+    },
+    {
+      "item_key": "utilities:advance_settlement",
+      "language": "de",
+      "source": "S09-de",
+      "source_locator": "Broschüre «Wohnen in der Schweiz» (de, Ausgabe 29.01.2026), PDF-Seite 7, Abschnitt «Mietzins und Nebenkosten bezahlen»",
+      "title": "Nebenkosten mit Akontozahlungen",
+      "summary": "Werden Nebenkosten akonto verrechnet, muss mindestens einmal im Jahr detailliert abgerechnet werden; daraus kann eine Nachzahlung oder Rückerstattung folgen.",
+      "source_passage": [
+        "Wenn sie «akonto» – das heisst als Anzahlung – in Rechnung gestellt werden, muss die Vermieterin/der Vermieter mindestens einmal im Jahr eine detaillierte Abrechnung machen. Es kann sein, dass die Mieterin/der Mieter einen Betrag nachzahlen muss. Es kann aber auch sein, dass sie/er Geld zurückerhält. Die Rechnung für die Nebenkosten muss immer genau überprüft werden."
+      ],
+      "conditions": {
+        "billing_mode_only": "Gilt für akonto verrechnete Nebenkosten; es gibt andere Verrechnungsarten."
+      }
+    },
+    {
+      "item_key": "defects:notification",
+      "language": "de",
+      "source": "S09-de",
+      "source_locator": "Broschüre «Wohnen in der Schweiz» (de, Ausgabe 29.01.2026), PDF-Seite 9, Abschnitt «Wenn etwas kaputtgeht»",
+      "title": "Schäden in der Wohnung",
+      "summary": "Einfache Reparaturen und Reinigungen trägt die Mieterschaft; grössere Schäden sind umgehend dem Hauswart oder der Vermieterschaft zu melden, bei Untätigkeit schriftlich, am besten per Einschreiben.",
+      "source_passage": [
+        "Einfache Reparaturen oder Reinigungen muss die Mieterschaft selber vornehmen und bezahlen. Dazu gehören Reparaturen wie den Filter im Dampfabzug wechseln, ein Backblech oder den Duschschlauch ersetzen. Bei grösseren Schäden muss umgehend der Hauswart/die Hauswartin oder die Vermieterin/der Vermieter benachrichtigt werden. Wenn diese nichts unternehmen, sollte die Mieterin/der Mieter den Schaden schriftlich und am besten per Einschreiben melden. Hat die Mieterin/der Mieter einen Schaden selber verursacht, muss sie/er zumindest teilweise die Kosten übernehmen. Ist sie/er nicht dafür verantwortlich, übernimmt die Vermieterin/der Vermieter die Kosten."
+      ],
+      "conditions": {
+        "examples_only": "Beispiele für kleinen Unterhalt sind keine allgemeine Kostenregel.",
+        "cost_allocation": "Hängt von der Verantwortung der Mieterschaft ab."
+      }
+    },
+    {
+      "item_key": "alterations:permission",
+      "language": "de",
+      "source": "S09-de",
+      "source_locator": "Broschüre «Wohnen in der Schweiz» (de, Ausgabe 29.01.2026), PDF-Seite 8, Kapitel «Wohnen»",
+      "title": "Veränderungen in der Wohnung",
+      "summary": "Für Veränderungen (z. B. Wände streichen, Teppich ersetzen, Waschmaschine einbauen) braucht es zuerst die schriftliche Einwilligung der Vermieterschaft.",
+      "source_passage": [
+        "Wer in der Wohnung etwas verändern will, braucht zunächst die schriftliche Einwilligung der Vermieterin/des Vermieters. Solche Veränderungen können zum Beispiel Wände streichen, Teppich ersetzen, Waschmaschine einbauen usw. betreffen."
+      ],
+      "conditions": {
+        "examples_only": "Die genannten Arbeiten sind Beispiele."
+      }
+    },
+    {
+      "item_key": "termination:tenant",
+      "language": "de",
+      "source": "S09-de",
+      "source_locator": "Broschüre «Wohnen in der Schweiz» (de, Ausgabe 29.01.2026), PDF-Seite 10, Kapitel «Kündigen und Ausziehen»",
+      "title": "Kündigung durch die Mieterschaft",
+      "summary": "Kündigung schriftlich, am besten per Einschreiben; bei Ehepaaren unterschreiben beide. Bei ausserterminlichem Auszug kann eine Nachmieterin oder ein Nachmieter vorgeschlagen werden, sonst ist der Mietzins bis zum Vertragstermin geschuldet.",
+      "source_passage": [
+        "Der Mietvertrag kann sowohl von der Mieter- als auch von der Vermieterschaft gekündigt werden. Welche Termine und Fristen einzuhalten sind, steht im Vertrag. Wenn die Mieterin/der Mieter kündigt, muss sie/er das schriftlich und am besten per Einschreiben machen. Bei Ehepaaren ist eine Kündigung nur dann gültig, wenn beide Ehepartner das Kündigungsschreiben unterschrieben haben. Wer die Wohnung ausserterminlich – d.h. zu einem anderen Zeitpunkt als im Vertrag vereinbart – verlassen will, kann den Vermietenden eine Nachmieterin/einen Nachmieter vorschlagen, die/der bereit ist, den Mietvertrag zu übernehmen. Die Vermieterin/der Vermieter hat rund einen Monat Zeit, um zu prüfen, ob die Kandidierenden die Bedingungen für die Vertragsübernahme erfüllen. Falls das nicht der Fall ist, muss die Mieterin/der Mieter den Mietzins bis zum vertraglich vereinbarten Termin bezahlen."
+      ],
+      "conditions": {
+        "deadlines": "Termine und Fristen stehen im Vertrag; keine allgemeine Frist importiert.",
+        "early_exit_condition": "Erfüllen die Kandidierenden die Bedingungen nicht, ist der Mietzins bis zum vereinbarten Termin geschuldet.",
+        "approximate": "«rund einen Monat» ist ein Richtwert."
+      }
+    },
+    {
+      "item_key": "termination:landlord",
+      "language": "de",
+      "source": "S09-de",
+      "source_locator": "Broschüre «Wohnen in der Schweiz» (de, Ausgabe 29.01.2026), PDF-Seite 10, Kapitel «Kündigen und Ausziehen»",
+      "title": "Kündigung durch die Vermieterschaft",
+      "summary": "Die Vermieterschaft muss ein offizielles Formular verwenden (bei Ehepaaren je eines in separatem Couvert). Wer eine Kündigung erhält, kann sich innert 30 Tagen schriftlich bei der Schlichtungsbehörde wehren.",
+      "source_passage": [
+        "Wenn die Vermieterin/der Vermieter kündigt, muss sie/er ein offizielles Formular verwenden. Bei Ehepaaren erhalten die Ehepartner je ein Formular in einem separaten Couvert zugeschickt. Wer eine Kündigung erhält, hat 30 Tage Zeit, um sich schriftlich bei der Schlichtungsbehörde dagegen zu wehren."
+      ],
+      "conditions": {
+        "local_authority": "Örtlich zuständige Schlichtungsbehörde; Adressen nicht importiert.",
+        "nature": "Ratgeber, kein Gesetzesauszug."
+      }
+    },
+    {
+      "item_key": "handover:outgoing",
+      "language": "de",
+      "source": "S09-de",
+      "source_locator": "Broschüre «Wohnen in der Schweiz» (de, Ausgabe 29.01.2026), PDF-Seite 10, Abschnitt «Aus der Wohnung ausziehen»",
+      "title": "Wohnungsrückgabe beim Auszug",
+      "summary": "Bei der Übergabe prüfen beide Parteien die Wohnung und protokollieren alle Mängel, auch kleine; mit der Unterschrift bestätigt die Mieterschaft ihr Einverständnis und allfällige Kosten.",
+      "source_passage": [
+        "Bei der Wohnungsübergabe prüfen die Vermieter- und Mieterschaft gemeinsam den Zustand der Wohnung und halten allfällige Mängel schriftlich in einem Protokoll fest. Das gilt auch für kleine Schäden. Gemeinsam wird abgemacht, wer, falls nötig, die Kosten für welche Reparaturen übernimmt. Mieter/innenverbände geben Auskunft darüber, welche Schäden Mieterinnen und Mieter übernehmen müssen. Es ist wichtig, dass der Mieter/die Mieterin jeden Punkt genau versteht. Denn mit seiner/ihrer Unterschrift bestätigt er/sie, dass er/sie einverstanden ist und allenfalls Kosten übernimmt."
+      ],
+      "conditions": {
+        "damage_liability": "Haftung für Schäden hier nicht festgelegt; Verweis auf Mieter/innenverbände."
+      }
+    },
+    {
+      "item_key": "reference_rate:2026-09-01",
+      "language": "fr",
+      "source": "S02-fr",
+      "source_locator": "Communiqué de presse du 1er septembre 2026, corps du texte",
+      "title": "Taux d’intérêt de référence : publication du 1er septembre 2026",
+      "summary": "Le taux de référence reste à 1,25 % et s’applique à partir du 2 septembre 2026 ; taux moyen de 1,31 % au 30 juin 2026. Inchangé depuis le 2 septembre 2025. Prochain communiqué prévu le 1er décembre 2026.",
+      "source_passage": [
+        "Le taux d’intérêt moyen établi le 30 juin 2026, jour de référence, est resté le même que celui du trimestre précédent et s'élève toujours à 1,31 %. Le taux d'intérêt de référence déterminant pour les loyers est arrondi selon la règle commerciale et s'élève donc toujours à 1,25 %, à partir du 2 septembre 2026.",
+        "Depuis le 2 septembre 2025, le taux d’intérêt de référence est de 1,25 %. Étant donné qu’il n’a pas subi de modification par rapport au trimestre précédent, il ne donne pas droit à de nouvelles prétentions de diminution ou de hausse de loyer.",
+        "Le taux hypothécaire de référence ainsi que le taux hypothécaire moyen sur lequel il est fondé sont communiqués par l’OFL chaque trimestre à l’adresse suivante: www.tauxdereference.admin.ch. Le public est informé à chaque fois par le biais d’un communiqué de presse, le prochain étant prévu pour le 1er décembre 2026."
+      ],
+      "conditions": {
+        "scope": "Taux national unique pour l’adaptation des loyers ; aucun canton requis.",
+        "not_a_forecast": "next_publication_on est une date annoncée, pas une valeur prévue.",
+        "history": "Atteste uniquement cette publication et value_unchanged_since ; pas de série trimestrielle complète."
+      }
+    },
+    {
+      "item_key": "reference_rate:method",
+      "language": "fr",
+      "source": "S12",
+      "source_locator": "Introduction ; section « Quelle est l'importance du taux directeur pour le taux d'intérêt de référence ? »",
+      "title": "Comment le taux d’intérêt de référence est établi",
+      "summary": "Le taux de référence repose sur le taux hypothécaire moyen des banques, arrondi au quart de pour-cent le plus proche. C’est lui, et non le taux directeur de la BNS, qui est déterminant pour les loyers ; le taux directeur n’a qu’un effet indirect et différé.",
+      "source_passage": [
+        "Un taux d’intérêt de référence est établi depuis septembre 2008 en vue de l’adaptation des loyers sur la base des modifications du taux hypothécaire. Il est fondé sur le taux hypothécaire moyen des banques et est toujours arrondi au quart de pour-cent le plus proche.",
+        "En Suisse, le taux déterminant pour l’adaptation des loyers de baux en cours n’est pas le taux directeur, mais le taux d’intérêt de référence. Celui-ci est calculé sur la base des données relatives aux créances hypothécaires en cours que les banques suisses soumises à l’obligation de renseigner communiquent à la BNS chaque trimestre. Le taux d’intérêt de référence est ensuite établi en arrondissant le taux hypothécaire moyen au quart de point de pourcentage. Comme les hypothèques à taux fixe de longue durée sont également incluses dans le calcul, le taux d’intérêt de référence n’évolue que lentement, à la hausse comme à la baisse. Une modification du taux directeur n’a donc qu’un effet indirect et différé sur les loyers."
+      ],
+      "conditions": {
+        "not_a_forecast": "Ne pas déduire de prévision du taux de référence à partir du taux directeur."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:quarter_point",
+      "language": "fr",
+      "source": "S12",
+      "source_locator": "Taux d’intérêt de référence – Questions et réponses, question 1",
+      "title": "Variation du taux de référence de 0,25 point",
+      "summary": "Une hausse de 0,25 point permet de relever le loyer de 3 % ; une baisse donne en principe droit à une réduction de 2,91 %. Seul le loyer net est concerné ; le calcul dépend du bail.",
+      "source_passage": [
+        "Un changement du taux d’intérêt de référence de 0,25 point de pourcentage peut donner lieu à une adaptation du loyer. Si le taux d’intérêt de référence augmente de 0,25 point de pourcentage, le loyer peut être relevé de 3% (cf. art. 13, al. 1, let. c, de l’ordonnance sur le bail à loyer et le bail à ferme d’habitations et de locaux commerciaux). Si le taux d’intérêt de référence diminue de 0,25 point de pourcentage, les locataires peuvent en principe demander une réduction du loyer à hauteur de 2,91%. Des taux de répercussion différents s’appliquent en cas de changement supérieur à 0,25 point de pourcentage (cf. question 2). Il est important de préciser dans ce contexte que d’autres facteurs de coûts peuvent influencer le montant du loyer (cf. question 3 et 6). Par conséquent, une éventuelle adaptation de loyer en fonction de l’évolution du taux d’intérêt de référence ne peut être calculée que sur la base du bail qui a été conclu. Elle ne portera que sur le loyer net et ne concerne donc pas les frais de chauffage et autres frais accessoires convenus séparément."
+      ],
+      "conditions": {
+        "applies_to": "Loyer net uniquement ; frais de chauffage et accessoires convenus séparément exclus.",
+        "individual_calculation": "Calcul uniquement sur la base du bail conclu ; autres facteurs de coûts (questions 3 et 6).",
+        "larger_changes": "Autres taux de répercussion au-delà de 0,25 point (question 2).",
+        "exceptions": "Pas applicable aux régimes exclus de la question 9."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:large_change",
+      "language": "fr",
+      "source": "S12",
+      "source_locator": "Taux d’intérêt de référence – Questions et réponses, question 2",
+      "title": "Écart de plus de 0,25 point par rapport au taux actuel",
+      "summary": "Si le loyer repose sur un taux qui s’écarte de 0,5 point ou plus, une adaptation plus importante est possible selon des taux de répercussion publiés ; d’autres facteurs de coûts interviennent.",
+      "source_passage": [
+        "Il se peut qu’un loyer soit basé sur un taux d’intérêt de référence qui s’écarte de 0,5 point de pourcentage ou plus du taux actuel. Par exemple, si un loyer est fondé sur un taux d’intérêt de référence de 2%, alors que le taux actuel est de 1,5%, il est possible de procéder à une adaptation plus importante. Les taux de répercussion correspondants peuvent être consultés ici ou ici. Par ailleurs, d’autres facteurs de coûts peuvent influencer le montant du loyer (cf. questions 1, 3 et 6)."
+      ],
+      "conditions": {
+        "rates_not_imported": "Les taux de répercussion figurent dans des documents liés non importés ; ne pas extrapoler.",
+        "individual_calculation": "D’autres facteurs de coûts influencent le montant (questions 1, 3 et 6)."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:contract_basis",
+      "language": "fr",
+      "source": "S12",
+      "source_locator": "Taux d’intérêt de référence – Questions et réponses, question 3",
+      "title": "Taux de référence sur lequel repose le loyer actuel",
+      "summary": "Le taux déterminant est généralement indiqué dans le bail (celui en vigueur à sa conclusion) ; si le loyer a ensuite été adapté au taux de référence sans contestation, c’est ce nouveau taux qui compte.",
+      "source_passage": [
+        "Le niveau du taux d’intérêt de référence déterminant est généralement indiqué explicitement dans le bail. En principe, il s’agit de celui en vigueur au moment de la conclusion du bail. Toutefois, si, depuis la conclusion du bail, le loyer a été adapté en fonction d’une hausse ou d’une baisse du taux d’intérêt de référence et qu’il n’a pas été contesté, c’est à ce nouveau taux d’intérêt qu’il convient de se référer."
+      ],
+      "conditions": {
+        "override_requires": "Adaptation liée au taux de référence et non contestée."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:request_reduction",
+      "language": "fr",
+      "source": "S12",
+      "source_locator": "Taux d’intérêt de référence – Questions et réponses, question 4",
+      "title": "Comment demander une baisse de loyer",
+      "summary": "Demande au bailleur, de préférence par recommandé ; il doit répondre dans les 30 jours. En cas de refus, de compensation ou d’absence de réponse, on peut saisir l’autorité de conciliation dans les 30 jours.",
+      "source_passage": [
+        "Si les conditions pour une baisse de loyer sont remplies, vous pouvez en faire la demande auprès de votre bailleur, de préférence par courrier recommandé. Après l'envoi de la lettre, votre bailleur doit répondre à la demande dans un délai de 30 jours. Il peut approuver la demande et réduire le loyer. Il peut également rejeter la demande ou compenser la réduction par d'autres facteurs (cf. question 6). Si le bailleur rejette la demande ou la compense, il doit expliquer pourquoi. Si vous n'êtes pas d'accord avec la réponse – ou si vous ne recevez aucune réponse dans les 30 jours – vous pouvez vous adresser à l'autorité de conciliation compétente (cf. question 7). Il est important que cela se fasse dans les 30 jours, sinon vous devrez recommencer depuis le début et adresser une nouvelle demande au bailleur. En d'autres termes, vous devez soumettre votre demande de réduction de loyer à l'autorité de conciliation au plus tard 60 jours après avoir adressé votre demande initiale à votre bailleur."
+      ],
+      "conditions": {
+        "prerequisite": "Les conditions d’une baisse doivent être remplies.",
+        "not_a_calculator": "Le calcul des délais dépend du cas de procédure ; ne pas en tirer un délai général de 60 jours dès l’envoi.",
+        "local_authority": "Autorité de conciliation compétente localement ; adresses non importées."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:increase_form",
+      "language": "fr",
+      "source": "S12",
+      "source_locator": "Taux d’intérêt de référence – Questions et réponses, question 5",
+      "title": "Exigences formelles pour une hausse de loyer",
+      "summary": "La hausse fondée sur le taux de référence doit être motivée et notifiée sur une formule approuvée par le canton au moins 10 jours avant le début du délai de résiliation, et ne peut intervenir qu’à la prochaine date de résiliation possible.",
+      "source_passage": [
+        "Le bailleur qui décide de répercuter l’augmentation du taux d’intérêt de référence est tenu de respecter certains aspects formels (art. 269d et 266c CO) : l’augmentation de loyer doit être motivée et notifiée au locataire au moyen d’une formule approuvée par le canton au moins 10 jours avant le début du délai de résiliation, qui est d’au moins trois mois pour les logements locatifs ; l’augmentation de loyer ne peut intervenir au plus tôt qu’à la prochaine date de résiliation possible."
+      ],
+      "conditions": {
+        "notice_period": "La page précise un délai de résiliation d’au moins trois mois pour les logements locatifs.",
+        "tenancy_type": "Aucun délai minimum n’est indiqué ici pour d’autres types de locaux ; ne pas transposer.",
+        "form": "Formule approuvée par le canton ; modèles non importés."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:other_factors",
+      "language": "fr",
+      "source": "S12",
+      "source_locator": "Taux d’intérêt de référence – Questions et réponses, question 5 et 6",
+      "title": "Autres facteurs de coûts dans l’adaptation du loyer",
+      "summary": "Le bailleur peut cumuler d’autres hausses de coûts et le renchérissement jusqu’à 40 % de la hausse de l’IPC ; le locataire peut notamment invoquer un vice de forme, une erreur de calcul, un rendement excessif ou des baisses de coûts.",
+      "source_passage": [
+        "Le bailleur a en outre la possibilité de cumuler une augmentation fondée sur l’évolution du taux d’intérêt de référence avec d’autres augmentations de coûts (p. ex. des taxes) ou avec l’évolution du renchérissement (à hauteur de 40% maximum de la hausse de l’indice des prix à la consommation).",
+        "Il convient de déterminer au cas par cas si une augmentation de loyer motivée par la hausse du taux d’intérêt de référence peut être contestée et, le cas échéant, dans quelle mesure elle peut l’être. Un motif envisageable de contestation peut être donné par le fait que : la hausse n’a pas été notifiée correctement du point de vue formel, par exemple parce que la formule officielle du canton n’a pas été utilisée ou qu’elle n’indique pas le motif de la hausse (voir également question 5) ; la hausse n’a pas été calculée correctement parce qu’elle prend en considération un taux d’intérêt de référence ou un taux de répercussion de ce dernier qui est erroné (voir également questions 1, 2 et 5) ; la hausse entraîne un rendement excessif (rendement net) ou le loyer adapté ne s’inscrit plus dans le cadre des loyers usuels dans la localité ou le quartier ; la hausse doit être corrigée par certaines réductions de coûts ou par l’évolution du renchérissement (à hauteur de 40% maximum de la baisse éventuelle de l’indice des prix à la consommation)."
+      ],
+      "conditions": {
+        "individual_contract": "La possibilité de contester se détermine au cas par cas ; liste exemplative."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:contest_increase",
+      "language": "fr",
+      "source": "S12",
+      "source_locator": "Taux d’intérêt de référence – Questions et réponses, question 7",
+      "title": "Délai pour contester une hausse de loyer",
+      "summary": "Une hausse notifiée peut être contestée auprès de l’autorité de conciliation locale compétente dans les 30 jours suivant sa notification.",
+      "source_passage": [
+        "En Suisse, il n’existe pas de contrôle général des loyers par l’État. Le suivi pour éventuelle adaptation du loyer est l’affaire des parties au bail. Une augmentation de loyer notifiée en raison de la hausse du taux d’intérêt de référence peut être contestée auprès de l’autorité de conciliation locale compétente dans les 30 jours suivant sa notification (cf. art. 270b du code des obligations)."
+      ],
+      "conditions": {
+        "trigger_wording": "La page française formule le point de départ comme « dans les 30 jours suivant sa notification ».",
+        "local_authority": "Autorité compétente selon le lieu ; adresses non importées.",
+        "no_state_control": "Pas de contrôle général des loyers par l’État ; les parties doivent agir."
+      }
+    },
+    {
+      "item_key": "rent_adjustment:exceptions",
+      "language": "fr",
+      "source": "S12",
+      "source_locator": "Taux d’intérêt de référence – Questions et réponses, question 9",
+      "title": "Baux auxquels le taux de référence ne s’applique pas",
+      "summary": "Sont exclus les loyers indexés, échelonnés, subventionnés et les logements de luxe (y compris maisons individuelles de six pièces ou plus, cuisine non comprise).",
+      "source_passage": [
+        "Le taux d'intérêt de référence est déterminant pour l'adaptation des loyers des contrats existants. Cependant, il ne s'applique pas à tous les baux, car les loyers indexés, les loyers échelonnés, les loyers subventionnés et les maisons familiales de luxe en sont exclus. Loyer indexé : Dans le cas d'un loyer indexé, les parties conviennent que le loyer doit suivre l'évolution de l'indice national des prix à la consommation. Pendant une durée contractuelle fixe d'au moins cinq ans, toutes les autres possibilités d'adaptation du loyer sont en principe exclues. Loyer échelonné : Dans le cas d'un loyer échelonné, le loyer augmente automatiquement dans les proportions convenues dans le contrat de location, aux dates indiquées. Appartements de luxe et maisons individuelles de six pièces ou plus (sans prise en compte de la cuisine) : Les loyers des appartements de luxe peuvent être convenus librement. Les logements subventionnés : Lorsqu'un logement est subventionné par les pouvoirs publics, il est soumis au contrôle des autorités pendant la période de subventionnement, selon leurs règles. Le loyer est alors souvent calculé sur la base des coûts."
+      ],
+      "conditions": {
+        "scope": "Concerne l’adaptation des loyers des contrats existants.",
+        "hedged": "Pour le loyer indexé, les autres adaptations sont « en principe » exclues ; loyer subventionné « souvent » calculé sur les coûts."
+      }
+    },
+    {
+      "item_key": "jurisdiction:tenancy",
+      "language": "fr",
+      "source": "S05-fr",
+      "source_locator": "Sections « Le droit du bail, domaine de compétence de la Confédération » et « Action par le biais du droit public »",
+      "title": "Compétences fédérales et cantonales en droit du bail",
+      "summary": "La Confédération règle le bail de manière exhaustive dans le CO ; des règles cantonales ne sont admises qu’en cas de réserve expresse (p. ex. forme des sûretés, formule du loyer initial). Les cantons peuvent agir indirectement par le droit public.",
+      "source_passage": [
+        "Le droit du bail étant intégré au CO (art. 253 CO ss.), il a donc lui aussi été réglé de manière exhaustive par la Confédération. L’établissement de dispositions relevant du droit du bail par les cantons n’est donc en principe admis que si le CO le prévoit expressément, c’est-à-dire qu’il existe une réserve légale correspondante accordant aux cantons une compétence réglementaire propre, ce qui n’a été que très rarement le cas jusqu’à présent. Les cantons peuvent par exemple édicter des dispositions complémentaires sur la forme des sûretés fournies par le locataire (art. 257e, al. 4 CO) ou sur le recours à la formule officielle d’annonce du loyer initial (art. 270, al. 2, CO).",
+        "En revanche, il est admis que les cantons agissent sur les possibilités de location au moyen du droit public (art. 6 CC) et influent ainsi indirectement sur l’application des dispositions du CO relatives au droit du bail."
+      ],
+      "conditions": {
+        "publisher_vs_jurisdiction": "L’OFL est l’éditeur ; cela n’implique pas que chaque règle soit exclusivement fédérale.",
+        "reserves_list": "Les réserves citées sont des exemples, pas une liste exhaustive."
+      }
+    },
+    {
+      "item_key": "deposit:residential",
+      "language": "fr",
+      "source": "S09-fr",
+      "source_locator": "Brochure « Le logement en Suisse » (fr), page PDF 12, paragraphe « Dépôt d’une caution »",
+      "title": "Caution de loyer",
+      "summary": "Le locataire verse normalement une caution de trois mois de loyer au maximum sur un compte de garantie de loyer à son nom, restituée avec les intérêts à son départ. Dans les coopératives, il acquiert généralement une part au lieu d’une caution.",
+      "source_passage": [
+        "Après la conclusion du contrat, le locataire doit normalement verser une somme fixe, que l’on appelle caution, pour servir de garantie. Ce montant s’élève au maximum à trois mois de loyer et est placé sur un compte bancaire spécial, appelé compte de garantie de loyer, au nom du locataire. La caution représente une garantie pour le propriétaire. Lorsqu’il quitte le logement, le locataire récupère sa caution, intérêts compris. Dans le cas des coopératives de logement, le locataire ne paie généralement pas de caution, mais acquiert une part pour en devenir membre."
+      ],
+      "conditions": {
+        "tenancy_type": "Guide pour le logement ; ne pas appliquer automatiquement la limite aux locaux commerciaux.",
+        "hedged": "« normalement », « généralement » ; guide, pas extrait de loi.",
+        "cantonal_reserve": "Les cantons peuvent édicter des dispositions complémentaires sur la forme des sûretés (voir jurisdiction:tenancy)."
+      }
+    },
+    {
+      "item_key": "handover:incoming",
+      "language": "fr",
+      "source": "S09-fr",
+      "source_locator": "Brochure « Le logement en Suisse » (fr), page PDF 12, paragraphe « Emménagement »",
+      "title": "État des lieux d’entrée",
+      "summary": "Avant l’emménagement, propriétaire et locataire font ensemble l’état des lieux et consignent par écrit tous les défauts, même minimes.",
+      "source_passage": [
+        "Le locataire a le droit d’exiger que le logement dans lequel il va emménager soit propre et en bon état. Avant que le nouveau locataire n’emménage, il est procédé à la remise de l’appartement. Le propriétaire et le locataire effectuent ensemble l’état des lieux et constatent dans un rapport écrit les éventuels défauts, y compris ceux qui sont minimes comme une prise électrique défectueuse ou un miroir de salle de bain endommagé."
+      ],
+      "conditions": {
+        "nature": "Guide ; les exemples de défauts ne sont pas exhaustifs."
+      }
+    },
+    {
+      "item_key": "utilities:advance_settlement",
+      "language": "fr",
+      "source": "S09-fr",
+      "source_locator": "Brochure « Le logement en Suisse » (fr), page PDF 13, paragraphe « Paiement du loyer et des charges »",
+      "title": "Charges facturées par acompte",
+      "summary": "Si les charges sont facturées par acompte, le propriétaire doit établir un décompte détaillé au moins une fois par an ; il peut en résulter un paiement supplémentaire ou un remboursement.",
+      "source_passage": [
+        "Quand elles sont facturées par acompte (c’est-à-dire à l’avance), le propriétaire est tenu d’établir un décompte détaillé, au moins une fois par an. En fonction de ce décompte, il se peut que le locataire doive payer un montant supplémentaire, mais il est aussi possible que de l’argent lui soit remboursé. Le décompte des charges doit faire l’objet d’un contrôle attentif."
+      ],
+      "conditions": {
+        "billing_mode_only": "Vaut pour les charges facturées par acompte ; d’autres modes de facturation existent."
+      }
+    },
+    {
+      "item_key": "defects:notification",
+      "language": "fr",
+      "source": "S09-fr",
+      "source_locator": "Brochure « Le logement en Suisse » (fr), page PDF 16, paragraphe « Dégâts »",
+      "title": "Dégâts dans le logement",
+      "summary": "Les réparations et nettoyages simples incombent au locataire ; les dommages plus importants doivent être signalés immédiatement au concierge ou au propriétaire, puis par écrit, de préférence en recommandé, s’il ne réagit pas.",
+      "source_passage": [
+        "Les réparations ou les nettoyages simples doivent être effectués et pris en charge par le locataire lui-même (p. ex. remplacer le filtre de la hotte aspirante, une plaque de four ou un tuyau de douche). Les dommages plus importants doivent être immédiatement signalés au concierge ou au propriétaire. Si le bailleur ne donne pas suite à cet avis, il est conseillé au locataire de réitérer l’avis par écrit, de préférence par lettre recommandée. Si le locataire est responsable d’un dommage, c’est à lui d’en assumer les coûts, du moins partiellement. En revanche, s’il n’est pas responsable du dommage, c’est au propriétaire de prendre en charge les frais de réparation."
+      ],
+      "conditions": {
+        "examples_only": "Les exemples de petit entretien ne constituent pas une règle générale de répartition des coûts.",
+        "cost_allocation": "Dépend de la responsabilité du locataire."
+      }
+    },
+    {
+      "item_key": "alterations:permission",
+      "language": "fr",
+      "source": "S09-fr",
+      "source_locator": "Brochure « Le logement en Suisse » (fr), page PDF 15, chapitre « Vie en location »",
+      "title": "Changements dans le logement",
+      "summary": "Pour apporter des changements (repeindre, remplacer la moquette, installer une machine à laver), le locataire doit obtenir au préalable l’autorisation écrite du propriétaire.",
+      "source_passage": [
+        "Si le locataire souhaite apporter des changements dans le logement (repeindre les murs, remplacer la moquette, installer une machine à laver, p. ex.), il doit obtenir au préalable l’autorisation écrite du propriétaire."
+      ],
+      "conditions": {
+        "examples_only": "Les travaux cités sont des exemples."
+      }
+    },
+    {
+      "item_key": "termination:tenant",
+      "language": "fr",
+      "source": "S09-fr",
+      "source_locator": "Brochure « Le logement en Suisse » (fr), page PDF 19, chapitre « Résiliation du bail et déménagement »",
+      "title": "Résiliation par le locataire",
+      "summary": "Résiliation par écrit, idéalement en recommandé ; pour les couples mariés, signature des deux époux. Pour partir hors échéance, le locataire doit proposer un nouveau locataire ; à défaut de candidat adéquat, le loyer reste dû jusqu’à l’échéance.",
+      "source_passage": [
+        "Le bail peut être résilié aussi bien par le locataire que par le propriétaire. Les échéances et les délais à respecter figurent dans le contrat. Si le locataire souhaite résilier son bail, il doit le faire par écrit, idéalement par courrier recommandé. Pour les couples mariés, la résiliation n’est valable que si elle a été signée par les deux époux. Toute personne souhaitant quitter son logement à une date autre que celle prévue dans le bail doit proposer au propriétaire un nouveau locataire prêt à reprendre le contrat de location. Le propriétaire dispose d’environ un mois pour vérifier si le candidat proposé est en mesure de reprendre le bail. Si ce n’est pas le cas, le locataire devra verser le loyer jusqu’à l’échéance prévue par le contrat."
+      ],
+      "conditions": {
+        "deadlines": "Échéances et délais figurent dans le contrat ; aucun délai général importé.",
+        "wording_difference": "La version française dit « doit proposer », l’italienne et l’allemande « peut proposer ».",
+        "approximate": "« environ un mois » est indicatif."
+      }
+    },
+    {
+      "item_key": "termination:landlord",
+      "language": "fr",
+      "source": "S09-fr",
+      "source_locator": "Brochure « Le logement en Suisse » (fr), page PDF 19, chapitre « Résiliation du bail et déménagement »",
+      "title": "Résiliation par le bailleur",
+      "summary": "Le bailleur doit utiliser une formule officielle (pour un couple marié, un envoi séparé à chaque époux). Le locataire dispose de 30 jours pour saisir par écrit l’autorité de conciliation.",
+      "source_passage": [
+        "Si c’est le bailleur qui souhaite résilier le contrat, il est tenu d’utiliser une formule officielle. Dans le cas d’un logement occupé par un couple marié, il doit adresser cette formule à chacun des époux dans deux courriers séparés. Un locataire dont le bail a été résilié dispose de 30 jours pour saisir, par écrit, l’autorité de conciliation."
+      ],
+      "conditions": {
+        "local_authority": "Autorité de conciliation compétente localement ; adresses non importées.",
+        "nature": "Guide, pas extrait de loi."
+      }
+    },
+    {
+      "item_key": "handover:outgoing",
+      "language": "fr",
+      "source": "S09-fr",
+      "source_locator": "Brochure « Le logement en Suisse » (fr), page PDF 19, paragraphe « Déménagement »",
+      "title": "État des lieux de sortie",
+      "summary": "Lors de la remise, propriétaire et locataire examinent le logement et consignent tous les défauts, même minimes ; par sa signature, le locataire accepte les frais éventuels.",
+      "source_passage": [
+        "Lors de la remise du logement, le propriétaire et le locataire examinent ensemble l’état de l’appartement et prennent note, dans un état des lieux écrit, de tous les défauts, y compris les dégâts minimes. Le cas échéant, ils s’accordent pour répartir la prise en charge des réparations. Les associations de locataires donnent des informations sur les dommages qui sont à la charge du locataire. Il est important que le locataire comprenne bien tout ce qui est décidé. En effet, par sa signature, il déclare être d’accord pour prendre en charge des frais éventuels."
+      ],
+      "conditions": {
+        "damage_liability": "La responsabilité des dégâts n’est pas définie ici ; renvoi aux associations de locataires."
+      }
+    },
+    {
+      "item_key": "deposit:residential",
+      "language": "rm",
+      "source": "S10",
+      "source_locator": "Fegl d'infurmaziun «Abitar en Svizra» (rumantsch), pagina PDF 3, paragraf «Pajar in deposit»",
+      "title": "Deposit (cauziun)",
+      "summary": "Il deposit importa maximalmain trais tschains da locaziun mensils sin in conto da cauziun sin il num dal locatari; suenter la partenza vegn el restituì inclusiv ils tschains. En societads cooperativas paja il locatari per regla ina summa per daventar commember.",
+      "source_passage": [
+        "Ils locataris ston savens pajar ordavant ina tscherta summa – in uschenumnà deposit (u cauziun). Quel importa maximalmain trais tschains da locaziun mensils e vegn assegnà ad in conto da banca spezial (in conto da cauziun dal tschains da locaziun) sin il num dal locatari. Il deposit serva al locatur sco garanzia. Suenter la partenza da l'abitaziun vegn il deposit restituì al locatari – inclusiv ils tschains. En cas da societads cooperativas per la construcziun d'abitaziuns na paja il locatari per regla nagin deposit, mabain ina summa per daventar commember. Quella po esser bler pli auta che trais tschains da locaziun mensils."
+      ],
+      "conditions": {
+        "tenancy_type": "Infurmaziun per abitaziuns; betg applitgar automaticamain a locals commerzials.",
+        "cooperative": "La summa da commember po esser bler pli auta che trais tschains mensils.",
+        "edition": "Il colofon dal PDF inditgescha «zercladur 2006»; la pagina da l'UFAB inditgescha il 10-03-2021. Na cumprova betg l'actualitad."
+      }
+    },
+    {
+      "item_key": "handover:incoming",
+      "language": "rm",
+      "source": "S10",
+      "source_locator": "Fegl d'infurmaziun «Abitar en Svizra» (rumantsch), pagina PDF 3, paragraf «Retrair l'abitaziun»",
+      "title": "Retrair l'abitaziun",
+      "summary": "Avant la retratga controlleschan locatur e locatari cuminaivlamain l'abitaziun e protocolleschan en scrit eventuals donns, er pitschens.",
+      "source_passage": [
+        "Il locatari ha il dretg da retrair in'abitaziun netta e bain duvrabla. Avant che novs locataris retiran l'abitaziun, ha lieu la surdada da la clav. Il locatur ed il locatari controlleschan cuminaivlamain il stadi da l'abitaziun e protocolleschan en scrit eventuals donns (er pitschens donns!)."
+      ],
+      "conditions": {
+        "edition": "Il colofon dal PDF inditgescha «zercladur 2006»; la pagina da l'UFAB inditgescha il 10-03-2021. Na cumprova betg l'actualitad."
+      }
+    },
+    {
+      "item_key": "utilities:advance_settlement",
+      "language": "rm",
+      "source": "S10",
+      "source_locator": "Fegl d'infurmaziun «Abitar en Svizra» (rumantsch), pagina PDF 3, paragraf «Pajar tschains da locaziun e custs accessorics»",
+      "title": "Custs accessorics aconto",
+      "summary": "Sche custs accessorics vegnan mess a quint aconto, sto il locatur far almain ina giada per onn in rendaquint detaglià; il locatari po stuair pajar anc ina summa u survegnir enavos daners.",
+      "source_passage": [
+        "Sch'els vegnan mess a quint aconto (vul dir sco pajament a quint), sto il locatur far in rendaquint detaglià almain ina giada per onn. Podar ch'il locatari sto pajar anc ina giada ina summa u ch'el survegn enavos daners. Sco tut ils quints sto er il quint dals custs accessorics vegnir examinà detagliadamain."
+      ],
+      "conditions": {
+        "billing_mode_only": "Vala per custs accessorics aconto.",
+        "edition": "Il colofon dal PDF inditgescha «zercladur 2006»; la pagina da l'UFAB inditgescha il 10-03-2021. Na cumprova betg l'actualitad."
+      }
+    },
+    {
+      "item_key": "defects:notification",
+      "language": "rm",
+      "source": "S10",
+      "source_locator": "Fegl d'infurmaziun «Abitar en Svizra» (rumantsch), pagina PDF 4, paragraf «Sch'insatge va en paglia»",
+      "title": "Donns en l'abitaziun",
+      "summary": "Donns pli gronds ston vegnir annunziads immediatamain al pedel u al locatur, sch'el na fa nagut en scrit ed il meglier per posta recumandada; pitschnas reparaturas fa e paja il locatari sez.",
+      "source_passage": [
+        "En cas da donns pli gronds vala: infurmar immediatamain il pedel u il locatur. Sch'il locatur na fa nagut, duai il locatari annunziar il donn anc ina giada en scrit ed il meglier per posta recumandada. Pitschnas reparaturas u pitschens nettegiaments sto il locatari far e pajar sez. Per exempel remplazzar il filter da la ventilaziun en cuschina, ina lastra u l'uder da la duscha. Sch'in locatari ha chaschunà sez in donn, surpiglia el almain ina part dals custs. Sch'el n'è betg responsabel per il donn, surpiglia il locatur la reparatura sin agens custs."
+      ],
+      "conditions": {
+        "examples_only": "Ils exempels na furman betg ina regla generala da custs.",
+        "edition": "Il colofon dal PDF inditgescha «zercladur 2006»; la pagina da l'UFAB inditgescha il 10-03-2021. Na cumprova betg l'actualitad."
+      }
+    },
+    {
+      "item_key": "alterations:permission",
+      "language": "rm",
+      "source": "S10",
+      "source_locator": "Fegl d'infurmaziun «Abitar en Svizra» (rumantsch), pagina PDF 4, chapitel «Abitar»",
+      "title": "Midadas en l'abitaziun",
+      "summary": "Tgi che vul far midadas en l'abitaziun dovra l'emprim il consentiment en scrit dal locatur.",
+      "source_passage": [
+        "Tgi che vul far midadas en l'abitaziun (dar colur a paraids, remplazzar tarpuns, installar ina maschina da lavar e.u.v.) dovra l'emprim il consentiment en scrit dal locatur."
+      ],
+      "conditions": {
+        "examples_only": "Las lavurs numnadas èn exempels.",
+        "edition": "Il colofon dal PDF inditgescha «zercladur 2006»; la pagina da l'UFAB inditgescha il 10-03-2021. Na cumprova betg l'actualitad."
+      }
+    },
+    {
+      "item_key": "termination:tenant",
+      "language": "rm",
+      "source": "S10",
+      "source_locator": "Fegl d'infurmaziun «Abitar en Svizra» (rumantsch), pagina PDF 4, paragraf «Disdir il contract da locaziun»",
+      "title": "Disditga dal locatari",
+      "summary": "Il locatari disdescha en scrit, il meglier per posta recumandada; tar conjugals ston tuts dus suttascriver. Per partir ad in auter termin po el proponer in locatari successur; uschiglio paja el fin il termin dal contract.",
+      "source_passage": [
+        "Il contract da locaziun po vegnir disdì dal locatari e dal locatur. Ils temps ed ils termins che ston vegnir observads, èn inditgads en il contract. Sch'il locatari disdescha il contract, sto el far quai en scrit ed il meglier per posta recumandada. Conjugals han ils medems dretgs. Quai signifitga che la disditga vala mo, sche tuts dus conjugals han suttascrit. Tgi che vul dar giu in'abitaziun per in auter termin che previs en il contract, po proponer al locatur in locatari successur ch'è pront da surpigliar il contract da locaziun. Il locatur ha temp circa 1 mais per examinar, sch'il locatari successur è effectivamain en cas d'ademplir il contract da locaziun e da pajar il tschains da locaziun. Sche quai n'è betg il cas, sto il locatari pajar il tschains da locaziun fin il termin ch'è fixà en il contract."
+      ],
+      "conditions": {
+        "deadlines": "Temps e termins èn inditgads en il contract.",
+        "approximate": "«circa 1 mais» è in'indicaziun.",
+        "edition": "Il colofon dal PDF inditgescha «zercladur 2006»; la pagina da l'UFAB inditgescha il 10-03-2021. Na cumprova betg l'actualitad."
+      }
+    },
+    {
+      "item_key": "termination:landlord",
+      "language": "rm",
+      "source": "S10",
+      "source_locator": "Fegl d'infurmaziun «Abitar en Svizra» (rumantsch), pagina PDF 4, paragraf «Disdir il contract da locaziun»",
+      "title": "Disditga dal locatur",
+      "summary": "Il locatur sto duvrar in formular uffizial, a conjugals en cuvertas separadas. Tgi che survegn ina disditga ha 30 dis per sa defender en scrit tar l'autoritad da mediaziun.",
+      "source_passage": [
+        "Per disdir il contract da locaziun sto il locatur duvrar in formular uffizial. A conjugals sto el trametter a mintgin mintgamai in formular en ina cuverta separada. En cas spezials po il locatur disdir a curta vista, per exempel sch'il tschains da locaziun na vegn betg pajà. Tgi che survegn ina disditga, ha temp durant 30 dis da sa defender en scrit cunter quella tar l'autoritad da mediaziun."
+      ],
+      "conditions": {
+        "short_notice": "Questa ediziun menziuna disditgas a curta vista en cas spezials (p.ex. tschains betg pajà); betg generalisar.",
+        "local_authority": "Autoritad da mediaziun locala; adressas betg importadas.",
+        "edition": "Il colofon dal PDF inditgescha «zercladur 2006»; la pagina da l'UFAB inditgescha il 10-03-2021. Na cumprova betg l'actualitad."
+      }
+    },
+    {
+      "item_key": "handover:outgoing",
+      "language": "rm",
+      "source": "S10",
+      "source_locator": "Fegl d'infurmaziun «Abitar en Svizra» (rumantsch), pagina PDF 4, paragraf «Partir d'ina abitaziun»",
+      "title": "Returnar l'abitaziun",
+      "summary": "A la partenza controlleschan locatur e locatari l'abitaziun e protocolleschan eventuals donns, er pitschens; cun sia suttascripziun conferma il locatari ch'el è d'accord e surpiglia eventualmain custs.",
+      "source_passage": [
+        "A chaschun da la partenza d'ina abitaziun surdat il locatari l'abitaziun en in stadi net. Sch'il locatari sa dumonda, tge ch'el sto eventualmain remplazzar avant sia partenza, contactescha el il meglier a temp il pedel u il locatur. Il locatur ed il locatari controlleschan cuminaivlamain il stadi da l'abitaziun e protocolleschan en scrit eventuals donns (er pitschens donns!). Ensemen vegni fixà, tgi che paja eventualmain tge reparaturas. Igl è impurtant ch'il locatari chapescha exactamain mintga punct. Cun sia suttascripziun conferma el numnadamain ch'el saja d'accord e ch'el surpiglia eventualmain custs."
+      ],
+      "conditions": {
+        "damage_liability": "La responsabladad per donns n'è betg fixada qua.",
+        "edition": "Il colofon dal PDF inditgescha «zercladur 2006»; la pagina da l'UFAB inditgescha il 10-03-2021. Na cumprova betg l'actualitad."
+      }
+    }
+  ]
+}

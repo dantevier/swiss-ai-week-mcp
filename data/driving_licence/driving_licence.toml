@@ -1,0 +1,374 @@
+# Foreign driving licence exchange: federal rules plus 26 cantonal procedures.
+#
+# Two levels. The substance (12-month deadline, control drive and country
+# exemptions) is federal law and is identical in every canton. Procedure,
+# form, fee and office are cantonal. A complete answer cites both levels,
+# each from the authority responsible for it; do not cite a cantonal page as
+# the source of the federal 12-month rule (BaseKnowledge/SOURCES.md §9.1, §9.3).
+#
+# on_missing_place = "answer": without a canton, answer the federal level and
+# state that the procedure depends on the canton; asking when an answer is
+# already possible is penalised (BaseKnowledge/CHALLENGE.md §5.4).
+#
+# Research notes are kept in English in driving_licence.en.toml.
+
+# --------------------------------------------------------------------------
+# Federal level: one entry for all cantons
+# --------------------------------------------------------------------------
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "CH"
+subtopic = "deadline_and_exams"
+resolution_level = "national"
+on_missing_place = "answer"
+authority = "Bundesamt für Strassen ASTRA"
+authority_level = "federal"
+source_url = "https://www.fedlex.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1976/2423_2423_2423/20260101/de/html/fedlex-data-admin-ch-eli-cc-1976-2423_2423_2423-20260101-de-html.html"
+landing_url = "https://www.fedlex.admin.ch/eli/cc/1976/2423_2423_2423/de"
+source_status = "binding"
+validated_at = "2026-09-23"
+legal_basis = "VZV/OAC, SR 741.51, art. 29, 42-44, 150"
+
+# --------------------------------------------------------------------------
+# Cantonal procedure (26 entries, same structure)
+# --------------------------------------------------------------------------
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "BE"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrs- und Schifffahrtsamt SVSA"
+authority_level = "canton"
+source_url = "https://www.svsa.sid.be.ch/de/start/fuehrerausweise/rund-um-fuehrerausweis/umtausch-fuehrerausweis-ausland.html"
+landing_url = "https://www.svsa.sid.be.ch/de/start.html"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "GR"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrsamt Graubünden STVA"
+authority_level = "canton"
+source_url = "https://www.gr.ch/DE/institutionen/verwaltung/djsg/stva/Documents/Gesuch_um_Umtausch_eines_ausl%C3%A4ndischen_F%C3%BChrerausweises_DE.pdf"
+landing_url = "https://www.gr.ch/DE/institutionen/verwaltung/djsg/stva/Seiten/Start.aspx"
+source_status = "binding"
+validated_at = "2026-09-24"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "TI"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Sezione della circolazione"
+authority_level = "canton"
+source_url = "https://www4.ti.ch/di/sc/home/conversione-licenza-estera"
+landing_url = "https://www4.ti.ch/di/sc/home"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "VD"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Service des automobiles et de la navigation SAN"
+authority_level = "canton"
+source_url = "https://www.vd.ch/prestation/echanger-un-permis-de-conduire-etranger"
+landing_url = "https://www.vd.ch/mobilite/automobile-et-navigation"
+source_status = "binding"
+validated_at = "2026-09-24"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "ZH"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrsamt Kanton Zürich"
+authority_level = "canton"
+source_url = "https://www.zh.ch/de/mobilitaet/fuehrerausweis-fahren-lernen/auslaendischer-fuehrerausweis/auslaendischen-fuehrerausweis-umtauschen.html"
+landing_url = "https://www.zh.ch/de/sicherheitsdirektion/strassenverkehrsamt.html"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "AG"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrsamt Aargau"
+authority_level = "canton"
+source_url = "https://www.ag.ch/media/kanton-aargau/dvi/dokumente/stva/fuehrerausweise/merkblatt-f-r-den-umtausch-von-ausl-ndischen-f-hrerausweisen-v3.pdf"
+landing_url = "https://www.ag.ch/de/themen/mobilitaet-verkehr/strassenverkehr"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "AI"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrsamt Appenzell I.-Rh."
+authority_level = "canton"
+source_url = "https://www.ai.ch/themen/mobilitaet-und-verkehr/strassenverkehr/fuehrerausweise/umschrieb-auslaendischer-fuehrerausweise"
+landing_url = "https://www.ai.ch/verwaltung/justiz-polizei-und-militaerdepartement/strassenverkehrsamt"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "AR"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrsamt Appenzell A.-Rh."
+authority_level = "canton"
+source_url = "https://ar.ch/verwaltung/departement-inneres-und-sicherheit/strassenverkehrsamt/fuehrerausweis/auslaendischer-fuehrerausweis/"
+landing_url = "https://ar.ch/verwaltung/departement-inneres-und-sicherheit/strassenverkehrsamt/"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "BL"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Motorfahrzeugkontrolle Basel-Landschaft"
+authority_level = "canton"
+source_url = "https://www.baselland.ch/politik-und-behorden/direktionen/sicherheitsdirektion/motorfahrzeugkontrolle/fuehrer-und-lernfahrausweise/motorfahrzeugfuehrer-aus-dem-ausland"
+landing_url = "https://www.baselland.ch/politik-und-behorden/direktionen/sicherheitsdirektion/motorfahrzeugkontrolle"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "BS"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Motorfahrzeugkontrolle Basel-Stadt"
+authority_level = "canton"
+source_url = "https://www.bs.ch/themen/mobilitaet/fuehrerausweise/umtausch-schweizer-fuehrerausweis"
+landing_url = "https://www.bs.ch/jsd/polizei/fuer-ihre-sicherheit/im-verkehr/im-strassenverkehr/motorfahrzeugkontrolle"
+source_status = "binding"
+validated_at = "2026-09-24"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "FR"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Freiburg Amt fuer Strassenverkehr und Schifffahrt / Office de la circulation et de la navigation OCN"
+authority_level = "canton"
+source_url = "https://www.ocn.ch/sites/default/files/2025-05/Informations_%20echange_%20permis_%20etranger_20250519.pdf"
+landing_url = "https://www.ocn.ch/fr"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "GE"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Office cantonal des vehicules"
+authority_level = "canton"
+source_url = "https://www.ge.ch/echanger-son-permis-conduire-etranger"
+landing_url = "https://www.ge.ch/organisation/office-cantonal-vehicules-ocv"
+source_status = "binding"
+validated_at = "2026-09-24"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "GL"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrs- und Schifffahrtsamt Glarus"
+authority_level = "canton"
+source_url = "https://www.gl.ch/verwaltung/sicherheit-und-justiz/justiz/strassenverkehrsamt/strassenverkehr/fuehrerzulassung/auslaendischer-ausweis/umtausch.html/401"
+landing_url = "https://www.gl.ch/verwaltung/sicherheit-und-justiz/justiz/strassenverkehrsamt.html/466"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "JU"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Office des vehicules"
+authority_level = "canton"
+source_url = "https://www.jura.ch/fr/Autorites/Administration/DEC/OVJ/Conducteurs-et-eleves-conducteurs/Conducteurs-et-eleves-conducteurs.html"
+landing_url = "https://www.jura.ch/ovj"
+source_status = "binding"
+validated_at = "2026-09-24"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "LU"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrsamt Luzern"
+authority_level = "canton"
+source_url = "https://strassenverkehrsamt.lu.ch/Strassenverkehr/fuehrer_und_lerner/spezielle_fuehrerausweise/auslaendischer_fuehrerausweis"
+landing_url = "https://strassenverkehrsamt.lu.ch/"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "NE"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Service des automobiles et de la navigation SCAN"
+authority_level = "canton"
+source_url = "https://www.scan-ne.ch/conducteur/permis/obtenir-un-permis/permis-etrangers/echange-du-permis-etranger-contre-permis-suisse-voiture-ou-moto/"
+landing_url = "https://www.scan-ne.ch/"
+source_status = "binding"
+validated_at = "2026-09-24"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "NW"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Verkehrssicherheitszentrum OW/NW"
+authority_level = "canton"
+source_url = "https://www.vsz.ch/strassenverkehr/fuehrerausweis/privatpersonen/auslaendische-fuehrerausweise"
+landing_url = "https://www.vsz.ch/"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "OW"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Verkehrssicherheitszentrum OW/NW"
+authority_level = "canton"
+source_url = "https://www.vsz.ch/strassenverkehr/fuehrerausweis/privatpersonen/auslaendische-fuehrerausweise"
+landing_url = "https://www.vsz.ch/"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "SG"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrs- und Schifffahrtsamt St. Gallen"
+authority_level = "canton"
+source_url = "https://www.sg.ch/verkehr/strassenverkehr/fuehrerausweise/umschreibung_vom_ausland.html"
+landing_url = "https://www.sg.ch/verkehr/strassenverkehr.html"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "SH"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrs- und Schifffahrtsamt Schaffhausen"
+authority_level = "canton"
+source_url = "https://services.sh.ch/de/services/gesuch-umtausch-auslandischer-fuhrerausweis"
+landing_url = "https://sh.ch/CMS/Webseite/Kanton-Schaffhausen/Beh-rde/Verwaltung/Baudepartement/Strassenverkehrs--und-Schifffahrtsamt-3612-DE.html"
+source_status = "binding"
+validated_at = "2026-09-24"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "SO"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Motorfahrzeugkontrolle Solothurn"
+authority_level = "canton"
+source_url = "https://so.ch/verwaltung/bau-und-justizdepartement/motorfahrzeugkontrolle/fuehrerinnen-und-fuehrer/fahrzeugfuehrerinnen-und-fahrzeugfuehrer/umtausch-des-auslaendischen-fuehrerausweises/"
+landing_url = "https://so.ch/verwaltung/bau-und-justizdepartement/motorfahrzeugkontrolle/"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "SZ"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Verkehrsamt Kanton Schwyz"
+authority_level = "canton"
+source_url = "https://www.sz.ch/verkehrsamt/strassenverkehr/fahrzeuglenker/fuehrerausweis/auslaendischer-fuehrerausweis.html/8756-8758-8802-9276-9293-12520-12381-12527-12539"
+landing_url = "https://www.sz.ch/behoerden/verwaltung/baudepartement/verkehrsamt.html/8756-8758-8802-9276-9293"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "TG"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrsamt Thurgau"
+authority_level = "canton"
+source_url = "https://strassenverkehrsamt.tg.ch/fuehrerzulassung/fuehrerausweis/umtausch-auslaendischer-fuehrerausweis.html/13128"
+landing_url = "https://strassenverkehrsamt.tg.ch/"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "UR"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Amt fuer Strassen- und Schiffsverkehr Uri"
+authority_level = "canton"
+source_url = "https://www.ur.ch/dienstleistungen/3229"
+landing_url = "https://www.ur.ch/verkehr/4372"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "VS"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Dienststelle fuer Strassenverkehr und Schifffahrt / Service de la circulation routiere et de la navigation"
+authority_level = "canton"
+source_url = "https://www.vs.ch/web/scn/permis-de-conduire-etranger"
+landing_url = "https://www.vs.ch/web/scn"
+source_status = "binding"
+validated_at = "2026-09-23"
+
+[[entry]]
+theme = "driving_licence_exchange"
+jurisdiction = "ZG"
+subtopic = "procedure"
+resolution_level = "cantonal_uniform"
+on_missing_place = "answer"
+authority = "Strassenverkehrsamt Zug"
+authority_level = "canton"
+source_url = "https://cdn.zg.ch/dam/jcr:10f78ed7-4098-4f7e-828c-7e071e7d275f/ZU_M_FU_Umschreibung%20ausl_FA-1%20(QR).pdf"
+landing_url = "https://zg.ch/de/sicherheitsdirektion/strassenverkehrsamt"
+source_status = "binding"
+validated_at = "2026-09-24"
+
