@@ -29,7 +29,66 @@ It installs dependencies, asks for the two API keys (optional, saved to the git-
 
 Manual equivalent for Claude Code: `claude mcp add --scope user mcp-swiss-info -- uv run --directory <path-to-this-repo> python -m mcp_swiss_info.main`.
 
-Next: [Run locally](#run-locally) and [Client configuration](#client-configuration).
+## Run locally
+
+```bash
+uv sync
+uv run python -m mcp_swiss_info.main            # stdio transport (default)
+```
+
+`uv sync --all-extras` additionally installs the `dev` group (pytest, respx,
+ruff, mypy, ...), needed to run the test suite below.
+
+SSE transport, for web/HTTP integration:
+
+```bash
+make run-sse
+# equivalent to:
+uv run python -m mcp_swiss_info.main --transport sse --port 8000
+```
+
+On first use, the knowledge-base tools copy the packaged seed database to
+`~/.swiss-ai-week-mcp/knowledge.sqlite3`; later starts reuse that writable
+copy. Set `KNOWLEDGE_DB_PATH` to use another location. Restart your MCP
+client after changing server code or configuration.
+
+### Client configuration
+
+Claude Desktop / Claude Code (`.mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "mcp-swiss-info": {
+      "command": "uv",
+      "args": ["run", "--frozen", "python", "-m", "mcp_swiss_info.main"]
+    }
+  }
+}
+```
+
+Codex (`.codex/config.toml`):
+
+```toml
+[mcp_servers.mcp-swiss-info]
+command = "uv"
+args = ["run", "--frozen", "python", "-m", "mcp_swiss_info.main"]
+```
+
+OpenCode (`opencode.json`):
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "mcp-swiss-info": {
+      "type": "local",
+      "command": ["uv", "run", "--frozen", "python", "-m", "mcp_swiss_info.main"],
+      "enabled": true
+    }
+  }
+}
+```
 
 ## Check data freshness
 
@@ -340,67 +399,6 @@ Per source:
 
 Zero secrets are committed to this repository. Put credentials in a local
 `.env` file, which is gitignored (`git check-ignore .env` confirms this).
-
-## Run locally
-
-```bash
-uv sync
-uv run python -m mcp_swiss_info.main            # stdio transport (default)
-```
-
-`uv sync --all-extras` additionally installs the `dev` group (pytest, respx,
-ruff, mypy, ...), needed to run the test suite below.
-
-SSE transport, for web/HTTP integration:
-
-```bash
-make run-sse
-# equivalent to:
-uv run python -m mcp_swiss_info.main --transport sse --port 8000
-```
-
-On first use, the knowledge-base tools copy the packaged seed database to
-`~/.swiss-ai-week-mcp/knowledge.sqlite3`; later starts reuse that writable
-copy. Set `KNOWLEDGE_DB_PATH` to use another location. Restart your MCP
-client after changing server code or configuration.
-
-### Client configuration
-
-Claude Desktop / Claude Code (`.mcp.json`):
-
-```json
-{
-  "mcpServers": {
-    "mcp-swiss-info": {
-      "command": "uv",
-      "args": ["run", "--frozen", "python", "-m", "mcp_swiss_info.main"]
-    }
-  }
-}
-```
-
-Codex (`.codex/config.toml`):
-
-```toml
-[mcp_servers.mcp-swiss-info]
-command = "uv"
-args = ["run", "--frozen", "python", "-m", "mcp_swiss_info.main"]
-```
-
-OpenCode (`opencode.json`):
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "mcp": {
-    "mcp-swiss-info": {
-      "type": "local",
-      "command": ["uv", "run", "--frozen", "python", "-m", "mcp_swiss_info.main"],
-      "enabled": true
-    }
-  }
-}
-```
 
 ## Tests
 
