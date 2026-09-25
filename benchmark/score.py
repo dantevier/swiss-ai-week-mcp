@@ -95,7 +95,10 @@ def links_to_source_domain(row: dict[str, Any], answer: str) -> bool | None:
     if not domains:
         return None
     for raw_url in re.findall(r"https?://[^\s<>\"']+", answer):
-        host = (urlparse(raw_url.rstrip(".,;:!?)]}")).hostname or "").lower()
+        try:
+            host = (urlparse(raw_url.rstrip(".,;:!?)]}")).hostname or "").lower()
+        except ValueError:  # a model can output a malformed URL
+            continue
         if any(host == domain or host.endswith("." + domain) for domain in domains):
             return True
     return False
