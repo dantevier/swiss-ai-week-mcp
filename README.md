@@ -42,6 +42,14 @@ Bonilla, Jesus Sebastian, Jiaqi Yu.
   uv run --frozen python -m mcp_swiss_info.main
   ```
 
+  Ready-to-use project configurations are committed for Claude Code and other
+  `.mcp.json`-compatible clients ([`.mcp.json`](.mcp.json)), Antigravity
+  ([`.agents/mcp_config.json`](.agents/mcp_config.json)), Codex
+  ([`.codex/config.toml`](.codex/config.toml)), OpenCode
+  ([`opencode.json`](opencode.json)), and Janito
+  ([`.janito/mcp_services.json`](.janito/mcp_services.json)). Each starts the
+  same local stdio server from the repository root.
+
 6. **Prebuilt data:** setup downloads Python packages (and a compatible Python
   runtime if `uv` needs one), but no application dataset. Approximately 65 MiB
   of tracked data is shipped in the repository:
@@ -72,9 +80,18 @@ Bonilla, Jesus Sebastian, Jiaqi Yu.
   A complete rebuild duration is **above 30 minutes**. The `crawl_federal_sources`,
   `crawl_cantonal_sources`, and `crawl_municipal_sources` MCP tools refresh the
   writable authority-page database but do not replace the packaged seed.
+  The `swiss_health_insurance_premiums` CSV and Markdown exports can also be
+  regenerated for a selected year by manually running the
+  [Regenerate KVG premiums](.github/workflows/regenerate-kvg-premiums.yml)
+  GitHub Actions workflow. It runs `scripts/build_kvg_premiums.py`, validates
+  the exporter, and opens a pull request containing the generated files.
 
 7. **Credentials:** no credential is required to start the server or use its
-  offline tools.
+  offline tools. `CRAWLORA_API_KEY` enables Crawlora's rendered main-content
+  extraction for reviewed HTML/JSON pages. Without it, the crawler uses
+  standard direct web retrieval of the same allow-listed official URL; tools
+  backed by dedicated APIs, local data, or purpose-built fetchers continue to
+  use those mechanisms.
 
   | Environment variable | Purpose | Starts without it? |
   |---|---|---|
@@ -83,8 +100,12 @@ Bonilla, Jesus Sebastian, Jiaqi Yu.
   | `ZEFIX_USERNAME` | Optional username for the documented Zefix PublicREST enrichment API; use with `ZEFIX_PASSWORD` | Yes; LINDAS remains the primary company source |
   | `ZEFIX_PASSWORD` | Optional password for Zefix PublicREST; use with `ZEFIX_USERNAME` | Yes; LINDAS remains the primary company source |
 
-  `ANTHROPIC_API_KEY` is used only by the separate benchmark runner and is not
-  an MCP server credential.
+  No LLM API key is required for normal answers. `ANTHROPIC_API_KEY` is used
+  only by the internal benchmark and MCP-result evaluation runner.
+  `OPENAI_API_KEY` is also accepted by that runner and is optionally used at
+  runtime for semantic ranking and source-refresh embeddings; without it, the
+  server falls back to local keyword ranking. The other optional runtime
+  credentials above are source-specific, not LLM credentials.
 
 8. **Hosted endpoint (optional):** The declared stdio transport does not require either one.
 
@@ -95,6 +116,7 @@ Bonilla, Jesus Sebastian, Jiaqi Yu.
   | 1. Health insurance premiums and basic insurance | All of Switzerland; minimum basic-insurance premiums for premium year 2026 |
   | 3. Law and regulations | Selected federal rules represented by the reviewed sources; not a general-purpose legal search |
   | 6. Residence permits and migration | All of Switzerland at federal SEM-guidance level; cantonal authorities still decide individual cases |
+  | 9. Schools and education | School holidays for all Swiss cantons through live OpenHolidays data; a municipality is required where dates vary below canton level |
   | 11. Road traffic, vehicles and driving licences | Federal exchange rules plus documented fee and requirement facts for all 26 cantons |
   | 12. Housing and renting | All of Switzerland for federal BWO reference-rate and renting guidance |
   | 13. Voting, elections and political rights | Federal political-rights rules only |
@@ -102,10 +124,9 @@ Bonilla, Jesus Sebastian, Jiaqi Yu.
   | 15. Customs and ordering from abroad | All of Switzerland for conservative parcel import-VAT estimates |
   | 16. Statistics, open data, geodata and weather | All of Switzerland, subject to the municipality, postal-code forecast point, weather station, and upstream dataset requested |
 
-  Topics 2, 4, 5, 7, 8, and 10 are not covered. Topic 9 coverage status is
-  **?????**. Supported languages are English, German, French, and Italian;
-  Romansh support is partial. Some tools return verbatim source-language
-  passages rather than translations.
+  Topics 2, 4, 5, 7, 8, and 10 are not covered. Supported languages are
+  English, German, French, and Italian; Romansh support is partial. Some tools
+  return verbatim source-language passages rather than translations.
 
 10. **One example call:** call `swiss_health_insurance_premiums` with:
 
