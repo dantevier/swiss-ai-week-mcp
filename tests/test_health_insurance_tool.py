@@ -2,8 +2,8 @@
 
 import asyncio
 
-from src.mcp_boilerplate.server import mcp
-from src.mcp_boilerplate.tools.health_insurance_tools import swiss_health_insurance_premiums
+from src.mcp_swiss_info.server import mcp
+from src.mcp_swiss_info.tools.health_insurance_tools import swiss_health_insurance_premiums
 
 
 def test_tool_is_registered_with_source_and_validity_description() -> None:

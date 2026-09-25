@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "benchmark"))
 import interpret  # noqa: E402
 import run_mcp  # noqa: E402
 
-from mcp_boilerplate.dashboard import server as dashboard  # noqa: E402
+from mcp_swiss_info.dashboard import server as dashboard  # noqa: E402
 
 
 def question(qid, behavior="answer", must=r"30 (Tage|days)", must_not=r"60 Tage"):
@@ -128,7 +128,7 @@ def test_dashboard_serves_the_latest_run(tmp_path, monkeypatch):
 
 
 def test_settings_page_saves_the_anthropic_key(tmp_path, monkeypatch):
-    from mcp_boilerplate.config import env
+    from mcp_swiss_info.config import env
 
     path = tmp_path / ".env"
     monkeypatch.setattr(env, "ENV_PATH", path)

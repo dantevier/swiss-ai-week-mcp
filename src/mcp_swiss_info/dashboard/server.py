@@ -176,7 +176,7 @@ def ensure_running() -> str:
     if not listening():
         flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         subprocess.Popen(
-            [sys.executable, "-m", "mcp_boilerplate.dashboard"],
+            [sys.executable, "-m", "mcp_swiss_info.dashboard"],
             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             creationflags=flags, start_new_session=sys.platform != "win32",
         )

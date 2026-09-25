@@ -2,10 +2,10 @@
 
 import asyncio
 
-from mcp_boilerplate import bfs
-from mcp_boilerplate import geodata as geo
-from mcp_boilerplate import opendata_catalog as catalog
-from mcp_boilerplate.server import mcp
+from mcp_swiss_info import bfs
+from mcp_swiss_info import geodata as geo
+from mcp_swiss_info import opendata_catalog as catalog
+from mcp_swiss_info.server import mcp
 
 
 def test_public_data_tools_are_registered() -> None:

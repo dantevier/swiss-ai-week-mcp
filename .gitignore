@@ -226,7 +226,7 @@ secrets.json
 *.sqlite
 *.sqlite3
 !data/swiss_places_premiums_2026.sqlite
-!src/mcp_boilerplate/knowledge_seed.sqlite3
+!src/mcp_swiss_info/knowledge_seed.sqlite3
 
 # MCP specific
 mcp_config.json

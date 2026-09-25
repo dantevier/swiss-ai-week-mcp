@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from src.mcp_boilerplate.config.settings import settings
-from src.mcp_boilerplate.server import mcp
-from src.mcp_boilerplate.tools.housing_tools import (
+from src.mcp_swiss_info.config.settings import settings
+from src.mcp_swiss_info.server import mcp
+from src.mcp_swiss_info.tools.housing_tools import (
     swiss_housing_info,
     swiss_reference_interest_rate,
 )

@@ -27,7 +27,7 @@ It installs dependencies, asks for the two API keys (optional, saved to the git-
 
 **API keys:** `OPENAI_API_KEY` is required — refreshing sources embeds new passages and fails without it. `CRAWLORA_API_KEY` is optional — HTML/JSON fetches fall back to a direct download when it is unset.
 
-Manual equivalent for Claude Code: `claude mcp add --scope user mcp-swiss-info -- uv run --directory <path-to-this-repo> python -m mcp_boilerplate.main`.
+Manual equivalent for Claude Code: `claude mcp add --scope user mcp-swiss-info -- uv run --directory <path-to-this-repo> python -m mcp_swiss_info.main`.
 
 Next: [Run locally](#run-locally) and [Client configuration](#client-configuration).
 
@@ -145,7 +145,7 @@ description and response.
   matches (SQLite FTS5) with `method: "keyword_fallback"`.
 - `get_source(level, source)` returns the complete saved page and metadata.
   Levels are `federal`, `cantonal`, and `municipal`; names are in
-  [the approved source list](src/mcp_boilerplate/sources.py).
+  [the approved source list](src/mcp_swiss_info/sources.py).
 - `crawl_federal_sources`, `crawl_cantonal_sources`, `crawl_municipal_sources`
   (each `source: str | None = None`) refresh one approved source by name, or
   every source at that authority level. They accept no pasted URLs. HTML and
@@ -217,9 +217,9 @@ These three tools fetch the selected authority page at query time and return its
 ## Data sources
 
 Two different things share the word "source" here:
-`src/mcp_boilerplate/zefix/sources/` holds the **live API clients**
+`src/mcp_swiss_info/zefix/sources/` holds the **live API clients**
 (`LindasClient`, `ZefixClient`, `GazetteClient`) that `company_info` calls
-fresh on every request and stores nothing; `src/mcp_boilerplate/sources.py`
+fresh on every request and stores nothing; `src/mcp_swiss_info/sources.py`
 is the **single registry of reviewed authorities**, `SOURCES`, so every source
 the server reads is reviewed and attributed in one place. Most rows are pages,
 fetched only when a `crawl_*_sources` call asks for them and saved, not
@@ -301,13 +301,13 @@ of pages.
 
 Outbound requests are further restricted by an egress allow-list enforced on
 every request (including redirects). The allow-list is derived from
-`API_SOURCES` in `src/mcp_boilerplate/sources.py`: `lindas.admin.ch`,
+`API_SOURCES` in `src/mcp_swiss_info/sources.py`: `lindas.admin.ch`,
 `register.ld.admin.ch`, `www.zefix.admin.ch`, `amtsblattportal.ch`.
 
 ### Knowledge base
 
 The crawler has no `RESPECT_ROBOTS_TXT`-equivalent setting; it is compliant
-by construction instead. `check_url()` in `src/mcp_boilerplate/crawler.py`
+by construction instead. `check_url()` in `src/mcp_swiss_info/crawler.py`
 rejects any URL — including a redirect target — that is not exactly one of
 the 16 URLs listed in `sources.py` (13 pages and the 3 commercial-register API
 endpoints, whose crawl fails validation and saves nothing); `crawl_*_sources`
@@ -345,7 +345,7 @@ Zero secrets are committed to this repository. Put credentials in a local
 
 ```bash
 uv sync
-uv run python -m mcp_boilerplate.main            # stdio transport (default)
+uv run python -m mcp_swiss_info.main            # stdio transport (default)
 ```
 
 `uv sync --all-extras` additionally installs the `dev` group (pytest, respx,
@@ -356,7 +356,7 @@ SSE transport, for web/HTTP integration:
 ```bash
 make run-sse
 # equivalent to:
-uv run python -m mcp_boilerplate.main --transport sse --port 8000
+uv run python -m mcp_swiss_info.main --transport sse --port 8000
 ```
 
 On first use, the knowledge-base tools copy the packaged seed database to
@@ -373,7 +373,7 @@ Claude Desktop / Claude Code (`.mcp.json`):
   "mcpServers": {
     "mcp-swiss-info": {
       "command": "uv",
-      "args": ["run", "--frozen", "python", "-m", "mcp_boilerplate.main"]
+      "args": ["run", "--frozen", "python", "-m", "mcp_swiss_info.main"]
     }
   }
 }
@@ -384,7 +384,7 @@ Codex (`.codex/config.toml`):
 ```toml
 [mcp_servers.mcp-swiss-info]
 command = "uv"
-args = ["run", "--frozen", "python", "-m", "mcp_boilerplate.main"]
+args = ["run", "--frozen", "python", "-m", "mcp_swiss_info.main"]
 ```
 
 OpenCode (`opencode.json`):
@@ -395,7 +395,7 @@ OpenCode (`opencode.json`):
   "mcp": {
     "mcp-swiss-info": {
       "type": "local",
-      "command": ["uv", "run", "--frozen", "python", "-m", "mcp_boilerplate.main"],
+      "command": ["uv", "run", "--frozen", "python", "-m", "mcp_swiss_info.main"],
       "enabled": true
     }
   }
@@ -441,9 +441,9 @@ Company data: Zefix, Federal Office of Justice / EHRA, via LINDAS
 extract is authoritative. Official notices: SHAB via amtsblattportal.ch; the
 signed PDF is the binding version.
 
-Parts of `src/mcp_boilerplate/zefix/sources` are vendored from
+Parts of `src/mcp_swiss_info/zefix/sources` are vendored from
 `malkreide/register-mcp`, MIT, Copyright (c) 2026 Hayal Oezkan; see
-`src/mcp_boilerplate/zefix/sources/LICENSE-register-mcp`.
+`src/mcp_swiss_info/zefix/sources/LICENSE-register-mcp`.
 
 Knowledge-base pages are attributed inline by every `search_knowledge` and
 `get_source` result (`authority`, `url`) — see the

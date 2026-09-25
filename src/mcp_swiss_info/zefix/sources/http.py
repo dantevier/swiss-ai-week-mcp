@@ -13,7 +13,7 @@ import httpx
 from ...config.settings import settings
 from ...sources import api_hosts
 
-logger = logging.getLogger("mcp_boilerplate.sources.http")
+logger = logging.getLogger("mcp_swiss_info.sources.http")
 
 
 class EgressDenied(httpx.RequestError):

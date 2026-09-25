@@ -252,7 +252,7 @@ async def run(args: argparse.Namespace, questions: list[dict[str, Any]], out: Pa
     else:
         from fastmcp import Client
 
-        from mcp_boilerplate.server import mcp as server
+        from mcp_swiss_info.server import mcp as server
 
         async with Client(server) as client:
             mcp = McpTools(client, await client.list_tools())
@@ -300,7 +300,7 @@ def main() -> int:
         for r in questions:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
-    logging.getLogger("mcp_boilerplate").setLevel(logging.WARNING)
+    logging.getLogger("mcp_swiss_info").setLevel(logging.WARNING)
     print(f"{len(questions)} questions, model {args.model}, {'no MCP' if args.no_mcp else 'with MCP'} -> {out}", file=sys.stderr)
     meta = {"model": args.model, "provider": provider, "mcp": not args.no_mcp, "questions": len(questions),
             "seed": args.seed, "per_area": args.per_area, "topic_area": args.topic_area,

@@ -3,8 +3,8 @@
 import asyncio
 from datetime import UTC, datetime, timedelta
 
-from mcp_boilerplate import weather
-from mcp_boilerplate.server import mcp
+from mcp_swiss_info import weather
+from mcp_swiss_info.server import mcp
 
 
 def test_tools_are_registered() -> None:

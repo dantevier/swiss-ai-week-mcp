@@ -3,9 +3,9 @@
 import asyncio
 from urllib.error import URLError
 
-from src.mcp_boilerplate import school_holiday as holidays
-from src.mcp_boilerplate.server import mcp
-from src.mcp_boilerplate.tools.school_holiday_tools import swiss_school_holidays
+from src.mcp_swiss_info import school_holiday as holidays
+from src.mcp_swiss_info.server import mcp
+from src.mcp_swiss_info.tools.school_holiday_tools import swiss_school_holidays
 
 
 def call(*args, **kwargs):

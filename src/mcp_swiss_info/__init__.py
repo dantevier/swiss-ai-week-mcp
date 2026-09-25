@@ -1,5 +1,5 @@
 """
-MCP Boilerplate - A robust template for Model Context Protocol server implementations.
+mcp-swiss-info - an MCP server that grounds questions about Switzerland in official sources.
 """
 
 __version__ = "0.1.0"

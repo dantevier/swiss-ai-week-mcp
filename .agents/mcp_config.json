@@ -2,7 +2,7 @@
   "mcpServers": {
     "mcp-swiss-info": {
       "command": "uv",
-      "args": ["run", "python", "-m", "mcp_boilerplate.main"]
+      "args": ["run", "python", "-m", "mcp_swiss_info.main"]
     }
   }
 }

@@ -53,7 +53,7 @@ def test_registers_everywhere_saves_keys_and_is_idempotent(sandbox):
     for cli, prefix in (("claude", "mcp add --scope user mcp-swiss-info -- uv run --directory"),
                         ("codex", "mcp add mcp-swiss-info -- uv run --directory")):
         calls = (tmp_path / f"{cli}.args").read_text().splitlines()
-        assert any(call.strip().startswith(prefix) and call.strip().endswith("python -m mcp_boilerplate.main")
+        assert any(call.strip().startswith(prefix) and call.strip().endswith("python -m mcp_swiss_info.main")
                    for call in calls), calls
         assert any(call.strip().startswith(f"mcp remove") for call in calls)  # rerun drops the old entry first
     config = json.loads((tmp_path / "opencode.json").read_text())

@@ -1,5 +1,5 @@
 """
-Prompts module for the MCP Boilerplate server.
+Prompts module for the mcp-swiss-info server.
 
 Import all prompt modules to register them with the MCP server.
 """

@@ -1,5 +1,5 @@
 """
-Swiss tax tools for the MCP Boilerplate server.
+Swiss tax tools for the mcp-swiss-info server.
 """
 
 from ..server import mcp

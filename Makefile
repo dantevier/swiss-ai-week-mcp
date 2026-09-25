@@ -1,4 +1,4 @@
-# MCP Boilerplate Server Makefile
+# mcp-swiss-info Server Makefile
 
 .PHONY: help setup dashboard install install-dev test lint format type-check clean run build docs
 
@@ -28,7 +28,7 @@ setup:
 	powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1
 
 dashboard:
-	uv run python -m mcp_boilerplate.dashboard
+	uv run python -m mcp_swiss_info.dashboard
 
 install:
 	uv sync --no-dev
@@ -67,28 +67,28 @@ clean:
 
 # Running
 run:
-	uv run python -m mcp_boilerplate.main
+	uv run python -m mcp_swiss_info.main
 
 run-debug:
-	uv run python -m mcp_boilerplate.main --debug
+	uv run python -m mcp_swiss_info.main --debug
 
 run-sse:
-	uv run python -m mcp_boilerplate.main --transport sse --port 8000
+	uv run python -m mcp_swiss_info.main --transport sse --port 8000
 
 run-sse-debug:
-	uv run python -m mcp_boilerplate.main --transport sse --port 8000 --debug
+	uv run python -m mcp_swiss_info.main --transport sse --port 8000 --debug
 
 # MCP Inspector (requires FastMCP CLI)
 run-inspector:
 	@echo "Starting MCP server with Inspector..."
 	@echo "This will open MCP Inspector in your browser"
 	@command -v fastmcp >/dev/null 2>&1 || (echo "FastMCP CLI not found. Install with: pip install 'fastmcp[cli]>=2.0.0'" && exit 1)
-	fastmcp dev src/mcp_boilerplate/inspector.py
+	fastmcp dev src/mcp_swiss_info/inspector.py
 
 run-inspector-debug:
 	@echo "Starting MCP server with Inspector in debug mode..."
 	@command -v fastmcp >/dev/null 2>&1 || (echo "FastMCP CLI not found. Install with: pip install 'fastmcp[cli]>=2.0.0'" && exit 1)
-	DEBUG=1 fastmcp dev src/mcp_boilerplate/inspector.py
+	DEBUG=1 fastmcp dev src/mcp_swiss_info/inspector.py
 
 # Building
 build:

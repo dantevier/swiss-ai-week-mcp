@@ -11,7 +11,7 @@ from .config.settings import settings
 from .utils.logger import setup_logger
 
 # Initialize the logger
-logger = setup_logger("mcp_boilerplate.server")
+logger = setup_logger("mcp_swiss_info.server")
 
 
 @asynccontextmanager

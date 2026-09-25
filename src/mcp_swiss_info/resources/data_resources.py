@@ -1,5 +1,5 @@
 """
-Data resources for the MCP Boilerplate server.
+Data resources for the mcp-swiss-info server.
 """
 
 import json
@@ -10,7 +10,7 @@ from ..server import mcp
 from ..utils.logger import setup_logger
 from ..utils.validation import sanitize_input
 
-logger = setup_logger("mcp_boilerplate.resources.data")
+logger = setup_logger("mcp_swiss_info.resources.data")
 
 # In-memory data store for demo purposes
 data_store: dict[str, Any] = {

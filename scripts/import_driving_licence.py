@@ -15,12 +15,12 @@ TRANSLATIONS = ROOT / "data" / "driving_licence" / "driving_licence.en.toml"
 SCHEMA = (
     ROOT
     / "src"
-    / "mcp_boilerplate"
+    / "mcp_swiss_info"
     / "storage"
     / "migrations"
     / "001_driving_licence_sources.sql"
 )
-FACT_SCHEMA = ROOT / "src" / "mcp_boilerplate" / "storage" / "migrations" / "002_driving_licence_facts.sql"
+FACT_SCHEMA = ROOT / "src" / "mcp_swiss_info" / "storage" / "migrations" / "002_driving_licence_facts.sql"
 FACT_SOURCE = ROOT / "data" / "driving_licence" / "driving_licence_facts.json"
 DEFAULT_DATABASE = ROOT / "var" / "swissproject.sqlite3"
 THEME = "driving_licence_exchange"
