@@ -23,9 +23,13 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 It installs dependencies, asks for the two API keys (optional, saved to the git-ignored `.env`), and registers the server in whichever of Claude Code, Codex and opencode it finds. Restart the harness afterwards. Use `-Yes` to skip prompts (keys are then read from `$env:CRAWLORA_API_KEY` and `$env:OPENAI_API_KEY`), and `-Uninstall` to remove the server from every harness.
 
-**First time:** run  once in the repo directory — it prepares the environment, and the server is then ready to be used as an MCP server over stdio. ( already does this.)
+**First time:** run `uv sync` once in the repo directory — it prepares the environment, and the server is then ready to be used as an MCP server over stdio. (`install.ps1` already does this.)
+
+**API keys:** `OPENAI_API_KEY` is required — refreshing sources embeds new passages and fails without it. `CRAWLORA_API_KEY` is optional — HTML/JSON fetches fall back to a direct download when it is unset.
 
 Manual equivalent for Claude Code: `claude mcp add --scope user mcp-swiss-info -- uv run --directory <path-to-this-repo> python -m mcp_boilerplate.main`.
+
+Next: [Run locally](#run-locally) and [Client configuration](#client-configuration).
 
 ## Check data freshness
 
