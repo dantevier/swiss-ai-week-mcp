@@ -15,7 +15,7 @@ Bonilla, Jesus Sebastian, Jiaqi Yu.
 
 ## Install
 
-Requires [uv](https://docs.astral.sh/uv/). From a clone of this repo, in PowerShell:
+Requires [uv](https://docs.astral.sh/uv/getting-started/installation/). From a clone of this repo, in PowerShell:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1
