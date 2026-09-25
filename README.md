@@ -170,6 +170,17 @@ Source data: `data/housing_knowledge.json` and `data/driving_licence/`. Run `uv 
 
 Run `uv run pytest -q` for local checks. Credentials belong in local environment variables or `.env`, never in the repository.
 
+## Swiss school holidays (live)
+
+`swiss_school_holidays(canton, school_year=None, holiday_type=None, municipality=None)` fetches structured school holiday dates and names directly from [OpenHolidays](https://www.openholidaysapi.org/en/) (CC BY 4.0). Internet access to `openholidaysapi.org` is required; no API key is needed. The response includes the exact source URL, license, requested scope, and each record's area codes and school types. Records for different school types remain separate even when their dates match.
+
+- `canton`: two-letter code such as `BE`, or `CH-BE`.
+- `school_year`: starting calendar year; `2026` means August 1, 2026 through July 31, 2027. Defaults to the current school year in `Europe/Zurich`. OpenHolidays returns a full holiday period if any part overlaps this window.
+- `holiday_type`: optional name fragment in any OpenHolidays translation, such as `summer` or `Sommerferien`.
+- `municipality`: exact municipality name or OpenHolidays subdivision code, such as `CH-GR-ML-BR`. The tool resolves it against OpenHolidays' live subdivision list.
+
+When OpenHolidays records vary below canton level, the tool returns `municipality_required` until a municipality is given. [Zurich's school holiday rules](https://www.zh.ch/de/bildung/bildungssystem/schulferien.html) also leave dates to individual schools, so Zurich queries require a municipality and carry a coverage note. OpenHolidays may still omit local sport holidays and school-free days; confirm exact dates with the relevant school. A municipality result is labeled as such, and each holiday retains its canton or district source scope. `no_data` means the API returned no matching records; `source_unavailable` means the live lookup failed.
+
 ## MeteoSwiss weather
 
 The weather tools download MeteoSwiss Open Data files from `data.geo.admin.ch` and return only the requested point or station and time period. No API key is needed. Times are UTC unless specified otherwise; missing measurements are returned as `null`. Results include source URLs and the required “Source: MeteoSwiss” attribution.
@@ -462,3 +473,5 @@ Knowledge base and premium lookup:
 - The premium table is frozen to 2026; the tool returns `invalid_input`/
   `no_data` rather than an outdated figure once a new premium year applies,
   and a fresh CSV has to be regenerated and shipped, not auto-refreshed.
+
+The MCP response includes a readable holiday list for chat clients and the original structured fields for programmatic use. [AGENTS.md](AGENTS.md) directs Codex to use this tool first for school holiday questions. Codex web search remains available for other questions or when you explicitly request independent verification. Start a new Codex session after changing its guidance.
