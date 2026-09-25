@@ -66,6 +66,12 @@ def test_env_file_fills_missing_keys_only(tmp_path, monkeypatch):
     assert run_mcp.os.environ["OTHER_KEY"] == "from-env"
 
 
+def test_model_prompt_includes_server_instructions_only_with_mcp():
+    mcp = run_mcp.McpTools(None, [], "Use specific tools before search_knowledge.")
+    assert "Use specific tools before search_knowledge." in run_mcp.system_prompt(mcp)
+    assert run_mcp.system_prompt(None) == run_mcp.SYSTEM_PROMPT
+
+
 def test_interpretation_explains_each_failure(tmp_path):
     rows = [question("ok"), question("error"), question("wrong"), question("ask", behavior="ask_back", must=None),
             question("notool"), question("missed"), question("declined"), question("gap")]

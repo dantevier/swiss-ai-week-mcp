@@ -67,14 +67,21 @@ If you cannot find a reliable answer, say so instead of guessing."""
 TOOLS_HINT = "\nUse the available tools to look up official sources before answering."
 
 
+def system_prompt(mcp: McpTools | None) -> str:
+    if mcp is None:
+        return SYSTEM_PROMPT
+    return SYSTEM_PROMPT + TOOLS_HINT + ("\n" + mcp.instructions if mcp.instructions else "")
+
+
 # ---------- MCP ----------
 
 class McpTools:
     """The server's tools, called in-process through a FastMCP client."""
 
-    def __init__(self, client: Any, tools: list[Any]):
+    def __init__(self, client: Any, tools: list[Any], instructions: str = ""):
         self.client = client
         self.tools = [t for t in tools if not EXCLUDED_TOOLS.match(t.name)]
+        self.instructions = instructions
 
     async def call(self, name: str, args: dict[str, Any]) -> tuple[str, bool]:
         try:
@@ -102,7 +109,7 @@ class AnthropicAgent:
             {"name": t.name, "description": t.description or "", "input_schema": t.input_schema}
             for t in (mcp.tools if mcp else [])
         ]
-        system = SYSTEM_PROMPT + (TOOLS_HINT if mcp else "")
+        system = system_prompt(mcp)
         messages: list[dict[str, Any]] = [{"role": "user", "content": question}]
         for _ in range(MAX_TOOL_ROUNDS + 1):
             kwargs = {"tools": tools} if tools else {}
@@ -138,7 +145,7 @@ class OpenAICompatAgent:
              "function": {"name": t.name, "description": t.description or "", "parameters": t.input_schema}}
             for t in (mcp.tools if mcp else [])
         ]
-        system = SYSTEM_PROMPT + (TOOLS_HINT if mcp else "")
+        system = system_prompt(mcp)
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": system},
             {"role": "user", "content": question},
@@ -255,7 +262,7 @@ async def run(args: argparse.Namespace, questions: list[dict[str, Any]], out: Pa
         from mcp_swiss_info.server import mcp as server
 
         async with Client(server) as client:
-            mcp = McpTools(client, await client.list_tools())
+            mcp = McpTools(client, await client.list_tools(), server.instructions or "")
             print(f"MCP tools: {', '.join(t.name for t in mcp.tools)}", file=sys.stderr)
             results = await asyncio.gather(*(one(r, mcp) for r in questions))
 
