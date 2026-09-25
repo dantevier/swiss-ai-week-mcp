@@ -13,6 +13,133 @@ directly from a precomputed table. Also known by its MCP server name,
 Team: Roberto Cerrone, Edoardo Diana, Alberto Minetti, Vincent Van Loo, Victor
 Bonilla, Jesus Sebastian, Jiaqi Yu.
 
+## Evaluation quick start
+
+1. **Commit to evaluate:** tag `v1.0`.
+
+2. **Transport:** stdio. No port or HTTP path is needed.
+
+3. **Runtime:** Python 3.11 or newer (the package metadata declares Python
+  3.11/3.12), with `uv` and the committed `uv.lock`. The server runs from
+  source; no prebuilt container image is shipped. It is intended to run in a
+  Linux container on arm64. No project-specific system package is required;
+  the setup block requires a POSIX shell, `curl`, and CA certificates.
+
+4. **Setup:** run this non-interactive block from the repository root:
+
+  ```bash
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  export PATH="$HOME/.local/bin:$PATH"
+  uv sync --frozen --no-dev
+  ```
+
+  Setup duration: **immediate (<2s)**. Additional disk required after cloning:
+  **8 MB**. Peak setup memory: **Unknown in the long run**.
+
+5. **Start command:**
+
+  ```bash
+  uv run --frozen python -m mcp_swiss_info.main
+  ```
+
+6. **Prebuilt data:** setup downloads Python packages (and a compatible Python
+  runtime if `uv` needs one), but no application dataset. Approximately 65 MiB
+  of tracked data is shipped in the repository:
+
+  - `data/swiss_places_premiums_2026.sqlite` (about 29 MiB) contains BFS
+    municipalities and mutations, BAG 2026 premiums, Fedlex premium regions,
+    and the reviewed benchmark facts used to build it.
+  - `data/kvg_minimum_premiums_2026.csv` (about 15 MiB) is the 2026 lookup
+    table extracted from the KVG26 mapper and cross-referenced against
+    Priminfo; its generated Markdown rendering is about 12 MiB.
+  - `src/mcp_swiss_info/knowledge_seed.sqlite3` (about 9.4 MiB) contains the
+    saved reviewed authority pages. On first use it is copied to
+    `~/.swiss-ai-week-mcp/knowledge.sqlite3`.
+  - `data/housing_knowledge.json` (about 108 KiB) and
+    `data/driving_licence/driving_licence_facts.json` (about 96 KiB) are
+    imported into `var/swissproject.sqlite3` when the server starts.
+
+  Network rebuild and local import commands are:
+
+  ```bash
+  uv run --frozen python scripts/build_knowledge_db.py
+  uv run --frozen python scripts/build_kvg_premiums.py --year 2026
+  uv run --frozen python scripts/import_housing.py
+  uv run --frozen python scripts/import_driving_licence.py
+  # Rebuild command for src/mcp_swiss_info/knowledge_seed.sqlite3: ?????
+  ```
+
+  A complete rebuild duration is **above 30 minutes**. The `crawl_federal_sources`,
+  `crawl_cantonal_sources`, and `crawl_municipal_sources` MCP tools refresh the
+  writable authority-page database but do not replace the packaged seed.
+
+7. **Credentials:** no credential is required to start the server or use its
+  offline tools.
+
+  | Environment variable | Purpose | Starts without it? |
+  |---|---|---|
+  | `OPENAI_API_KEY` | Optional semantic ranking; required only when a `crawl_*_sources` refresh embeds new passages | Yes; search uses SQLite keyword ranking and refresh embedding is unavailable |
+  | `CRAWLORA_API_KEY` | Optional Crawlora retrieval of approved HTML/JSON sources | Yes; refreshes fall back to direct retrieval of the same approved URL |
+  | `ZEFIX_USERNAME` | Optional username for the documented Zefix PublicREST enrichment API; use with `ZEFIX_PASSWORD` | Yes; LINDAS remains the primary company source |
+  | `ZEFIX_PASSWORD` | Optional password for Zefix PublicREST; use with `ZEFIX_USERNAME` | Yes; LINDAS remains the primary company source |
+
+  `ANTHROPIC_API_KEY` is used only by the separate benchmark runner and is not
+  an MCP server credential.
+
+8. **Hosted endpoint (optional):** The declared stdio transport does not require either one.
+
+9. **Declared scope:**
+
+  | Topic | Declared geography and coverage |
+  |---|---|
+  | 1. Health insurance premiums and basic insurance | All of Switzerland; minimum basic-insurance premiums for premium year 2026 |
+  | 3. Law and regulations | Selected federal rules represented by the reviewed sources; not a general-purpose legal search |
+  | 6. Residence permits and migration | All of Switzerland at federal SEM-guidance level; cantonal authorities still decide individual cases |
+  | 11. Road traffic, vehicles and driving licences | Federal exchange rules plus documented fee and requirement facts for all 26 cantons |
+  | 12. Housing and renting | All of Switzerland for federal BWO reference-rate and renting guidance |
+  | 13. Voting, elections and political rights | Federal political-rights rules only |
+  | 14. Companies, commercial register and VAT | All of Switzerland for companies and commercial-register publications; VAT status is not covered |
+  | 15. Customs and ordering from abroad | All of Switzerland for conservative parcel import-VAT estimates |
+  | 16. Statistics, open data, geodata and weather | All of Switzerland, subject to the municipality, postal-code forecast point, weather station, and upstream dataset requested |
+
+  Topics 2, 4, 5, 7, 8, and 10 are not covered. Topic 9 coverage status is
+  **?????**. Supported languages are English, German, French, and Italian;
+  Romansh support is partial. Some tools return verbatim source-language
+  passages rather than translations.
+
+10. **One example call:** call `swiss_health_insurance_premiums` with:
+
+   ```json
+   {
+    "age": 30,
+    "municipality_code": 5192,
+    "franchise": 2500
+   }
+   ```
+
+   This performs an offline 2026 lookup for Lugano (BFS municipality 5192)
+   and returns the minimum monthly options both with and without accident
+   cover, including insurer, model, source, and validity information.
+
+11. **Known limits:** the server is intentionally not a complete Swiss public
+   information service. Topics listed as not covered are out of scope; topic 3
+   contains selected reviewed rules rather than the full body of Swiss law.
+   Premium answers are valid only for 2026. Live company, school-holiday,
+   weather, population, geodata, open-data, migration, political-rights, and
+   customs lookups require network access to their named upstream authorities.
+   Commercial-register answers exclude natural persons, VAT status, certified
+   extracts, and register-wide analytics. Source-language passages are not
+   automatically translated.
+
+12. **robots.txt and terms of use:** `RESPECT_ROBOTS_TXT=true` by default. With
+   that default, the undocumented Zefix web endpoint is not called. The
+   reviewed knowledge crawler has no equivalent toggle: it accepts only the
+   fixed source registry, checks redirect targets against that allow-list, and
+   accesses sources reviewed for their terms of use. See [Compliance](#compliance).
+
+13. **Parallel use:** support for several simultaneous conversations is
+   **available** (not load-tested). Approximate cold-start time is **5 seconds**.
+
 ## Install
 
 Requires [uv](https://docs.astral.sh/uv/getting-started/installation/). From a clone of this repo, in PowerShell:
