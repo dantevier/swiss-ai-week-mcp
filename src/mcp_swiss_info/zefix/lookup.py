@@ -36,7 +36,7 @@ from .sources.http import SourceUnavailable
 from .sources.lindas import LindasClient
 from .sources.rest import ZefixClient
 
-logger = setup_logger("mcp_boilerplate.zefix.lookup")
+logger = setup_logger("mcp_swiss_info.zefix.lookup")
 
 # Gazette rubrics that are commercial-register publications (HR = Handelsregister).
 # Other rubrics (building permits, debt enforcement, ...) also cite company UIDs

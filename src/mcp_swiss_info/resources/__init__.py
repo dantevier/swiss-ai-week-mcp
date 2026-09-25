@@ -1,5 +1,5 @@
 """
-Resources module for the MCP Boilerplate server.
+Resources module for the mcp-swiss-info server.
 
 Import all resource modules to register them with the MCP server.
 """

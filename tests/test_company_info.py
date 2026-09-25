@@ -19,11 +19,11 @@ import json
 import pytest
 import respx
 
-from mcp_boilerplate.config.settings import Settings
-from mcp_boilerplate.zefix import envelope, gates
-from mcp_boilerplate.zefix.sources import gazette
-from mcp_boilerplate.zefix.sources.http import EgressDenied, SourceUnavailable, make_client
-from mcp_boilerplate.zefix.sources.rest import format_uid
+from mcp_swiss_info.config.settings import Settings
+from mcp_swiss_info.zefix import envelope, gates
+from mcp_swiss_info.zefix.sources import gazette
+from mcp_swiss_info.zefix.sources.http import EgressDenied, SourceUnavailable, make_client
+from mcp_swiss_info.zefix.sources.rest import format_uid
 
 from .conftest import FakeGazette, FakeLindas, FakeZefix, lookup
 
@@ -195,7 +195,7 @@ async def test_q3b_uid_lookup_with_enrichment_when_robots_disabled(swisscom, enr
 async def test_q4_publications_attached_newest_first_capped(swisscom):
     """PRD §5.2 step 5, §4 Q4: gazette publications are attached newest first and
     capped at max_publications; publications_status is "answered" on success."""
-    from mcp_boilerplate.zefix.sources.gazette import Publication
+    from mcp_swiss_info.zefix.sources.gazette import Publication
 
     six_newest_first = [
         Publication(
@@ -542,7 +542,7 @@ def _ubs_seats():
     Mirrors the live shape reported by the verifier: ehraid 415520 (Basel)
     and 421132 (Zürich), both CHE101329561, both legalName "UBS AG".
     """
-    from mcp_boilerplate.zefix.sources.lindas import Company
+    from mcp_swiss_info.zefix.sources.lindas import Company
 
     common = {
         "uid": "CHE101329561",
@@ -620,7 +620,7 @@ async def test_mixed_ambiguous_candidates_are_deduplicated_by_uid():
     """F2: a genuinely ambiguous prefix search (two distinct legal entities) still
     de-duplicates need_info candidates by uid, joining the seats of a
     multi-seat uid into one candidate row rather than listing it twice."""
-    from mcp_boilerplate.zefix.sources.lindas import Company
+    from mcp_swiss_info.zefix.sources.lindas import Company
 
     basel, zurich = _ubs_seats()
     fund_mgmt = Company(

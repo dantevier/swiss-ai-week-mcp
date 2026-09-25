@@ -2,13 +2,13 @@
 
 import pytest
 
-from mcp_boilerplate import knowledge
-from mcp_boilerplate.crawler import Crawler, check_url
-from mcp_boilerplate.knowledge import KnowledgeBase
-from mcp_boilerplate.server import mcp
-from mcp_boilerplate.source_access import SourceAccess
-from mcp_boilerplate.sources import SOURCES
-from mcp_boilerplate.tools import source_tools
+from mcp_swiss_info import knowledge
+from mcp_swiss_info.crawler import Crawler, check_url
+from mcp_swiss_info.knowledge import KnowledgeBase
+from mcp_swiss_info.server import mcp
+from mcp_swiss_info.source_access import SourceAccess
+from mcp_swiss_info.sources import SOURCES
+from mcp_swiss_info.tools import source_tools
 
 
 class FakeFetcher:

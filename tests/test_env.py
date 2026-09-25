@@ -3,8 +3,8 @@
 import pytest
 from starlette.testclient import TestClient
 
-from mcp_boilerplate.dashboard import server as dashboard
-from mcp_boilerplate.config import env
+from mcp_swiss_info.dashboard import server as dashboard
+from mcp_swiss_info.config import env
 
 
 def test_save_preserves_other_lines_and_validates(tmp_path):

@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from mcp_boilerplate import (
+from mcp_swiss_info import (
     bfs,
     customs,
     driving_licence,
@@ -17,8 +17,8 @@ from mcp_boilerplate import (
     political_rights,
     weather,
 )
-from mcp_boilerplate.source_access import SourceAccess
-from mcp_boilerplate.tools import (
+from mcp_swiss_info.source_access import SourceAccess
+from mcp_swiss_info.tools import (
     bfs_tools,
     customs_tools,
     driving_licence_tools,

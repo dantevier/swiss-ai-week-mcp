@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from src.mcp_boilerplate.config.settings import settings
-from src.mcp_boilerplate.server import mcp
-from src.mcp_boilerplate.tools.driving_licence_tools import get_driving_licence_exchange_info
+from src.mcp_swiss_info.config.settings import settings
+from src.mcp_swiss_info.server import mcp
+from src.mcp_swiss_info.tools.driving_licence_tools import get_driving_licence_exchange_info
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location(

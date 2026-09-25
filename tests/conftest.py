@@ -14,12 +14,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from mcp_boilerplate.config.settings import Settings
-from mcp_boilerplate.zefix import CompanyLookup
-from mcp_boilerplate.zefix.sources import gazette
-from mcp_boilerplate.zefix.sources.gazette import Publication
-from mcp_boilerplate.zefix.sources.lindas import Company
-from mcp_boilerplate.zefix.sources.rest import Enrichment, ZefixClient
+from mcp_swiss_info.config.settings import Settings
+from mcp_swiss_info.zefix import CompanyLookup
+from mcp_swiss_info.zefix.sources import gazette
+from mcp_swiss_info.zefix.sources.gazette import Publication
+from mcp_swiss_info.zefix.sources.lindas import Company
+from mcp_swiss_info.zefix.sources.rest import Enrichment, ZefixClient
 
 # ---------------------------------------------------------------------------
 # Company / Enrichment / Publication fixtures (PRD §5.3)

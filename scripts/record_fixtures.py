@@ -60,8 +60,8 @@ def _append_provenance(entries: list[str]) -> None:
 async def record_lindas() -> None:
     # Imported lazily so `--help`-style misuse doesn't require the package
     # to be importable in every environment that might run this script.
-    from mcp_boilerplate.config.settings import settings
-    from mcp_boilerplate.zefix.sources import lindas
+    from mcp_swiss_info.config.settings import settings
+    from mcp_swiss_info.zefix.sources import lindas
 
     FIXTURES_DIR.mkdir(parents=True, exist_ok=True)
     entries: list[str] = []

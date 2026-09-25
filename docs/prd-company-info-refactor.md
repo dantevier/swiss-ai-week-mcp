@@ -8,7 +8,7 @@ PR #7 ships `company_info` as a 915-line module under `tools/`, a 539-line `enve
 
 | Code | Decision |
 |---|---|
-| D1 | `tools/company_info.py` keeps only the MCP surface: signature, docstring, `@mcp.tool`, one delegate call. Everything else lives in one package, `mcp_boilerplate/zefix/`. |
+| D1 | `tools/company_info.py` keeps only the MCP surface: signature, docstring, `@mcp.tool`, one delegate call. Everything else lives in one package, `mcp_swiss_info/zefix/`. |
 | D2 | Orchestrator `CompanyLookup` in `zefix/lookup.py`, constructor-injected clients and config, mirroring `Crawler(web_fetcher, pdf_fetcher, database, embedder)`. |
 | D3 | The three source clients live in `zefix/sources/` (moved from `zefix_sources/` with `git mv`) and become classes (`LindasClient`, `ZefixClient`, `GazetteClient`) whose constructors take config with defaults from `settings`. Method names and pure helpers keep their vendored names. |
 | D4 | `SOURCES` is the one reviewed registry. `SOURCES["federal"]` lists Zefix/LINDAS and the gazette as three plain `Source` rows (`zefix_lindas`, `zefix_web`, `gazette`: url = API base URL, authority, `expected = NOT_A_PAGE`), so every source the server reads is reviewed and attributed in one place. The companion table `API_SOURCES: dict[str, ApiSource]` is defined first and holds the API data: `hosts` (feeding the egress allow-list `api_hosts()`) and `terms`, plus the `base_url` and `authority` the three `Source` rows are built from. Settings defaults for the three endpoints come from `API_SOURCES[*].base_url`. No consumer filters by kind (F5). |
@@ -55,7 +55,7 @@ Non-goals:
 ## 4. Target architecture
 
 ```
-src/mcp_boilerplate/
+src/mcp_swiss_info/
   sources.py              SOURCES (pages + NOT_A_PAGE rows zefix_lindas, zefix_web, gazette); API_SOURCES (base_url, hosts, authority, terms); api_hosts()
   zefix/                  NEW package: everything company_info needs except the MCP surface
     __init__.py           exports CompanyLookup
@@ -78,11 +78,11 @@ Path moves (`git mv`, history preserved) and the files whose imports or text cha
 
 | From | To |
 |---|---|
-| `src/mcp_boilerplate/envelope.py` | `src/mcp_boilerplate/zefix/envelope.py` |
-| `src/mcp_boilerplate/zefix_sources/{__init__,http,lindas,zefix,gazette}.py`, `LICENSE-register-mcp` | `src/mcp_boilerplate/zefix/sources/` |
+| `src/mcp_swiss_info/envelope.py` | `src/mcp_swiss_info/zefix/envelope.py` |
+| `src/mcp_swiss_info/zefix_sources/{__init__,http,lindas,zefix,gazette}.py`, `LICENSE-register-mcp` | `src/mcp_swiss_info/zefix/sources/` |
 | `tests/test_zefix_sources_{lindas,zefix,gazette}.py` | unchanged names; imports updated |
 
-Import rewrites: `mcp_boilerplate.zefix_sources` → `mcp_boilerplate.zefix.sources`, `mcp_boilerplate.envelope` → `mcp_boilerplate.zefix.envelope`, in `tools/company_info.py`, `scripts/record_fixtures.py`, `tests/conftest.py`, `tests/test_company_info.py`, `tests/test_live.py`, the three `tests/test_zefix_sources_*.py`. Text references in `README.md` (lines naming `zefix_sources/`) and `docs/prd-zefix-company-info.md` §8 are rewritten to the new paths. Inside the package, relative imports change depth: `..config.settings` becomes `...config.settings` in `zefix/sources/*`.
+Import rewrites: `mcp_swiss_info.zefix_sources` → `mcp_swiss_info.zefix.sources`, `mcp_swiss_info.envelope` → `mcp_swiss_info.zefix.envelope`, in `tools/company_info.py`, `scripts/record_fixtures.py`, `tests/conftest.py`, `tests/test_company_info.py`, `tests/test_live.py`, the three `tests/test_zefix_sources_*.py`. Text references in `README.md` (lines naming `zefix_sources/`) and `docs/prd-zefix-company-info.md` §8 are rewritten to the new paths. Inside the package, relative imports change depth: `..config.settings` becomes `...config.settings` in `zefix/sources/*`.
 
 Symbol map, `tools/company_info.py` today → destination:
 

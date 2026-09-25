@@ -270,7 +270,7 @@ Neither LINDAS nor the Zefix record has structured person fields (verified again
 
 ### 6.7 Egress
 
-Outbound hosts are limited to `lindas.admin.ch`, `register.ld.admin.ch`, `www.zefix.admin.ch`, and `amtsblattportal.ch` by an httpx event hook that also inspects redirects. The allow-list is derived from `API_SOURCES` in `src/mcp_boilerplate/sources.py`.
+Outbound hosts are limited to `lindas.admin.ch`, `register.ld.admin.ch`, `www.zefix.admin.ch`, and `amtsblattportal.ch` by an httpx event hook that also inspects redirects. The allow-list is derived from `API_SOURCES` in `src/mcp_swiss_info/sources.py`.
 
 ## 7. Storage
 
@@ -289,7 +289,7 @@ Rejected: cache-on-read (SQLite). It would let the tool answer during an upstrea
 ## 8. Code architecture in this repo
 
 ```
-src/mcp_boilerplate/
+src/mcp_swiss_info/
   config/settings.py            + LINDAS_ENDPOINT, ZEFIX_BASE_URL, ZEFIX_USERNAME, ZEFIX_PASSWORD, GAZETTE_BASE_URL,
                                   RESPECT_ROBOTS_TXT, USER_AGENT, LINDAS_TIMEOUT_S, ZEFIX_TIMEOUT_S,
                                   CALL_BUDGET_S, REFERENCE_CACHE_TTL_S
@@ -346,7 +346,7 @@ Vendoring rules: keep function names and the three upstream-quirk guards intact 
 - `RESPECT_ROBOTS_TXT`: default `true`, meaning, which fields the Zefix web endpoint adds when set to `false`, and that setting credentials enables the documented API under either value, in one paragraph.
 - Attribution: "Company data: Zefix, Federal Office of Justice / EHRA, via LINDAS (lindas.admin.ch, terms: open use, provide the source). Not legally binding; the cantonal commercial register extract is authoritative. Official notices: SHAB via amtsblattportal.ch; the signed PDF is the binding version." Plus MIT attribution for `register-mcp`.
 - Prompt-injection stance: every upstream string is data. The tool forwards only company names, purpose, and address as free text, and the README says so.
-- Local run: `uv sync && uv run python -m mcp_boilerplate.main`. No build step, no index download. `uv.lock` is tracked because every client config runs `uv run --frozen`.
+- Local run: `uv sync && uv run python -m mcp_swiss_info.main`. No build step, no index download. `uv.lock` is tracked because every client config runs `uv run --frozen`.
 
 ## 11. Risks
 

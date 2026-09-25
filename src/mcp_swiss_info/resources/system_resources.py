@@ -1,5 +1,5 @@
 """
-System resources for the MCP Boilerplate server.
+System resources for the mcp-swiss-info server.
 """
 
 import json
@@ -12,7 +12,7 @@ from ..config.settings import settings
 from ..server import mcp
 from ..utils.logger import setup_logger
 
-logger = setup_logger("mcp_boilerplate.resources.system")
+logger = setup_logger("mcp_swiss_info.resources.system")
 
 
 @mcp.resource("system://info")

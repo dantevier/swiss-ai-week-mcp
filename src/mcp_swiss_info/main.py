@@ -7,7 +7,7 @@ from .config.settings import settings
 from .server import main as server_main
 from .utils.logger import setup_logger
 
-logger = setup_logger("mcp_boilerplate.main")
+logger = setup_logger("mcp_swiss_info.main")
 
 
 def main() -> None:
@@ -16,7 +16,7 @@ def main() -> None:
     """
     import argparse
 
-    parser = argparse.ArgumentParser(description="MCP Boilerplate Server")
+    parser = argparse.ArgumentParser(description="mcp-swiss-info server")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     parser.add_argument(
         "--log-level",

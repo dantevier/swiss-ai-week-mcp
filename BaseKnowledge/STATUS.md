@@ -8,8 +8,8 @@ are not present in this repository.
 ## Current stack and verified behavior
 
 - Python 3.11+ project using FastMCP, Pydantic, and `uv` (`pyproject.toml`).
-- `src/mcp_boilerplate/server.py` creates a FastMCP server named `mcp-boilerplate`.
-  `src/mcp_boilerplate/main.py` starts it over stdio by default and also exposes an
+- `src/mcp_swiss_info/server.py` creates a FastMCP server named `mcp-swiss-info`.
+  `src/mcp_swiss_info/main.py` starts it over stdio by default and also exposes an
   SSE option.
 - The server imports and registers 20 example tools, 5 example resources, and 6
   example prompts. A direct FastMCP call to `add(2, 3)` returned `5.0` on
@@ -33,7 +33,7 @@ are not present in this repository.
 ## Test status
 
 `uv run --no-sync pytest -q` fails during collection: `tests/conftest.py` imports
-`MCPServer` and `create_server`, which `src/mcp_boilerplate/server.py` does not define.
+`MCPServer` and `create_server`, which `src/mcp_swiss_info/server.py` does not define.
 Other existing tests also target old `register_*_tools` functions. These tests do not
 validate the current FastMCP server. No passing automated suite is claimed.
 

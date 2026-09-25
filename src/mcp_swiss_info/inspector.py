@@ -10,7 +10,7 @@ import os
 # Add the src directory to the path to allow absolute imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from mcp_boilerplate.server import mcp
+from mcp_swiss_info.server import mcp
 
 # Set debug mode via environment variable if needed
 if os.getenv('DEBUG') == '1':

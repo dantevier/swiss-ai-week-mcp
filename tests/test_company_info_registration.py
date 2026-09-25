@@ -17,9 +17,9 @@ import httpx
 import respx
 from fastmcp import Client
 
-import mcp_boilerplate.tools  # noqa: F401 - registers every tool module on `mcp`
-from mcp_boilerplate.config.settings import settings
-from mcp_boilerplate.server import mcp
+import mcp_swiss_info.tools  # noqa: F401 - registers every tool module on `mcp`
+from mcp_swiss_info.config.settings import settings
+from mcp_swiss_info.server import mcp
 
 FIXTURES = Path(__file__).parent / "fixtures"
 PARAMETERS = {"question", "name", "uid", "canton", "language", "include_publications", "max_publications"}

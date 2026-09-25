@@ -1,5 +1,5 @@
 """
-Logging utilities for the MCP Boilerplate server.
+Logging utilities for the mcp-swiss-info server.
 """
 
 import logging
@@ -10,7 +10,7 @@ from ..config.settings import settings
 
 
 def setup_logger(
-    name: str = "mcp_boilerplate", level: str | None = None, log_file: str | None = None
+    name: str = "mcp_swiss_info", level: str | None = None, log_file: str | None = None
 ) -> logging.Logger:
     """
     Set up a logger with consistent formatting and configuration.
@@ -41,7 +41,7 @@ def setup_logger(
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
     # Each named logger owns its handlers; do not also bubble up to
-    # "mcp_boilerplate", which has its own handler and would print twice.
+    # "mcp_swiss_info", which has its own handler and would print twice.
     logger.propagate = False
 
     # File handler (if specified)

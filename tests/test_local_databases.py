@@ -8,9 +8,9 @@ from contextlib import closing
 import pytest
 from fastmcp import Client
 
-from src.mcp_boilerplate import local_databases
-from src.mcp_boilerplate.config.settings import settings
-from src.mcp_boilerplate.server import mcp
+from src.mcp_swiss_info import local_databases
+from src.mcp_swiss_info.config.settings import settings
+from src.mcp_swiss_info.server import mcp
 
 
 @pytest.fixture

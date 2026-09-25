@@ -1,0 +1,9 @@
+{
+  "services": {
+    "mcp-swiss-info": {
+      "transport": "stdio",
+      "command": "uv run --frozen python -m mcp_swiss_info.main",
+      "env": {}
+    }
+  }
+}

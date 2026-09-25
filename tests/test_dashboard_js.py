@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-COMMON_JS = Path(__file__).resolve().parents[1] / "src" / "mcp_boilerplate" / "dashboard" / "static" / "common.js"
+COMMON_JS = Path(__file__).resolve().parents[1] / "src" / "mcp_swiss_info" / "dashboard" / "static" / "common.js"
 pytestmark = pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
 
 

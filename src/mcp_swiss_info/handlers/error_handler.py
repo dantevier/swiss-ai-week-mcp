@@ -1,5 +1,5 @@
 """
-Error handling utilities for the MCP Boilerplate server.
+Error handling utilities for the mcp-swiss-info server.
 """
 
 import traceback
@@ -9,7 +9,7 @@ from typing import Any
 from ..config.settings import settings
 from ..utils.logger import setup_logger
 
-logger = setup_logger("mcp_boilerplate.handlers.error")
+logger = setup_logger("mcp_swiss_info.handlers.error")
 
 
 class MCPError(Exception):
@@ -58,7 +58,7 @@ class ErrorHandler:
     """
 
     def __init__(self) -> None:
-        self.logger = setup_logger("mcp_boilerplate.error_handler")
+        self.logger = setup_logger("mcp_swiss_info.error_handler")
         self.error_counts: dict[str, int] = {}
 
     def handle_error(

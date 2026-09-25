@@ -23,7 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SEED = ROOT / "data" / "housing_knowledge.json"
-SCHEMA = ROOT / "src" / "mcp_boilerplate" / "storage" / "migrations" / "003_housing_knowledge.sql"
+SCHEMA = ROOT / "src" / "mcp_swiss_info" / "storage" / "migrations" / "003_housing_knowledge.sql"
 DEFAULT_DATABASE = ROOT / "var" / "swissproject.sqlite3"
 USER_AGENT = "swiss-grounding-mcp/0.1 (Swiss AI Weeks hackathon; contact via repo)"
 PASSAGE_SEPARATOR = "\n[…]\n"

@@ -32,7 +32,7 @@ if (-not $EnvFile) { $EnvFile = Join-Path $Repo '.env' }
 if (-not $OpencodeConfig) { $OpencodeConfig = Join-Path (Join-Path (Join-Path $HOME '.config') 'opencode') 'opencode.json' }
 $Name = 'mcp-swiss-info'
 # --directory makes the server work from any project; the server then finds this repo's .env.
-$Launch = @('uv', 'run', '--directory', $Repo, 'python', '-m', 'mcp_boilerplate.main')
+$Launch = @('uv', 'run', '--directory', $Repo, 'python', '-m', 'mcp_swiss_info.main')
 $Keys = [ordered]@{
     CRAWLORA_API_KEY = 'Crawlora key (fetches the official pages)'
     OPENAI_API_KEY   = 'OpenAI key (semantic search embeddings)'

@@ -26,9 +26,9 @@ import httpx
 import pytest
 import respx
 
-from mcp_boilerplate.config.settings import settings
-from mcp_boilerplate.zefix.sources import lindas
-from mcp_boilerplate.zefix.sources.http import SourceUnavailable
+from mcp_swiss_info.config.settings import settings
+from mcp_swiss_info.zefix.sources import lindas
+from mcp_swiss_info.zefix.sources.http import SourceUnavailable
 
 COMPANY_URI = "https://register.ld.admin.ch/zefix/company/415941"
 

@@ -1,12 +1,12 @@
 """
-Analysis prompts for the MCP Boilerplate server.
+Analysis prompts for the mcp-swiss-info server.
 """
 
 from ..server import mcp
 from ..utils.logger import setup_logger
 from ..utils.validation import sanitize_input
 
-logger = setup_logger("mcp_boilerplate.prompts.analysis")
+logger = setup_logger("mcp_swiss_info.prompts.analysis")
 
 
 @mcp.prompt

@@ -13,9 +13,157 @@ directly from a precomputed table. Also known by its MCP server name,
 Team: Roberto Cerrone, Edoardo Diana, Alberto Minetti, Vincent Van Loo, Victor
 Bonilla, Jesus Sebastian, Jiaqi Yu.
 
+## Evaluation quick start
+
+1. **Commit to evaluate:** tag `v1.0`.
+
+2. **Transport:** stdio. No port or HTTP path is needed.
+
+3. **Runtime:** Python 3.11 or newer (the package metadata declares Python
+  3.11/3.12), with `uv` and the committed `uv.lock`. The server runs from
+  source; no prebuilt container image is shipped. It is intended to run in a
+  Linux container on arm64. No project-specific system package is required;
+  the setup block requires a POSIX shell, `curl`, and CA certificates.
+
+4. **Setup:** run this non-interactive block from the repository root:
+
+  ```bash
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  export PATH="$HOME/.local/bin:$PATH"
+  uv sync --frozen --no-dev
+  ```
+
+  Setup duration: **immediate (<2s)**. Additional disk required after cloning:
+  **8 MB**. Peak setup memory: **Unknown in the long run**.
+
+5. **Start command:**
+
+  ```bash
+  uv run --frozen python -m mcp_swiss_info.main
+  ```
+
+  Ready-to-use project configurations are committed for Claude Code and other
+  `.mcp.json`-compatible clients ([`.mcp.json`](.mcp.json)), Antigravity
+  ([`.agents/mcp_config.json`](.agents/mcp_config.json)), Codex
+  ([`.codex/config.toml`](.codex/config.toml)), OpenCode
+  ([`opencode.json`](opencode.json)), and Janito
+  ([`.janito/mcp_services.json`](.janito/mcp_services.json)). Each starts the
+  same local stdio server from the repository root.
+
+6. **Prebuilt data:** setup downloads Python packages (and a compatible Python
+  runtime if `uv` needs one), but no application dataset. Approximately 65 MiB
+  of tracked data is shipped in the repository:
+
+  - `data/swiss_places_premiums_2026.sqlite` (about 29 MiB) contains BFS
+    municipalities and mutations, BAG 2026 premiums, Fedlex premium regions,
+    and the reviewed benchmark facts used to build it.
+  - `data/kvg_minimum_premiums_2026.csv` (about 15 MiB) is the 2026 lookup
+    table extracted from the KVG26 mapper and cross-referenced against
+    Priminfo; its generated Markdown rendering is about 12 MiB.
+  - `src/mcp_swiss_info/knowledge_seed.sqlite3` (about 9.4 MiB) contains the
+    saved reviewed authority pages. On first use it is copied to
+    `~/.swiss-ai-week-mcp/knowledge.sqlite3`.
+  - `data/housing_knowledge.json` (about 108 KiB) and
+    `data/driving_licence/driving_licence_facts.json` (about 96 KiB) are
+    imported into `var/swissproject.sqlite3` when the server starts.
+
+  Network rebuild and local import commands are:
+
+  ```bash
+  uv run --frozen python scripts/build_knowledge_db.py
+  uv run --frozen python scripts/build_kvg_premiums.py --year 2026
+  uv run --frozen python scripts/import_housing.py
+  uv run --frozen python scripts/import_driving_licence.py
+  # Rebuild command for src/mcp_swiss_info/knowledge_seed.sqlite3: ?????
+  ```
+
+  A complete rebuild duration is **above 30 minutes**. The `crawl_federal_sources`,
+  `crawl_cantonal_sources`, and `crawl_municipal_sources` MCP tools refresh the
+  writable authority-page database but do not replace the packaged seed.
+  The `swiss_health_insurance_premiums` CSV and Markdown exports can also be
+  regenerated for a selected year by manually running the
+  [Regenerate KVG premiums](.github/workflows/regenerate-kvg-premiums.yml)
+  GitHub Actions workflow. It runs `scripts/build_kvg_premiums.py`, validates
+  the exporter, and opens a pull request containing the generated files.
+
+7. **Credentials:** no credential is required to start the server or use its
+  offline tools. `CRAWLORA_API_KEY` enables Crawlora's rendered main-content
+  extraction for reviewed HTML/JSON pages. Without it, the crawler uses
+  standard direct web retrieval of the same allow-listed official URL; tools
+  backed by dedicated APIs, local data, or purpose-built fetchers continue to
+  use those mechanisms.
+
+  | Environment variable | Purpose | Starts without it? |
+  |---|---|---|
+  | `OPENAI_API_KEY` | Optional semantic ranking; required only when a `crawl_*_sources` refresh embeds new passages | Yes; search uses SQLite keyword ranking and refresh embedding is unavailable |
+  | `CRAWLORA_API_KEY` | Optional Crawlora retrieval of approved HTML/JSON sources | Yes; refreshes fall back to direct retrieval of the same approved URL |
+  | `ZEFIX_USERNAME` | Optional username for the documented Zefix PublicREST enrichment API; use with `ZEFIX_PASSWORD` | Yes; LINDAS remains the primary company source |
+  | `ZEFIX_PASSWORD` | Optional password for Zefix PublicREST; use with `ZEFIX_USERNAME` | Yes; LINDAS remains the primary company source |
+
+  No LLM API key is required for normal answers. `ANTHROPIC_API_KEY` is used
+  only by the internal benchmark and MCP-result evaluation runner.
+  `OPENAI_API_KEY` is also accepted by that runner and is optionally used at
+  runtime for semantic ranking and source-refresh embeddings; without it, the
+  server falls back to local keyword ranking. The other optional runtime
+  credentials above are source-specific, not LLM credentials.
+
+8. **Hosted endpoint (optional):** The declared stdio transport does not require either one.
+
+9. **Declared scope:**
+
+  | Topic | Declared geography and coverage |
+  |---|---|
+  | 1. Health insurance premiums and basic insurance | All of Switzerland; minimum basic-insurance premiums for premium year 2026 |
+  | 3. Law and regulations | Selected federal rules represented by the reviewed sources; not a general-purpose legal search |
+  | 6. Residence permits and migration | All of Switzerland at federal SEM-guidance level; cantonal authorities still decide individual cases |
+  | 9. Schools and education | School holidays for all Swiss cantons through live OpenHolidays data; a municipality is required where dates vary below canton level |
+  | 11. Road traffic, vehicles and driving licences | Federal exchange rules plus documented fee and requirement facts for all 26 cantons |
+  | 12. Housing and renting | All of Switzerland for federal BWO reference-rate and renting guidance |
+  | 13. Voting, elections and political rights | Federal political-rights rules only |
+  | 14. Companies, commercial register and VAT | All of Switzerland for companies and commercial-register publications; VAT status is not covered |
+  | 15. Customs and ordering from abroad | All of Switzerland for conservative parcel import-VAT estimates |
+  | 16. Statistics, open data, geodata and weather | All of Switzerland, subject to the municipality, postal-code forecast point, weather station, and upstream dataset requested |
+
+  Topics 2, 4, 5, 7, 8, and 10 are not covered. Supported languages are
+  English, German, French, and Italian; Romansh support is partial. Some tools
+  return verbatim source-language passages rather than translations.
+
+10. **One example call:** call `swiss_health_insurance_premiums` with:
+
+   ```json
+   {
+    "age": 30,
+    "municipality_code": 5192,
+    "franchise": 2500
+   }
+   ```
+
+   This performs an offline 2026 lookup for Lugano (BFS municipality 5192)
+   and returns the minimum monthly options both with and without accident
+   cover, including insurer, model, source, and validity information.
+
+11. **Known limits:** the server is intentionally not a complete Swiss public
+   information service. Topics listed as not covered are out of scope; topic 3
+   contains selected reviewed rules rather than the full body of Swiss law.
+   Premium answers are valid only for 2026. Live company, school-holiday,
+   weather, population, geodata, open-data, migration, political-rights, and
+   customs lookups require network access to their named upstream authorities.
+   Commercial-register answers exclude natural persons, VAT status, certified
+   extracts, and register-wide analytics. Source-language passages are not
+   automatically translated.
+
+12. **robots.txt and terms of use:** `RESPECT_ROBOTS_TXT=true` by default. With
+   that default, the undocumented Zefix web endpoint is not called. The
+   reviewed knowledge crawler has no equivalent toggle: it accepts only the
+   fixed source registry, checks redirect targets against that allow-list, and
+   accesses sources reviewed for their terms of use. See [Compliance](#compliance).
+
+13. **Parallel use:** support for several simultaneous conversations is
+   **available** (not load-tested). Approximate cold-start time is **5 seconds**.
+
 ## Install
 
-Requires [uv](https://docs.astral.sh/uv/). From a clone of this repo, in PowerShell:
+Requires [uv](https://docs.astral.sh/uv/getting-started/installation/). From a clone of this repo, in PowerShell:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1
@@ -23,7 +171,72 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 It installs dependencies, asks for the two API keys (optional, saved to the git-ignored `.env`), and registers the server in whichever of Claude Code, Codex and opencode it finds. Restart the harness afterwards. Use `-Yes` to skip prompts (keys are then read from `$env:CRAWLORA_API_KEY` and `$env:OPENAI_API_KEY`), and `-Uninstall` to remove the server from every harness.
 
-Manual equivalent for Claude Code: `claude mcp add --scope user mcp-swiss-info -- uv run --directory <path-to-this-repo> python -m mcp_boilerplate.main`.
+**First time:** run `uv sync` once in the repo directory — it prepares the environment, and the server is then ready to be used as an MCP server over stdio. (`install.ps1` already does this.)
+
+**API keys:** `OPENAI_API_KEY` is required — refreshing sources embeds new passages and fails without it. `CRAWLORA_API_KEY` is optional — HTML/JSON fetches fall back to a direct download when it is unset.
+
+Manual equivalent for Claude Code: `claude mcp add --scope user mcp-swiss-info -- uv run --directory <path-to-this-repo> python -m mcp_swiss_info.main`.
+
+## Run locally
+
+```bash
+uv sync
+uv run python -m mcp_swiss_info.main            # stdio transport (default)
+```
+
+`uv sync --all-extras` additionally installs the `dev` group (pytest, respx,
+ruff, mypy, ...), needed to run the test suite below.
+
+SSE transport, for web/HTTP integration:
+
+```bash
+make run-sse
+# equivalent to:
+uv run python -m mcp_swiss_info.main --transport sse --port 8000
+```
+
+On first use, the knowledge-base tools copy the packaged seed database to
+`~/.swiss-ai-week-mcp/knowledge.sqlite3`; later starts reuse that writable
+copy. Set `KNOWLEDGE_DB_PATH` to use another location. Restart your MCP
+client after changing server code or configuration.
+
+### Client configuration
+
+Claude Desktop / Claude Code (`.mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "mcp-swiss-info": {
+      "command": "uv",
+      "args": ["run", "--frozen", "python", "-m", "mcp_swiss_info.main"]
+    }
+  }
+}
+```
+
+Codex (`.codex/config.toml`):
+
+```toml
+[mcp_servers.mcp-swiss-info]
+command = "uv"
+args = ["run", "--frozen", "python", "-m", "mcp_swiss_info.main"]
+```
+
+OpenCode (`opencode.json`):
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "mcp-swiss-info": {
+      "type": "local",
+      "command": ["uv", "run", "--frozen", "python", "-m", "mcp_swiss_info.main"],
+      "enabled": true
+    }
+  }
+}
+```
 
 ## Check data freshness
 
@@ -139,7 +352,7 @@ description and response.
   matches (SQLite FTS5) with `method: "keyword_fallback"`.
 - `get_source(level, source)` returns the complete saved page and metadata.
   Levels are `federal`, `cantonal`, and `municipal`; names are in
-  [the approved source list](src/mcp_boilerplate/sources.py).
+  [the approved source list](src/mcp_swiss_info/sources.py).
 - `crawl_federal_sources`, `crawl_cantonal_sources`, `crawl_municipal_sources`
   (each `source: str | None = None`) refresh one approved source by name, or
   every source at that authority level. They accept no pasted URLs. HTML and
@@ -211,9 +424,9 @@ These three tools fetch the selected authority page at query time and return its
 ## Data sources
 
 Two different things share the word "source" here:
-`src/mcp_boilerplate/zefix/sources/` holds the **live API clients**
+`src/mcp_swiss_info/zefix/sources/` holds the **live API clients**
 (`LindasClient`, `ZefixClient`, `GazetteClient`) that `company_info` calls
-fresh on every request and stores nothing; `src/mcp_boilerplate/sources.py`
+fresh on every request and stores nothing; `src/mcp_swiss_info/sources.py`
 is the **single registry of reviewed authorities**, `SOURCES`, so every source
 the server reads is reviewed and attributed in one place. Most rows are pages,
 fetched only when a `crawl_*_sources` call asks for them and saved, not
@@ -295,13 +508,13 @@ of pages.
 
 Outbound requests are further restricted by an egress allow-list enforced on
 every request (including redirects). The allow-list is derived from
-`API_SOURCES` in `src/mcp_boilerplate/sources.py`: `lindas.admin.ch`,
+`API_SOURCES` in `src/mcp_swiss_info/sources.py`: `lindas.admin.ch`,
 `register.ld.admin.ch`, `www.zefix.admin.ch`, `amtsblattportal.ch`.
 
 ### Knowledge base
 
 The crawler has no `RESPECT_ROBOTS_TXT`-equivalent setting; it is compliant
-by construction instead. `check_url()` in `src/mcp_boilerplate/crawler.py`
+by construction instead. `check_url()` in `src/mcp_swiss_info/crawler.py`
 rejects any URL — including a redirect target — that is not exactly one of
 the 16 URLs listed in `sources.py` (13 pages and the 3 commercial-register API
 endpoints, whose crawl fails validation and saves nothing); `crawl_*_sources`
@@ -334,67 +547,6 @@ Per source:
 
 Zero secrets are committed to this repository. Put credentials in a local
 `.env` file, which is gitignored (`git check-ignore .env` confirms this).
-
-## Run locally
-
-```bash
-uv sync
-uv run python -m mcp_boilerplate.main            # stdio transport (default)
-```
-
-`uv sync --all-extras` additionally installs the `dev` group (pytest, respx,
-ruff, mypy, ...), needed to run the test suite below.
-
-SSE transport, for web/HTTP integration:
-
-```bash
-make run-sse
-# equivalent to:
-uv run python -m mcp_boilerplate.main --transport sse --port 8000
-```
-
-On first use, the knowledge-base tools copy the packaged seed database to
-`~/.swiss-ai-week-mcp/knowledge.sqlite3`; later starts reuse that writable
-copy. Set `KNOWLEDGE_DB_PATH` to use another location. Restart your MCP
-client after changing server code or configuration.
-
-### Client configuration
-
-Claude Desktop / Claude Code (`.mcp.json`):
-
-```json
-{
-  "mcpServers": {
-    "mcp-swiss-info": {
-      "command": "uv",
-      "args": ["run", "--frozen", "python", "-m", "mcp_boilerplate.main"]
-    }
-  }
-}
-```
-
-Codex (`.codex/config.toml`):
-
-```toml
-[mcp_servers.mcp-swiss-info]
-command = "uv"
-args = ["run", "--frozen", "python", "-m", "mcp_boilerplate.main"]
-```
-
-OpenCode (`opencode.json`):
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "mcp": {
-    "mcp-swiss-info": {
-      "type": "local",
-      "command": ["uv", "run", "--frozen", "python", "-m", "mcp_boilerplate.main"],
-      "enabled": true
-    }
-  }
-}
-```
 
 ## Tests
 
@@ -435,9 +587,9 @@ Company data: Zefix, Federal Office of Justice / EHRA, via LINDAS
 extract is authoritative. Official notices: SHAB via amtsblattportal.ch; the
 signed PDF is the binding version.
 
-Parts of `src/mcp_boilerplate/zefix/sources` are vendored from
+Parts of `src/mcp_swiss_info/zefix/sources` are vendored from
 `malkreide/register-mcp`, MIT, Copyright (c) 2026 Hayal Oezkan; see
-`src/mcp_boilerplate/zefix/sources/LICENSE-register-mcp`.
+`src/mcp_swiss_info/zefix/sources/LICENSE-register-mcp`.
 
 Knowledge-base pages are attributed inline by every `search_knowledge` and
 `get_source` result (`authority`, `url`) — see the

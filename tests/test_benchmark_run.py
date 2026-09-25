@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "benchmark"))
 import interpret  # noqa: E402
 import run_mcp  # noqa: E402
 
-from mcp_boilerplate.dashboard import server as dashboard  # noqa: E402
+from mcp_swiss_info.dashboard import server as dashboard  # noqa: E402
 
 
 def question(qid, behavior="answer", must=r"30 (Tage|days)", must_not=r"60 Tage"):
@@ -64,6 +64,12 @@ def test_env_file_fills_missing_keys_only(tmp_path, monkeypatch):
     run_mcp.load_env_file(env)
     assert run_mcp.os.environ["OPENAI_API_KEY"] == "from-file"
     assert run_mcp.os.environ["OTHER_KEY"] == "from-env"
+
+
+def test_model_prompt_includes_server_instructions_only_with_mcp():
+    mcp = run_mcp.McpTools(None, [], "Use specific tools before search_knowledge.")
+    assert "Use specific tools before search_knowledge." in run_mcp.system_prompt(mcp)
+    assert run_mcp.system_prompt(None) == run_mcp.SYSTEM_PROMPT
 
 
 def test_interpretation_explains_each_failure(tmp_path):
@@ -128,7 +134,7 @@ def test_dashboard_serves_the_latest_run(tmp_path, monkeypatch):
 
 
 def test_settings_page_saves_the_anthropic_key(tmp_path, monkeypatch):
-    from mcp_boilerplate.config import env
+    from mcp_swiss_info.config import env
 
     path = tmp_path / ".env"
     monkeypatch.setattr(env, "ENV_PATH", path)

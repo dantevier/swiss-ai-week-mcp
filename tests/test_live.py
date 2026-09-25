@@ -10,9 +10,9 @@ from __future__ import annotations
 
 import pytest
 
-from mcp_boilerplate.tools.company_info import company_info
-from mcp_boilerplate.zefix.sources.gazette import GazetteClient
-from mcp_boilerplate.zefix.sources.lindas import LindasClient
+from mcp_swiss_info.tools.company_info import company_info
+from mcp_swiss_info.zefix.sources.gazette import GazetteClient
+from mcp_swiss_info.zefix.sources.lindas import LindasClient
 
 UID = "CHE101654423"
 UID_FORMATTED = "CHE-101.654.423"

@@ -2,11 +2,11 @@
 
 import pytest
 
-from mcp_boilerplate.config.settings import settings
-from mcp_boilerplate.crawler import Crawler, check_url
-from mcp_boilerplate.knowledge import KnowledgeBase
-from mcp_boilerplate.sources import API_SOURCES, NOT_A_PAGE, SOURCES, Source
-from mcp_boilerplate.zefix.sources import http
+from mcp_swiss_info.config.settings import settings
+from mcp_swiss_info.crawler import Crawler, check_url
+from mcp_swiss_info.knowledge import KnowledgeBase
+from mcp_swiss_info.sources import API_SOURCES, NOT_A_PAGE, SOURCES, Source
+from mcp_swiss_info.zefix.sources import http
 from tests.test_crawler import FakeEmbedder, FakeFetcher
 
 API_NAMES = ("zefix_lindas", "zefix_web", "gazette")

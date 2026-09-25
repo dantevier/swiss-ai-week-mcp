@@ -6,7 +6,7 @@ from pathlib import Path
 from .config.database_paths import driving_licence_path, housing_path
 from .utils.logger import setup_logger
 
-logger = setup_logger("mcp_boilerplate.local_databases")
+logger = setup_logger("mcp_swiss_info.local_databases")
 SCRIPTS = Path(__file__).resolve().parents[2] / "scripts"
 
 

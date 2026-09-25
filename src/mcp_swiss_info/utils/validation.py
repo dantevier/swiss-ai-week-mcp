@@ -1,5 +1,5 @@
 """
-Validation utilities for the MCP Boilerplate server.
+Validation utilities for the mcp-swiss-info server.
 """
 
 import re
