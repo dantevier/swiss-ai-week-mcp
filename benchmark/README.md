@@ -72,23 +72,23 @@ It tests whether an assistant (an LLM on its own, or an LLM connected to an MCP 
 |---|---|
 | `wrong_jurisdiction` | Gives a national answer where the rule depends on the canton or municipality, or asks for a location that does not change the answer |
 | `outdated` | Gives the VAT rate, pension amount or customs allowance of an earlier year |
-| `invisible_data` | The answer exists only on a cantonal or municipal website that general models rarely know |
+| `invisible_data` | The fact is on an official table, FAQ or leaflet that models rarely memorise: a BAG premium cell, a BWO 3 % / 30-day rule, a GTFS coverage window, a Romansh housing leaflet |
 | `foreign_confusion` | Answers a question about Konstanz or Austria as if it were Swiss, or applies German or Italian rules |
 
 ## Dataset configurations
 
 | config | items | how the answers were obtained |
 |---|---|---|
-| `verified` (`data/qa.jsonl`) | 35 | checked against the responsible authority's page; all 16 briefing topic areas |
+| `verified` (`data/qa.jsonl`) | 82 | checked against the responsible authority's page; all 16 briefing topic areas; German, French, Italian and Romansh |
 | `generated` (`data/generated.jsonl`) | 160 | balanced suite: exactly 10 cases for each of the 16 topic areas; some lower-data areas use question framings from verified facts |
-| `generated_full` (`data/generated_full.jsonl`) | 904 | complete data-derived corpus plus 34 context variants; intentionally uneven, retained for broader place-level stress tests |
+| `generated_full` (`data/generated_full.jsonl`) | 952 | complete data-derived corpus plus context variants; intentionally uneven, retained for broader place-level stress tests |
 
 The full corpus's 870 data-derived items come from `../data/swiss_places_premiums_2026.sqlite`.
 That reusable runtime database was built from the BAG health insurance premiums
 2026 (217,472 rows), SR 832.106 Annex 1 (premium region per municipality, version
 in force on 1 Jan 2026, from the Fedlex filestore), and the BFS register of
 municipalities (snapshot and mutations since 2015). Each such item quotes the data
-rows its answer came from in `evidence`. The 34 `gen-context-*` items are wrappers
+rows its answer came from in `evidence`. The 82 `gen-context-*` items are wrappers
 around verified benchmark seeds and retain their original evidence. The balanced
 suite samples the full corpus first, then adds question-framing variants of verified
 items where a sector has fewer than 10 cases.
@@ -102,7 +102,7 @@ items where a sector has fewer than 10 cases.
 | `gen-samename-*` | 35 | a municipality name that exists in several cantons with different premiums: the assistant must ask which one (`ask_back`) |
 | `gen-foreign-*` | 87 | premium, registration and school-holiday questions about 29 towns in Germany, France, Italy, Austria and Liechtenstein (`not_switzerland`) |
 | `gen-askback-*` | 8 | premium questions with no place given |
-| `gen-context-*` | 34 | one language-matched request-context variant for each non-Romansh verified item; keeps the original answer, evidence, and scoring checks |
+| `gen-context-*` | 82 | one language-matched request-context variant for each verified item, including Romansh; keeps the original answer, evidence, and scoring checks |
 | `gen-balanced-*` | varies | additional language-matched question framings used only where needed to reach 10 generated cases in a topic area; reuses a verified fact and carries `source_item_id` / `fact_cluster_id` |
 
 Regenerate, for example after the BAG publishes new premiums:
@@ -122,8 +122,7 @@ and partition the balanced generated set by topic area. Use these files or
 `--data benchmark/data/generated.jsonl` for an even sector comparison. The separate
 `generated_full_by_sector/` files retain the larger, uneven corpus. Framing variants
 exercise prompt wording and answer the same underlying fact; use `fact_cluster_id`
-to avoid treating them as independent factual evidence. Romansh variants are omitted
-until a fluent reviewer can verify them.
+to avoid treating them as independent factual evidence.
 Data-derived items whose answer a regex
 cannot separate from the typical wrong answer are left out, for example mergers
 where the new name is part of the old one (Bad Zurzach became Zurzach).
@@ -140,7 +139,8 @@ Every question has one `expected_behavior`:
 
 | field | meaning |
 |---|---|
-| `id` | stable identifier |
+| `id` | stable question identifier |
+| `fact_cluster_id` | stable identity for the underlying source-backed fact; translated or reframed questions share this ID |
 | `sample` | `true` if the wording reuses one of the challenge's published sample questions |
 | `lang` | language of the question: `de`, `fr`, `it`, `rm` |
 | `topic_area`, `topic` | the 16 topic areas of the challenge briefing (1 premiums … 16 statistics) |
@@ -168,6 +168,8 @@ python benchmark/score.py --template runs/my-assistant.jsonl
 # 2. fill in each "answer" with the assistant's reply
 # 3. score it
 python benchmark/score.py runs/my-assistant.jsonl --out runs/results.jsonl --judge-prompts runs/judge.jsonl
+# 4. optional: score LLM-judge JSONL {id, verdict, scores, reason} for a 0-8 quality score
+python benchmark/score.py runs/my-assistant.jsonl --judgements runs/judgements.jsonl
 ```
 
 `score.py` reads both files by default. Use `--data` to select a sector file or `--topic-area N` to filter a combined run. For example:
@@ -178,9 +180,9 @@ python benchmark/score.py runs/transport.jsonl --data benchmark/data/generated_b
 python benchmark/score.py --template runs/taxes.jsonl --topic-area 2
 ```
 
-An item passes when every `must_include` pattern matches, no `must_not_include` pattern matches, and, for `ask_back`, the answer contains a question and every `ask_for` pattern matches. Results are broken down by expected behaviour, failure mode, language and topic area. The share of answers that name the responsible authority's domain is reported separately.
+An item passes when every `must_include` pattern matches, no `must_not_include` pattern matches, and, for `ask_back`, the answer contains a question and every `ask_for` pattern matches. Results are broken down by expected behaviour, failure mode, language and topic area. The scorer also reports fact-cluster results: a cluster passes only when all its question framings pass. Per-question output includes `fact_cluster_id`, so reports can be audited or regrouped. The share of answers that name the responsible authority's domain, and the share that include a URL on one of those domains, are reported separately.
 
-The patterns accept German, French, Italian and English wording, but a regex cannot judge nuance. `--judge-prompts` writes one grading prompt per answer, containing the reference answer, the evidence and the common errors, for an LLM judge. Use both, and read the failures.
+The patterns accept German, French, Italian and English wording, but a regex cannot judge nuance. `--judge-prompts` writes one grading prompt per answer, containing the reference answer, the evidence and the common errors, for an LLM judge. The prompt asks for a verdict plus 0-2 scores on factual accuracy, evidence support, completeness, and clarity. `--judgements` reads those grades and reports a 0-8 quality score, both question-weighted and cluster-weighted. Use both, and read the failures.
 
 To compare an assistant with and without your MCP server, collect two answer files for the same questions and score each.
 
@@ -207,12 +209,13 @@ Swiss facts change: rates on 1 January, the reference interest rate every quarte
 
 ## Coverage and limits
 
-- The balanced generated set has exactly 10 questions per area (160 total). Combined with all 35 verified items, the `all` config has 195 rows and is not exactly balanced by area.
-- The full generated corpus has 904 items and remains heavily weighted toward premiums (514/904). Use it for broad stress testing, not equal-weight sector comparisons.
-- Several areas have only one to four underlying verified facts. Their balanced files contain distinct language-matched question framings but share `fact_cluster_id`; they provide wording robustness, not 10 independent facts. More source research is needed for broad factual coverage in those areas.
-- Romansh phrasing variants are omitted until a fluent reviewer can verify them.
+- The balanced generated set has exactly 10 questions per area (160 total). Combined with the verified items, the `all` config is not exactly balanced by area or language.
+- The full generated corpus remains heavily weighted toward premiums. Use it for broad stress testing, not equal-weight sector comparisons.
+- The balanced files keep 10 questions per area for comparison, but they still do not all contain 10 independent facts. After clustering translations and repeated framings, the current files have only 3 distinct fact clusters in waste/recycling and customs; 3 in migration, work, voting, and companies/VAT; 4 in social insurance, law, public transport, and road traffic/licences; and 7 in housing. Treat those sectors as small fact samples; their 10 questions do not represent 10 independent successes.
+- Romansh items are included where an official Romansh source exists (Scuol school calendar; BWO leaflet *Abitar en Svizra* for the deposit cap and the 30-day termination challenge). There is still no Romansh seed for every topic area.
+- `invisible_data` is the mode that fails most often without a local table or leaflet. Premium cells and BWO facts are in the offline stores; GTFS coverage, AHV minimum contributions and some licence fees are not. The current balanced housing file includes 6 Italian questions; language balance is reported separately from fact-cluster coverage.
 - The reference answers are in English; the questions are in the national languages.
-- Every verified fact was checked against the official page on 2026-09-24, except `premiums-lugano-it`, which comes from team research on 2026-09-21 against the BAG premium data.
+- Verified facts were checked against official pages on 2026-09-24 or 2026-09-25, except the Lugano premium items, which come from team research on 2026-09-21 against BAG premium data.
 - Premium items ask for the lowest premium "offered" in the region. For alternative models the generator requires the insurer to list the region in `Einzugsgebiete.csv`; the standard model is offered everywhere. In 2026 no offer is restricted to specific municipalities.
 - Five verified seed items (`sample: true`) reuse published sample questions; their generated context variants keep that flag. Filter by `sample` or deduplicate by `source_item_id` when reporting an unseen-question score.
 

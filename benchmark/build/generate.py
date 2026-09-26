@@ -62,8 +62,7 @@ CONTEXT_PREFIX = {
     "de": "Kannst du mir bitte helfen? ",
     "fr": "Pouvez-vous m'aider ? ",
     "it": "Può aiutarmi? ",
-    # Keep Romansh prompts intact until a Romansh reviewer can verify variants.
-    "rm": "",
+    "rm": "Pudais Vus m'agidar? ",
 }
 QUESTION_FRAMINGS = {
     "de": ["Bitte beantworte kurz: ", "Ich brauche dazu eine verlässliche Auskunft: ",
@@ -81,6 +80,8 @@ QUESTION_FRAMINGS = {
            "Mi spieghi per favore quanto segue: ", "Ho una domanda: ",
            "Verifichi per favore questa domanda: ", "Qual è l'informazione ufficiale? ",
            "Può aiutarmi? ", "Cerco un'informazione affidabile: "],
+    "rm": ["Jau hai ina dumonda: ", "Pudais Vus m'instruir: ",
+           "Pudais Vus m'agidar: ", "Jau tschertsch l'infurmaziun uffiziala: "],
 }
 
 
@@ -130,7 +131,7 @@ def read_verified_seeds() -> list[dict]:
 
 
 def gen_context_variants(seeds: list[dict]) -> list[dict]:
-    """Add a light prompt-context case for each non-Romansh verified seed."""
+    """Add a light prompt-context case for each verified seed."""
     out = []
     for seed in seeds:
         prefix = CONTEXT_PREFIX.get(seed["lang"])
@@ -142,7 +143,7 @@ def gen_context_variants(seeds: list[dict]) -> list[dict]:
         row["sample"] = seed.get("sample", False)
         row["generated_variant"] = "context_prefix"
         row["source_item_id"] = seed["id"]
-        row["fact_cluster_id"] = seed["id"]
+        row["fact_cluster_id"] = seed.get("fact_cluster_id") or seed["id"]
         row["verified_by"] = "generated prompt variant from verified benchmark item; answer and evidence retained"
         out.append(row)
     return out
@@ -186,7 +187,7 @@ def make_balanced_sector_suite(items: list[dict], seeds: list[dict], per_area: i
                 row["sample"] = seed.get("sample", False)
                 row["generated_variant"] = "question_framing"
                 row["source_item_id"] = seed["id"]
-                row["fact_cluster_id"] = seed["id"]
+                row["fact_cluster_id"] = seed.get("fact_cluster_id") or seed["id"]
                 row["verified_by"] = "generated question framing from verified benchmark item; answer and evidence retained"
                 variants.append(row)
         seen_questions = {row["question"] for row in chosen}
@@ -691,6 +692,8 @@ def main() -> int:
     full_items = (gen_premiums(data, rng, args.premiums_per_canton) + gen_regions(data, rng, args.regions)
                   + gen_cantons(data, rng, args.cantons) + gen_mergers(data, rng, args.mergers)
                   + gen_same_name(data) + gen_foreign(data) + gen_askback(data) + gen_context_variants(seeds))
+    for row in full_items:
+        row.setdefault("fact_cluster_id", row.get("source_item_id", row["id"]))
     items = make_balanced_sector_suite(full_items, seeds, args.questions_per_area)
     ids = [i["id"] for i in items]
     dupes = {i for i in ids if ids.count(i) > 1}

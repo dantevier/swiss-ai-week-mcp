@@ -117,14 +117,14 @@ Bonilla, Jesus Sebastian, Jiaqi Yu.
   | 3. Law and regulations | Selected federal rules represented by the reviewed sources; not a general-purpose legal search |
   | 6. Residence permits and migration | All of Switzerland at federal SEM-guidance level; cantonal authorities still decide individual cases |
   | 9. Schools and education | School holidays for all Swiss cantons through live OpenHolidays data; a municipality is required where dates vary below canton level |
-  | 11. Road traffic, vehicles and driving licences | Federal exchange rules plus documented fee and requirement facts for all 26 cantons |
+  | 11. **Partial** Driving licences | Federal exchange rules plus documented fee and requirement facts for all 26 cantons |
   | 12. Housing and renting | All of Switzerland for federal BWO reference-rate and renting guidance |
   | 13. Voting, elections and political rights | Federal political-rights rules only |
   | 14. Companies, commercial register and VAT | All of Switzerland for companies and commercial-register publications; VAT status is not covered |
   | 15. Customs and ordering from abroad | All of Switzerland for conservative parcel import-VAT estimates |
   | 16. Statistics, open data, geodata and weather | All of Switzerland, subject to the municipality, postal-code forecast point, weather station, and upstream dataset requested |
 
-  Topics 2, 4, 5, 7, 8, and 10 are not covered. Supported languages are
+  Topics 2, 4, 5, 7, 8, 10 and 11 (road traffic and vehicles) are not covered. Supported languages are
   English, German, French, and Italian; Romansh support is partial. Some tools
   return verbatim source-language passages rather than translations.
 
