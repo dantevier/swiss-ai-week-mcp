@@ -50,7 +50,7 @@ Bonilla, Jesus Sebastian, Jiaqi Yu.
   `.mcp.json`-compatible clients ([`.mcp.json`](.mcp.json)), Antigravity
   ([`.agents/mcp_config.json`](.agents/mcp_config.json)), Codex
   ([`.codex/config.toml`](.codex/config.toml)), OpenCode
-  ([`opencode.json`](opencode.json)), and Janito
+  ([`opencode.json`](opencode.json)), and [Janito](https://github.com/joaompinto/janito)
   ([`.janito/mcp_services.json`](.janito/mcp_services.json)). Each starts the
   same local stdio server from the repository root.
 
