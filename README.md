@@ -1,5 +1,9 @@
 # Swiss AI Week MCP
 
+## The hackathon
+
+Built for the [Swiss {ai} Weeks hackathon in Zurich](https://zh.ai-weeks.ch/), 24 and 25 September 2026, for the challenge [Swiss Grounding MCP](https://zh.ai-weeks.ch/challenges/swiss-grounding-mcp), set by Swisscom's myAI team.
+
 An MCP server that grounds questions about Switzerland in two complementary,
 independent mechanisms: a live lookup against the federal commercial register
 (Zefix) via LINDAS, with SHAB/cantonal gazette citations, and a local SQLite
@@ -163,15 +167,13 @@ Bonilla, Jesus Sebastian, Jiaqi Yu.
 
 ## Install
 
-Requires [uv](https://docs.astral.sh/uv/getting-started/installation/). From a clone of this repo, in PowerShell:
+Requires [uv](https://docs.astral.sh/uv/getting-started/installation/). From a clone of this repo:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1
+```bash
+uv sync
 ```
 
-It installs dependencies, asks for the two API keys (optional, saved to the git-ignored `.env`), and registers the server in whichever of Claude Code, Codex and opencode it finds. Restart the harness afterwards. Use `-Yes` to skip prompts (keys are then read from `$env:CRAWLORA_API_KEY` and `$env:OPENAI_API_KEY`), and `-Uninstall` to remove the server from every harness.
-
-**First time:** run `uv sync` once in the repo directory — it prepares the environment, and the server is then ready to be used as an MCP server over stdio. (`install.ps1` already does this.)
+**First time:** run `uv sync` once in the repo directory — it prepares the environment, and the server is then ready to be used as an MCP server over stdio.
 
 **API keys:** `OPENAI_API_KEY` is required — refreshing sources embeds new passages and fails without it. `CRAWLORA_API_KEY` is optional — HTML/JSON fetches fall back to a direct download when it is unset.
 
