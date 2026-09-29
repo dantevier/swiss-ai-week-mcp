@@ -57,6 +57,18 @@ PROVIDERS = {
 EXCLUDED_TOOLS = re.compile(r"^(crawl_.*|open_dashboard|source_status)$")
 MAX_TOOL_ROUNDS = 8
 MAX_TOOL_RESULT_CHARS = 12_000  # get_source can return whole laws
+TOPIC_TOOLS = {
+    1: {"swiss_health_insurance_premiums", "swiss_geo_search", "swiss_geo_context"},
+    3: {"swiss_housing_info"},
+    6: {"swiss_residence_permit_guidance"},
+    9: {"swiss_school_holidays"},
+    11: {"get_driving_licence_exchange_info", "search_knowledge"},
+    12: {"swiss_reference_interest_rate", "swiss_housing_info"},
+    13: {"swiss_federal_political_rights"},
+    14: {"company_info", "search_knowledge"},
+    15: {"swiss_import_parcel_vat", "search_knowledge"},
+    16: {"bfs_population", "opendata_search_datasets", "opendata_dataset", "swiss_geo_search", "swiss_geo_context"},
+}
 
 SYSTEM_PROMPT = """You answer questions from residents about Swiss public services and official data.
 Answer in the language of the question. Be brief and give concrete figures, dates and deadlines.
@@ -133,11 +145,12 @@ class AnthropicAgent:
 
 
 class OpenAICompatAgent:
-    def __init__(self, model: str, base_url: str, api_key: str):
+    def __init__(self, model: str, base_url: str, api_key: str, require_tool: bool = False):
         import openai
 
         self.client = openai.AsyncOpenAI(base_url=base_url, api_key=api_key)
         self.model = model
+        self.require_tool = require_tool
 
     async def answer(self, question: str, mcp: McpTools | None, log: list) -> str:
         tools = [
@@ -150,8 +163,10 @@ class OpenAICompatAgent:
             {"role": "system", "content": system},
             {"role": "user", "content": question},
         ]
-        for _ in range(MAX_TOOL_ROUNDS + 1):
+        for round_idx in range(MAX_TOOL_ROUNDS + 1):
             kwargs = {"tools": tools} if tools else {}
+            if round_idx == 0 and tools and self.require_tool:
+                kwargs["tool_choice"] = "required"
             response = await self.client.chat.completions.create(model=self.model, messages=messages, **kwargs)
             message = response.choices[0].message
             if not message.tool_calls:
@@ -217,7 +232,7 @@ def make_agent(args: argparse.Namespace):
     api_key = os.environ.get(key_env) if key_env else "not-needed"
     if not api_key:
         raise SystemExit(f"set {key_env} for provider {provider!r}")
-    return OpenAICompatAgent(model, base_url, api_key)
+    return OpenAICompatAgent(model, base_url, api_key, args.require_tool)
 
 
 # ---------- run ----------
@@ -243,9 +258,13 @@ async def run(args: argparse.Namespace, questions: list[dict[str, Any]], out: Pa
     async def one(row, mcp):
         nonlocal done
         log: list = []
+        scoped_mcp = mcp
+        if mcp and args.relevant_tools:
+            names = TOPIC_TOOLS[int(row["topic_area"])]
+            scoped_mcp = McpTools(mcp.client, [t for t in mcp.tools if t.name in names], mcp.instructions)
         async with semaphore:
             try:
-                answer = await agent.answer(row["question"], mcp, log)
+                answer = await agent.answer(row["question"], scoped_mcp, log)
             except Exception as e:  # keep the run going; the item scores as "no answer"
                 answer, log = "", log + [{"error": f"{type(e).__name__}: {e}"}]
         done += 1
@@ -283,6 +302,8 @@ def main() -> int:
     parser.add_argument("--model", help='"provider:model", e.g. claude-opus-5, gpt-5, ollama:qwen3 '
                         "(default: claude-opus-5 if ANTHROPIC_API_KEY is set, else gpt-5 if OPENAI_API_KEY is set)")
     parser.add_argument("--no-mcp", action="store_true", help="baseline: answer without tools")
+    parser.add_argument("--require-tool", action="store_true", help="require one tool call on the first OpenAI-compatible MCP request")
+    parser.add_argument("--relevant-tools", action="store_true", help="offer only the tools for each covered benchmark topic")
     parser.add_argument("--data", type=Path, nargs="+", default=DEFAULT_DATA, help="question files (default as score.py)")
     parser.add_argument("--topic-area", type=int, choices=range(1, 17), help="only this topic area (1-16)")
     parser.add_argument("--per-area", type=int, help="sample N questions per topic area")
@@ -299,6 +320,8 @@ def main() -> int:
     questions = pick_questions(args)
     if not questions:
         parser.error("no questions selected")
+    if args.relevant_tools and any(int(q["topic_area"]) not in TOPIC_TOOLS for q in questions):
+        parser.error("--relevant-tools requires questions only from covered topics")
     slug = re.sub(r"[^A-Za-z0-9.-]+", "_", args.model)
     out = HERE / "runs" / f"{dt.datetime.now():%Y%m%d-%H%M%S}-{slug}-{'no-mcp' if args.no_mcp else 'mcp'}"
     out.mkdir(parents=True)
@@ -309,7 +332,9 @@ def main() -> int:
 
     logging.getLogger("mcp_swiss_info").setLevel(logging.WARNING)
     print(f"{len(questions)} questions, model {args.model}, {'no MCP' if args.no_mcp else 'with MCP'} -> {out}", file=sys.stderr)
-    meta = {"model": args.model, "provider": provider, "mcp": not args.no_mcp, "questions": len(questions),
+    meta = {"model": args.model, "provider": provider, "mcp": not args.no_mcp, "require_tool": args.require_tool,
+            "relevant_tools": args.relevant_tools,
+            "questions": len(questions),
             "seed": args.seed, "per_area": args.per_area, "topic_area": args.topic_area,
             "started": dt.datetime.now().astimezone().isoformat(timespec="seconds")}
     meta["api_errors"] = asyncio.run(run(args, questions, out))

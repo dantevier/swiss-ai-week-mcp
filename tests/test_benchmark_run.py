@@ -3,6 +3,7 @@
 import json
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from starlette.testclient import TestClient
@@ -11,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "benchmark"))
 
 import interpret  # noqa: E402
 import run_mcp  # noqa: E402
+import score  # noqa: E402
 
 from mcp_swiss_info.dashboard import server as dashboard  # noqa: E402
 
@@ -43,6 +45,30 @@ def test_split_model_infers_the_provider():
     assert run_mcp.split_model("ollama:qwen3") == ("ollama", "qwen3")
     with pytest.raises(SystemExit):
         run_mcp.split_model("qwen3")
+
+
+@pytest.mark.asyncio
+async def test_required_tool_choice_only_when_mcp_is_available(monkeypatch):
+    calls = []
+
+    async def create(**kwargs):
+        calls.append(kwargs)
+        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(tool_calls=[], content="ok"))])
+
+    fake = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
+    monkeypatch.setattr("openai.AsyncOpenAI", lambda **kwargs: fake)
+    agent = run_mcp.OpenAICompatAgent("test", "https://example.org/v1", "key", require_tool=True)
+    mcp = SimpleNamespace(instructions="", tools=[SimpleNamespace(name="ping", description="", input_schema={"type": "object"})])
+    await agent.answer("Question?", mcp, [])
+    await agent.answer("Question?", None, [])
+    assert calls[0]["tool_choice"] == "required"
+    assert "tool_choice" not in calls[1]
+
+
+def test_malformed_answer_url_does_not_crash_scoring():
+    row = {"source_domains": ["admin.ch"]}
+    assert not score.links_to_source_domain(row, "https://[broken]")
+    assert score.links_to_source_domain(row, "https://[broken] https://www.admin.ch/page")
 
 
 def test_default_model_follows_the_available_key(monkeypatch):
