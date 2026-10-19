@@ -29,7 +29,11 @@ HERE = Path(__file__).resolve().parent
 TEMPLATES = HERE / "templates"
 # Written by benchmark/run_mcp.py; each run folder holds a summary.json made by benchmark/interpret.py.
 BENCHMARK_RUNS = Path(os.environ.get("BENCHMARK_RUNS_DIR", HERE.parents[2] / "benchmark" / "runs"))
-TABS = [("/", "Data sources", "main"), ("/benchmark", "Benchmark", "benchmark")]
+TABS = [
+    ("/", "Data sources", "main"),
+    ("/benchmark", "Benchmark", "benchmark"),
+    ("/architecture", "Architecture", "architecture"),
+]
 
 # One crawl at a time: they share the SQLite file and the paid API quotas.
 _crawl_lock = asyncio.Lock()
@@ -110,11 +114,54 @@ def latest_benchmark(runs: Path | None = None) -> dict | None:
     summary = json.loads((folders[-1] / "summary.json").read_text(encoding="utf-8"))
     summary["folder"] = str(folders[-1])
     summary["run_count"] = len(folders)
+    summary["compare"] = _counterpart(summary, folders[:-1])
     return summary
+
+
+def _counterpart(summary: dict, older: list[Path]) -> dict | None:
+    """The newest earlier run on the same questions with the other MCP setting, for a with/without comparison."""
+    mcp = summary.get("meta", {}).get("mcp")
+    ids = {q["id"] for q in summary.get("questions", [])}
+    for folder in reversed(older):
+        other = json.loads((folder / "summary.json").read_text(encoding="utf-8"))
+        if other.get("meta", {}).get("mcp") != mcp and {q["id"] for q in other.get("questions", [])} == ids:
+            return {
+                "run": other.get("run"), "meta": other.get("meta"), "total": other.get("total"),
+                "passed": other.get("passed"), "by_topic": other.get("by_topic"),
+                "by_behavior": other.get("by_behavior"),
+                "questions": {q["id"]: q["passed"] for q in other.get("questions", [])},
+            }
+    return None
 
 
 async def benchmark(request: Request) -> JSONResponse:
     return JSONResponse({"run": latest_benchmark()})
+
+
+def _signature(schema: dict) -> str:
+    """Render a tool's JSON schema as a short Python-like argument list."""
+    required = set(schema.get("required", []))
+    parts = []
+    for name, prop in schema.get("properties", {}).items():
+        kinds = [p.get("type") for p in prop.get("anyOf", [prop]) if p.get("type") not in (None, "null")]
+        part = f"{name}: {' | '.join(kinds) or 'any'}"
+        if name not in required:
+            part += f" = {json.dumps(prop.get('default'))}"
+        parts.append(part)
+    return ", ".join(parts)
+
+
+async def tools(request: Request) -> JSONResponse:
+    """The tools this MCP server registers, for the architecture page."""
+    from .. import tools as _register  # noqa: F401  (importing registers the tools)
+    from ..server import mcp
+
+    listed = await mcp.list_tools()
+    return JSONResponse({"tools": [
+        {"name": t.name, "description": (t.description or "").strip().split("\n\n")[0],
+         "args": _signature(t.parameters or {})}
+        for t in sorted(listed, key=lambda t: t.name)
+    ]})
 
 
 def _template(name: str) -> str:
@@ -143,6 +190,10 @@ async def benchmark_page(request: Request) -> HTMLResponse:
     return _page("Benchmark", "/settings", "Settings", "gear.svg", "benchmark.html", "benchmark")
 
 
+async def architecture_page(request: Request) -> HTMLResponse:
+    return _page("Architecture", "/settings", "Settings", "gear.svg", "architecture.html", "architecture")
+
+
 async def settings_page(request: Request) -> HTMLResponse:
     return _page("Settings", "/", "Back to data sources", "home.svg", "settings.html", "settings")
 
@@ -151,9 +202,11 @@ app = Starlette(
     routes=[
         Route("/", index),
         Route("/benchmark", benchmark_page),
+        Route("/architecture", architecture_page),
         Route("/settings", settings_page),
         Route("/api/status", status),
         Route("/api/benchmark", benchmark),
+        Route("/api/tools", tools),
         Route("/api/settings", save_settings, methods=["POST"]),
         Route("/api/refresh/{level}/{source}", refresh, methods=["POST"]),
         Mount("/static", StaticFiles(directory=HERE / "static"), name="static"),

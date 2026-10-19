@@ -1,0 +1,54 @@
+<div id="arch">
+<div class="ahero">
+<h2><span>How one question travels</span> <span class="r">through Smurf</span></h2>
+<p class="sub">Hollow rings are requests leaving the LLM; filled dots are official evidence coming back. Pick a scenario, then play it or step through it. Hover or tab to a tool to read its description.</p>
+</div>
+
+<div class="abar">
+<div class="seg" role="group" aria-label="Scenario">
+<button data-sc="move" aria-pressed="true">Moving to Zürich (5 tools)</button>
+<button data-sc="vat" aria-pressed="false">Parcel import VAT (1 tool)</button>
+</div>
+<span class="spacer"></span>
+<button id="prev" aria-label="Previous step">&#9664; Back</button>
+<button class="primary" id="play">Pause</button>
+<button id="next" aria-label="Next step">Next &#9654;</button>
+<button id="restart">Restart</button>
+<div class="seg" role="group" aria-label="Speed">
+<button data-sp="0.5" aria-pressed="false">0.5×</button>
+<button data-sp="1" aria-pressed="true">1×</button>
+<button data-sp="2" aria-pressed="false">2×</button>
+</div>
+</div>
+
+<div class="progress" aria-hidden="true"><b id="rail"></b></div>
+<div class="card stagebox" id="stagebox">
+<svg id="stage" viewBox="0 0 1470 560" role="img" aria-label="Animated flow between the user, the LLM, the MCP server, its tools and data sources">
+<g id="bg"></g><g id="edges"></g><g id="nodes"></g><g id="peeks"></g><g id="fx"></g><g id="packets"></g>
+</svg>
+<div class="atip" id="atip" role="tooltip"></div>
+</div>
+
+<div class="steps" id="steps" aria-label="Steps"></div>
+
+<div class="card settings wf">
+<h2>Timeline of calls</h2>
+<div class="wfbox"><div class="wfgrid" id="wf"></div></div>
+<p class="sub">Light part: the request travelling out. Solid part: the data coming back. Bars in the same column run in parallel; each new column had to wait for the one before.</p>
+</div>
+
+<div class="lower">
+<div class="card settings"><h2>Conversation</h2><div class="chat" id="chat" aria-live="polite"></div></div>
+<div class="card settings now" id="now" aria-live="polite"></div>
+</div>
+
+<div class="alegend" id="alegend"></div>
+
+<div class="card settings sectors">
+<h2>Benchmark sectors</h2>
+<p class="sub" id="sectorsub">Blue has a registered Smurf tool. Red has no dedicated tool yet.</p>
+<div class="sg" id="sg"></div>
+</div>
+
+<p class="sub afoot">Adapted from the <a href="https://trista1208.github.io/smurf-mcp-flow/" target="_blank" rel="noopener">Smurf MCP flow</a> showcase. Tool names, descriptions and the tool count come from this server; sector scores come from the latest benchmark run. The scenario values are a scripted example from the bundled 2026 data, and token counts are estimates.</p>
+</div>
